@@ -30,7 +30,9 @@ groundTruth:
         histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="catalog",
         http_route="/products"}[1m])))
       expect: above 0.3 seconds while the fault is active
+      assert: { when: fault, op: ">", value: 0.3 }
     - id: catalog-db-span-duration
       kind: trace
       query: '{ resource.service.name = "catalog" && span.db.system = "postgresql" && duration > 300ms }'
       expect: database spans of the catalog that each take longer than 300 milliseconds
+      assert: { when: fault, op: ">=", value: 1 }

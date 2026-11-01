@@ -32,3 +32,4 @@ groundTruth:
       kind: metric
       query: sum(rate(http_server_request_duration_seconds_count{service_name="inventory"}[1m])) or vector(0)
       expect: zero after the fault starts; a dead process stops reporting, so its series disappear
+      assert: { when: fault, op: "==", value: 0 }

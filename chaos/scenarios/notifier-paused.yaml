@@ -28,7 +28,9 @@ groundTruth:
       kind: metric
       query: sum(rate(mercadillo_checkouts_total{outcome="placed"}[1m]))
       expect: stays above zero, so orders keep arriving
+      assert: { when: fault, op: ">", value: 0 }
     - id: consumer-lag-grows
       kind: metric
       query: sum(kafka_consumergroup_lag{consumergroup="notifier", topic="orders.placed"})
       expect: grows steadily after the fault starts, measured by the broker
+      assert: { when: fault, op: ">", value: 20 }

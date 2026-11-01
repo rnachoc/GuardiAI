@@ -30,7 +30,9 @@ groundTruth:
         histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="cart",
         http_route!~"/actuator.*"}[1m])))
       expect: above 0.25 seconds while the fault is active
+      assert: { when: fault, op: ">", value: 0.25 }
     - id: cart-redis-spans
       kind: trace
       query: '{ resource.service.name = "cart" && span.db.system = "redis" && duration > 250ms }'
       expect: Redis spans of the cart service that each take longer than 250 milliseconds
+      assert: { when: fault, op: ">=", value: 1 }

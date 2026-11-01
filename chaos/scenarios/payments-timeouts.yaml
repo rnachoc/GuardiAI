@@ -30,7 +30,9 @@ groundTruth:
         sum(rate(http_server_request_duration_seconds_count{service_name="checkout", http_route="/checkouts",
         http_response_status_code="502"}[1m]))
       expect: above zero while the fault is active
+      assert: { when: fault, op: ">", value: 0 }
     - id: checkout-payment-timeout-logs
       kind: log
       query: '{service_name="checkout"} |= "failed calling a dependency" |= "payments-proxy"'
       expect: lines that name the call to payments that timed out
+      assert: { when: fault, op: ">=", value: 1 }

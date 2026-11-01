@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos chaos chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -71,16 +71,26 @@ test-mercadillo: ## Compile and test the Mercadillo services.
 	$(DOCKER_RUN) --env MAVEN_CONFIG=/var/maven/.m2 --volume "$(CURDIR)/.cache/m2":/var/maven/.m2 $(MAVEN_DOCKER_FLAGS) \
 		--workdir /repo/mercadillo $(MAVEN_IMAGE) mvn --batch-mode --no-transfer-progress --strict-checksums -Duser.home=/var/maven verify
 
-test-chaos: ## Type-check guardia-chaos, test it, and validate every scenario.
+test-chaos: ## Type-check guardia-chaos, test it, validate every scenario and verify every recording.
 	mkdir -p .cache/npm
 	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
-		--workdir /repo/chaos $(NODE_IMAGE) sh -c 'npm ci --no-audit --no-fund && npm run typecheck && npm test && npm run validate'
+		--workdir /repo/chaos $(NODE_IMAGE) sh -c 'npm ci --no-audit --no-fund && npm run typecheck && npm test && npm run validate && node src/cli.ts verify-fixtures'
 
 chaos: ## Run one scenario against the running stack: make chaos SCENARIO=payments-latency
 	@test -n "$(SCENARIO)" || (echo "name a scenario: make chaos SCENARIO=<id>" >&2; exit 1)
 	test -d chaos/node_modules || $(MAKE) test-chaos
 	docker run --rm --init --network guardia_default --volume "$(CURDIR)/chaos":/chaos \
 		--volume /var/run/docker.sock:/var/run/docker.sock --workdir /chaos $(NODE_IMAGE) node src/cli.ts run $(SCENARIO)
+
+record: ## Run one scenario and record it as a fixture bundle: make record SCENARIO=payments-latency
+	@test -n "$(SCENARIO)" || (echo "name a scenario: make record SCENARIO=<id>" >&2; exit 1)
+	test -d chaos/node_modules || $(MAKE) test-chaos
+	docker run --rm --init --network guardia_default --volume "$(CURDIR)/chaos":/chaos \
+		--volume /var/run/docker.sock:/var/run/docker.sock --workdir /chaos --env HOST_IDS=$$(id -u):$$(id -g) $(NODE_IMAGE) \
+		sh -c 'node src/cli.ts record $(SCENARIO); status=$$?; chown -R "$$HOST_IDS" fixtures runs 2>/dev/null; exit $$status'
+
+record-all: ## Record every scenario, one after another. Takes about an hour.
+	for scenario in $$(ls chaos/scenarios | sed 's/\.yaml$$//'); do $(MAKE) --no-print-directory record SCENARIO=$$scenario || exit 1; done
 
 chaos-reset: ## Remove every network fault guardia-chaos may have left behind.
 	docker run --rm --network guardia_default --volume "$(CURDIR)/chaos":/chaos --workdir /chaos $(NODE_IMAGE) node src/cli.ts reset

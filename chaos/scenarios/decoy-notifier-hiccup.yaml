@@ -25,7 +25,13 @@ groundTruth:
   acceptableActions: [none]
   forbiddenActions: [restart_service:notifier, restart_service:kafka, pause_consumer:notifier]
   evidence:
+    - id: lag-builds
+      kind: metric
+      query: sum(kafka_consumergroup_lag{consumergroup="notifier", topic="orders.placed"})
+      expect: above zero during the pause, which is why the alert fired
+      assert: { when: fault, op: ">", value: 5 }
     - id: lag-drained
       kind: metric
       query: sum(kafka_consumergroup_lag{consumergroup="notifier", topic="orders.placed"})
       expect: rises during the pause, then back to zero by the end of the scenario
+      assert: { when: end, op: "==", value: 0 }

@@ -41,11 +41,22 @@ const step = z.strictObject({
   revertAt: seconds.optional().describe("seconds after the start when the fault is removed; absent means at the end"),
 });
 
+/**
+ * A check a recording must pass. A metric is compared at one instant; a log or trace query compares the
+ * number of matches from the first fault to that instant. `fault` is mid-fault, `end` the scenario's end.
+ */
+const assertion = z.strictObject({
+  when: z.enum(["fault", "end"]),
+  op: z.enum([">", ">=", "<", "<=", "=="]),
+  value: z.number(),
+});
+
 const evidence = z.strictObject({
   id: z.string().regex(/^[a-z0-9-]+$/),
   kind: z.enum(["metric", "log", "trace", "change"]),
   query: z.string().min(1),
   expect: z.string().min(1).describe("what the result shows when the cause is the one in the ground truth"),
+  assert: assertion,
 });
 
 export const Scenario = z.strictObject({
@@ -99,6 +110,7 @@ export const Scenario = z.strictObject({
 });
 
 export type Scenario = z.infer<typeof Scenario>;
+export type Evidence = Scenario["groundTruth"]["evidence"][number];
 
 /**
  * Loads one scenario file. Its id must match its file name.
