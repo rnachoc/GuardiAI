@@ -98,6 +98,14 @@ What those runs found, and what changed:
 - **Checkout errors.** When a dependency did not answer, checkout answered 500 with a stack trace. It now answers a clean 502, counts the checkout as `dependency_failed`, and logs which call failed.
 - **Trace attribute.** Two trace queries used `db.system.name`, but the agent emits the older `db.system`, so they matched nothing. They now use `db.system`, and match.
 
-Not done:
+- Steps 3 to 5. The snapshot recorder ([ADR 10](docs/adr/0010-fixture-bundles-with-a-sealed-ground-truth.md)):
+  - `make record-all` recorded all 10 scenarios into `chaos/fixtures`, 1.2 MB in all;
+  - each piece of evidence now carries a machine-checkable assertion, and every recording's ground truth held when measured;
+  - each bundle holds the raw series of 15 metrics, logs, up to 40 trimmed traces, change events and the alert. The fault timeline and the measurements are sealed under `truth/`;
+  - on every build, `make test` verifies every bundle: its SHA-256 hashes, byte-for-byte replay, the ground truth, that nothing from `truth/` leaks into what tools will serve, and that no secret is hidden inside the compressed files;
+  - 23 tests cover the recorder, the plan and the schema.
 
-- Step 3, the snapshot recorder. Steps 4 and 5 depend on it.
+Notes:
+
+- No scenario yet changes a deploy, a config or a flag, so every bundle's change events are empty. The scenarios for bad config, bad deploys and flags come with the other 30.
+- Most services log nothing per request, so their recorded log lines are the warnings and errors. Checkout and the notifier log each order.

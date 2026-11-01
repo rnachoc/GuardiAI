@@ -11,9 +11,9 @@ What exists:
 - `guardia-chaos validate`, and tests that each rule rejects what it should.
 - The injector ([ADR 8](../docs/adr/0008-faults-through-toxiproxy-and-the-docker-api.md)): `make chaos SCENARIO=<id>` applies and reverts latency, timeout, kill, pause and planted-log faults, and writes a run record to `runs/`. `make chaos-reset` removes any network fault left behind.
 
-What does not exist yet:
+- The snapshot recorder ([ADR 10](../docs/adr/0010-fixture-bundles-with-a-sealed-ground-truth.md)). `make record SCENARIO=<id>` runs a scenario and stores what an engineer could see in `fixtures/<id>/`, in canonical, hashed files: metrics, logs, traces, changes and the alert. What only the grader may see goes under `truth/`. `make record-all` records every scenario. On every build, `make test` verifies each bundle: its hashes, its byte-for-byte replay, its ground truth and that nothing leaks.
 
-- The snapshot recorder and its replayable fixture bundles.
+What does not exist yet:
 - The other 30 scenarios and 4 families.
 
 All 10 scenarios were run on the live stack, and their evidence held, after the fixes listed in [PROGRESS.md](../PROGRESS.md), which also shows what was measured.
