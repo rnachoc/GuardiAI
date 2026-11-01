@@ -182,7 +182,14 @@ Done and tested:
 
 - The Spring Boot policy service. `POST /proposals` judges a proposal and writes it and its decision to the audit log; `GET /audit/verify` checks the chain. Preconditions come from a facts file kept by code, never from the request; without it, every proposal is rejected. 3 HTTP tests, 17 in the service.
 
-Not done: the facts collector, a Compose service for the policy engine, the executor (idempotency, dry run, verification, auto-revert, escalation), the remediation planner and the end-to-end test. The plan is in [docs/HANDOFF.md](docs/HANDOFF.md#52-phase-6-remediation-and-verification).
+- The executor core, test-first. It runs only what was approved, by the engine or by enough people; once per proposal, with the idempotency key claimed in the audit log so the claim survives a restart; dry run first; then it polls verification. When recovery is not confirmed, it reverts if the catalog allows and escalates. 6 tests, 23 in the service.
+
+Not done:
+- the real runner (Docker API, flag file, Redis, Kafka) and verifier (Prometheus);
+- the facts collector and the Compose service;
+- approvals over HTTP;
+- the remediation planner;
+- the end-to-end test. The plan is in [docs/HANDOFF.md](docs/HANDOFF.md#52-phase-6-remediation-and-verification).
 
 ## Next
 

@@ -106,7 +106,7 @@ Acceptance (brief): planner, executor, verification, automatic revert.
    - `GET /audit/verify`.
    - Preconditions are gathered by code: deploy freeze from a file, replicas from Docker, error budget from Prometheus. Never from the proposal's text.
    - Add a Compose service and a healthcheck.
-3. **Executor**, test-first:
+3. **Partly done:** `policy/.../Executor.java` and its 6 tests cover idempotency, dry run, verification polling, revert and escalation behind `Runner` and `Verifier` interfaces. Still to do: the real `Runner` and a Prometheus `Verifier`, and wiring them to `/proposals/{id}/approvals`. **Executor**, test-first:
    - an idempotency key per proposal, claimed in the audit log before running;
    - a dry run first, then the real run through the Docker API for `restart_service` and `scale_deployment` (Compose `--scale`), the flag file for `toggle_flag`, Redis for `clear_cache`, Kafka consumer pause and resume for the notifier, an env change plus restart for `increase_pool_size`, and a simulated standby for `failover`;
    - after running, poll the action's verification query until it holds or times out;
