@@ -19,3 +19,4 @@ Each record explains one significant decision: its context, the decision and its
 | 13 | [The investigator and its evidence ledger](0013-the-investigator-and-its-evidence-ledger.md) | Accepted |
 | 14 | [Claude through the official SDK, recorded for replay](0014-claude-through-the-official-sdk-recorded-for-replay.md) | Accepted |
 | 15 | [A policy engine that gathers every reason](0015-a-policy-engine-that-gathers-every-reason.md) | Accepted |
+| 16 | [No paid model runs](0016-no-paid-model-runs.md) | Accepted |
