@@ -100,7 +100,7 @@ The brief asks for 40 scenarios across 8 families, with 6 decoys and 6 injection
 Acceptance (brief): planner, executor, verification, automatic revert.
 
 1. **Done:** **`mcp-actions`** (`mcp/src/actions/server.ts`) has a single tool, `propose_action({action, target, reason, evidence[]})`. It validates the shape and writes the proposal to a queue, a JSON Lines file or an HTTP POST to the policy service, and returns a proposal ID. It executes nothing. Its tests prove it never touches Docker or any backend.
-2. **Policy service:** wrap `PolicyEngine` and `AuditLog` in Spring Boot (`policy/`, with `spring-boot-starter-web`):
+2. **Partly done:** the service exists, with `POST /proposals` and `GET /audit/verify`, facts read from `guardia.facts.file`. Still to do: approvals, a facts collector, and a Compose service. **Policy service:** wrap `PolicyEngine` and `AuditLog` in Spring Boot (`policy/`, with `spring-boot-starter-web`):
    - `POST /proposals` to judge a proposal;
    - `POST /proposals/{id}/approvals` for people;
    - `GET /audit/verify`.

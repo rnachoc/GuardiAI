@@ -12,6 +12,8 @@ What exists, test-first:
 
 - `AuditLog`: an append-only JSON Lines file. Each entry is chained to the one before it by a SHA-256 hash, and `verify()` reports any edit, deletion, reordering or forged entry.
 
-What does not exist yet: the Spring Boot service, `mcp-actions`, idempotent execution, verification and automatic revert (Phase 6).
+- The Spring Boot service: `POST /proposals` judges and audits; `GET /audit/verify` checks the chain. Facts come from `guardia.facts.file`, kept by code; a missing file makes every precondition unknown, so everything is rejected.
+
+What does not exist yet: the facts collector, its Compose service, idempotent execution, verification and automatic revert (Phase 6, [plan](../docs/HANDOFF.md#52-phase-6-remediation-and-verification)).
 
 `make test-policy` runs the tests in a container.

@@ -180,7 +180,9 @@ Done and tested:
 
 - `mcp-actions`: `propose_action` writes a proposal with its evidence and expected effect, returns its ID, and leaves judging to the policy engine. It refuses malformed proposals and caps them at 10 a minute. A test checks that its code has no way to execute anything.
 
-Not done: the Spring Boot policy service, the executor (idempotency, dry run, verification, auto-revert, escalation), the remediation planner and the end-to-end test. The plan is in [docs/HANDOFF.md](docs/HANDOFF.md#52-phase-6-remediation-and-verification).
+- The Spring Boot policy service. `POST /proposals` judges a proposal and writes it and its decision to the audit log; `GET /audit/verify` checks the chain. Preconditions come from a facts file kept by code, never from the request; without it, every proposal is rejected. 3 HTTP tests, 17 in the service.
+
+Not done: the facts collector, a Compose service for the policy engine, the executor (idempotency, dry run, verification, auto-revert, escalation), the remediation planner and the end-to-end test. The plan is in [docs/HANDOFF.md](docs/HANDOFF.md#52-phase-6-remediation-and-verification).
 
 ## Next
 
