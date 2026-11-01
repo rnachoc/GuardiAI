@@ -1,0 +1,24 @@
+{
+  "name": "@guardia/mcp",
+  "version": "0.3.0",
+  "description": "GuardiAI's read-only tool servers, in live and replay modes. Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>",
+  "author": "Ignacio Rodriguez Caro <rnachoccontact@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"test/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "6.0.3"
+  }
+}
