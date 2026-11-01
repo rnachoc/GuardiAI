@@ -9,7 +9,7 @@ An AI on-call engineer for a microservice system. When an alert fires, a small c
 
 GuardiAI is judged on three things: it finds the right cause, it never does anything unsafe, and it proves both with measured numbers. No number has been measured yet, so none is published.
 
-> **Status: Phase 2 done.** The marketplace GuardiAI will watch runs with steady synthetic shoppers and full telemetry, and 10 incident scenarios are recorded as replayable bundles with a sealed ground truth. GuardiAI itself (tools, agents, policy engine, evaluations) does not exist yet. The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
+> **Status: Phase 3 done.** The marketplace GuardiAI watches runs with full telemetry; 10 incident scenarios are recorded as replayable bundles with a sealed ground truth; and five read-only tool servers answer from the live stack or a recording. The agents, the policy engine and the evaluations do not exist yet. The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
 
 > **Synthetic only.** Mercadillo, the system GuardiAI watches, is a fictional marketplace. There are no real credentials anywhere in this repository.
 
@@ -37,7 +37,7 @@ make up && make test
 | 0 | Foundations | Done | Checks and CI, ADRs 1 to 3, and a stack with PostgreSQL, Redis and Kafka that `make smoke` proves works. |
 | 1 | Mercadillo and observability | Done | Seven services, steady load, and traces, metrics and logs in Grafana. `make verify` proves it on every CI run. |
 | 2 | Chaos and snapshots | Done | 10 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 30 scenarios to go. |
-| 3 | Read-only tool servers | In progress | All five servers, live and replay, with abuse tests. CI has not checked the last two yet. |
+| 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
 | 4 | Investigator | Not started | Nothing. |
 | 5 | Policy engine | Not started | Nothing. |
 | 6 | Remediation and verification | Not started | Nothing. |

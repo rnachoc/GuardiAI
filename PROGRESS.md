@@ -9,7 +9,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 0 | Foundations | Done | v0.0.0 at `5e0cf37`, not tagged yet |
 | 1 | Mercadillo and observability | Done | v0.1.0 at the commit that marks it done, not tagged yet |
 | 2 | Chaos and snapshots | Done | v0.2.0 at the commit that marks it done, not tagged yet |
-| 3 | Read-only tool servers | In progress | — |
+| 3 | Read-only tool servers | Done | v0.3.0 at the commit that marks it done, not tagged yet |
 | 4 | Investigator | Not started | — |
 | 5 | Policy engine | Not started | — |
 | 6 | Remediation and verification | Not started | — |
@@ -133,6 +133,8 @@ Done and tested ([ADR 11](docs/adr/0011-read-only-tool-servers-with-one-grammar-
 - `mcp-runbooks` searches six runbooks, one per incident family plus one for alerts that recover on their own. Ranking is BM25 plus character-trigram TF-IDF vectors, which are lexical, not neural embeddings ([ADR 12](docs/adr/0012-lexical-hybrid-search-for-runbooks.md)). The right runbook ranks first for each family, typos included.
 - 22 tests. The metrics, logs and traces servers were also driven in live mode against the running stack.
 
+Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41319483048) ran the tool servers' tests in a container, green.
+
 Known limits:
 
 - Nothing writes the live change log yet. The scenarios that change deploys, configs and flags come with the other 30, so live `mcp-changes` answers with an empty history until then.
@@ -140,4 +142,4 @@ Known limits:
 
 ## Next
 
-Phase 3: the five read-only tool servers (`mcp-metrics`, `mcp-logs`, `mcp-traces`, `mcp-changes`, `mcp-runbooks`), in live and replay modes, with unit and abuse tests. Replay serves the recorded bundles.
+Phase 4: the investigator, end to end on one scenario, with a fake model provider that replays recorded responses. Done when the diagnosis cites valid evidence.
