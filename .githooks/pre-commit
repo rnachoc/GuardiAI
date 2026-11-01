@@ -1,6 +1,8 @@
 #!/bin/sh
 # Stops a commit that would add a secret. Installed with `make hooks`.
 # The scan runs through make, so it uses the same pinned gitleaks as CI.
+#
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
 set -eu
 top=$(git rev-parse --show-toplevel)
 if ! make --no-print-directory --directory "$top" secrets-staged; then

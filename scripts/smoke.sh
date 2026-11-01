@@ -2,8 +2,12 @@
 # Proves that each backing service of the running stack does its job: the database answers a
 # query, the cache stores and returns a value, and the broker carries a message from a producer
 # to a consumer. A healthcheck alone only shows that a process is up.
+#
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
 set -eu
 
+# Runs docker compose for this project.
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
 compose() { docker compose "$@"; }
 
 echo "postgres: run a query"

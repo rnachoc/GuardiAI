@@ -1,5 +1,7 @@
 # Guardia. Docker and make are the only tools a machine needs (ADR 3): every check below runs
 # in a container whose image is pinned by digest. `make` alone lists the targets.
+#
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
 
 SHELL := /bin/sh
 .DEFAULT_GOAL := help
@@ -50,11 +52,12 @@ smoke: ## Prove each running service does its job, not only that it reports heal
 test: ## Run every test suite. Needs no API key and no running stack.
 	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 -m unittest discover --start-directory tests --verbose
 
-lint: ## Check workflows, YAML, editor rules, shell scripts and the Compose file.
+lint: ## Check workflows, YAML, editor rules, shell scripts, authorship and the Compose file.
 	$(DOCKER_RUN) $(ACTIONLINT_IMAGE) -color
 	$(DOCKER_RUN) $(YAMLLINT_IMAGE) yamllint --strict .
 	$(DOCKER_RUN) $(EDITORCONFIG_IMAGE) editorconfig-checker
 	$(DOCKER_RUN) $(SHELLCHECK_IMAGE) $(SHELL_SCRIPTS)
+	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 scripts/check_authorship.py
 	$(COMPOSE) --env-file .env.example config --quiet
 
 secrets: ## Scan the whole git history for secrets.

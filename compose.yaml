@@ -1,6 +1,8 @@
 # The local stack. Phase 0 starts Mercadillo's backing services; later phases add the services,
 # the observability pipeline and Guardia itself. Images are pinned by digest (ADR 3).
 # No port is published to the host yet: nothing outside the Compose network needs these services.
+#
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
 name: guardia
 
 services:
