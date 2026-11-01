@@ -9,8 +9,8 @@ GuardiAI's read-only MCP servers, in TypeScript on the official SDK ([ADR 11](..
 | `mcp-metrics` | `query_metrics`, `query_metrics_range`, `list_metrics` | Built, live and replay |
 | `mcp-logs` | `query_logs` | Built, live and replay |
 | `mcp-traces` | `search_traces`, `get_trace`, `critical_path` | Built, live and replay |
-| `mcp-changes` | deploy history, git log and diff, flags, config versions | Not built |
-| `mcp-runbooks` | hybrid search over runbooks and past incidents | Not built |
+| `mcp-changes` | `list_changes`, `get_change` | Built: live reads an append-only change log, replay the bundle's events |
+| `mcp-runbooks` | `search_runbooks`, `get_runbook` | Built: lexical hybrid search over `docs/runbooks` ([ADR 12](../docs/adr/0012-lexical-hybrid-search-for-runbooks.md)) |
 | `mcp-actions` | `propose_action`, which only creates a proposal | Comes with the policy engine |
 
 Every tool is read-only. Each server accepts only an allow-listed query subset with caps on time range and result size, and returns text from the system redacted and wrapped as untrusted data.

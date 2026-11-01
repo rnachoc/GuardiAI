@@ -129,11 +129,14 @@ Done and tested ([ADR 11](docs/adr/0011-read-only-tool-servers-with-one-grammar-
 - `mcp-metrics` runs an allow-listed PromQL subset with caps.
   - For every metric of every scenario, replay reached the same verdict as the real Prometheus. Most values were within 1%; the widest gaps were 1.0 against 1.28 for a rate, and 108 against 127 for a fast-growing gauge.
 - `mcp-logs` runs a LogQL subset with redaction and a line cap. `mcp-traces` offers structured search, a trace by ID and the critical path; on `payments-latency`, the critical path runs through the call to `payments-proxy`.
-- 16 tests, and each server was also driven in live mode against the running stack.
+- `mcp-changes` lists deploys, config versions, flag changes and commits, and returns each with its diff. Commit messages and diffs are untrusted: a hostile commit message comes back wrapped and flagged, and malformed change-log lines are skipped.
+- `mcp-runbooks` searches six runbooks, one per incident family plus one for alerts that recover on their own. Ranking is BM25 plus character-trigram TF-IDF vectors, which are lexical, not neural embeddings ([ADR 12](docs/adr/0012-lexical-hybrid-search-for-runbooks.md)). The right runbook ranks first for each family, typos included.
+- 22 tests. The metrics, logs and traces servers were also driven in live mode against the running stack.
 
-Not done:
+Known limits:
 
-- Step 3: `mcp-changes` and `mcp-runbooks`.
+- Nothing writes the live change log yet. The scenarios that change deploys, configs and flags come with the other 30, so live `mcp-changes` answers with an empty history until then.
+- `docs/incidents` is empty until postmortems exist (Phase 8).
 
 ## Next
 

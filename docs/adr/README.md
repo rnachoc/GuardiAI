@@ -15,3 +15,4 @@ Each record explains one significant decision: its context, the decision and its
 | 9 | [The project is called GuardiAI](0009-the-project-is-called-guardiai.md) | Accepted |
 | 10 | [Fixture bundles with a sealed ground truth](0010-fixture-bundles-with-a-sealed-ground-truth.md) | Accepted |
 | 11 | [Read-only tool servers with one grammar for both modes](0011-read-only-tool-servers-with-one-grammar-for-both-modes.md) | Accepted |
+| 12 | [Lexical hybrid search for runbooks](0012-lexical-hybrid-search-for-runbooks.md) | Accepted |
