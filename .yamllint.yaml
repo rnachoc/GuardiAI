@@ -9,6 +9,10 @@ rules:
     # An image pinned by digest is one long word that cannot be broken.
     allow-non-breakable-inline-mappings: true
   document-start: disable
+  # Scenarios write faults as one-line maps, { type: kill, service: inventory }, with a space inside.
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
   comments:
     min-spaces-from-content: 1
 
