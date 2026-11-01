@@ -1,0 +1,10 @@
+#!/bin/sh
+# Stops a commit that would add a secret. Installed with `make hooks`.
+# The scan runs through make, so it uses the same pinned gitleaks as CI.
+set -eu
+top=$(git rev-parse --show-toplevel)
+if ! make --no-print-directory --directory "$top" secrets-staged; then
+  echo "pre-commit: the secret scan found something, or could not run (is Docker running?)." >&2
+  echo "pre-commit: nothing was committed." >&2
+  exit 1
+fi
