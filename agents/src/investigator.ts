@@ -32,6 +32,8 @@ export interface ToolCall {
 
 export interface LedgerEntry extends ToolCall {
   id: string;
+  /** The step the call was made in; re-running it as evidence happens at that same moment. */
+  step: number;
   isError: boolean;
   result: string;
   sha256: string;
@@ -70,10 +72,12 @@ export function digest(text: string): string {
 
 /**
  * Checks a diagnosis against the ledger and returns the problems found, or an empty list. Each cited call
- * is run again, and its answer must be identical to the one the model saw.
+ * is run again at the step it was made in (`atStep` moves a replayed clock there), and its answer must be
+ * identical to the one the model saw.
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
-export async function validate(raw: unknown, ledger: LedgerEntry[], tools: Map<string, Tool>): Promise<{ diagnosis?: Diagnosis; problems: string[] }> {
+export async function validate(raw: unknown, ledger: LedgerEntry[], tools: Map<string, Tool>,
+                               atStep: (step: number) => void = () => {}): Promise<{ diagnosis?: Diagnosis; problems: string[] }> {
   const parsed = Diagnosis.safeParse(raw);
   if (!parsed.success) {
     return { problems: parsed.error.issues.map((issue) => `diagnosis.${issue.path.join(".")}: ${issue.message}`) };
@@ -105,6 +109,7 @@ export async function validate(raw: unknown, ledger: LedgerEntry[], tools: Map<s
         continue;
       }
       const tool = tools.get(entry.tool);
+      atStep(entry.step);
       const again = tool ? await tool(entry.args) : undefined;
       if (!again || again.isError || digest(again.text) !== entry.sha256) {
         problems.push(`hypothesis ${hypothesis.rank} cites ${id}, whose call no longer gives the same answer`);
@@ -133,12 +138,15 @@ export interface Investigation {
 /**
  * Runs one investigation: asks the provider for turns, executes the tool calls it requests through the
  * read-only tools, and validates the final diagnosis. Stops at the step limit or the token budget.
+ * `onStep` is told each step's number before it runs, which lets a replayed clock advance per step.
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
-export async function investigate(provider: Provider, alert: unknown, tools: Map<string, Tool>, limits: Limits): Promise<Investigation> {
+export async function investigate(provider: Provider, alert: unknown, tools: Map<string, Tool>, limits: Limits,
+                                  onStep: (step: number) => void = () => {}): Promise<Investigation> {
   const ledger: LedgerEntry[] = [];
   const tokens: Usage = { inputTokens: 0, outputTokens: 0 };
   for (let step = 1; step <= limits.maxSteps; step += 1) {
+    onStep(step);
     let turn: Turn;
     try {
       turn = await provider.next({ alert, ledger });
@@ -154,7 +162,7 @@ export async function investigate(provider: Provider, alert: unknown, tools: Map
       return { provider: provider.name, steps: step, tokens, ledger, problems: [`token budget of ${limits.maxTokens} exceeded`], stoppedBy: "token budget" };
     }
     if ("final" in turn) {
-      const { diagnosis, problems } = await validate(turn.final, ledger, tools);
+      const { diagnosis, problems } = await validate(turn.final, ledger, tools, onStep);
       return { provider: provider.name, steps: step, tokens, ledger, diagnosis, problems };
     }
     if (turn.toolCalls.length > limits.maxToolCallsPerStep) {
@@ -164,7 +172,7 @@ export async function investigate(provider: Provider, alert: unknown, tools: Map
     for (const call of turn.toolCalls) {
       const tool = tools.get(call.tool);
       const answer = tool ? await tool(call.args) : { text: JSON.stringify({ error: `no tool named ${call.tool}` }), isError: true };
-      ledger.push({ ...call, id: `ev-${ledger.length + 1}`, isError: answer.isError, result: answer.text, sha256: digest(answer.text) });
+      ledger.push({ ...call, id: `ev-${ledger.length + 1}`, step, isError: answer.isError, result: answer.text, sha256: digest(answer.text) });
     }
   }
   return { provider: provider.name, steps: limits.maxSteps, tokens, ledger, problems: [`no diagnosis within ${limits.maxSteps} steps`], stoppedBy: "step limit" };

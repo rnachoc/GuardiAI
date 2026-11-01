@@ -92,7 +92,7 @@ function present(span: Span) {
 export function createTracesServer(mode: Mode, now: () => number = () => Math.floor(Date.now() / 1000)): McpServer {
   const server = new McpServer({ name: "mcp-traces", version: "0.3.0" });
   const recorded: Trace[] = mode.kind === "replay" ? readToolFile(mode.bundle, "traces.json.gz").traces : [];
-  const clock = mode.kind === "replay" ? () => replayClock(mode.bundle) : now;
+  const clock = mode.kind === "replay" ? () => replayClock(mode.bundle) + (mode.elapsed?.() ?? 0) : now;
 
   /**
    * Fetches one trace from Tempo and trims it to the recorder's span shape.

@@ -6,7 +6,11 @@
  */
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
-export type Mode = { kind: "live"; baseUrl: string } | { kind: "replay"; bundle: string };
+/**
+ * Live mode talks to a backend. Replay mode answers from a bundle, at the moment its alert fired plus
+ * `elapsed()` seconds, so time passes as an investigation goes on and a decoy can be seen recovering.
+ */
+export type Mode = { kind: "live"; baseUrl: string } | { kind: "replay"; bundle: string; elapsed?: () => number };
 
 /**
  * Reads the mode from the environment: GUARDIA_TOOLS_MODE=replay with GUARDIA_BUNDLE, or live with the

@@ -29,7 +29,7 @@ export const Change = z.strictObject({
 });
 export type Change = z.infer<typeof Change>;
 
-export type ChangesMode = { kind: "live"; file: string } | { kind: "replay"; bundle: string };
+export type ChangesMode = { kind: "live"; file: string } | { kind: "replay"; bundle: string; elapsed?: () => number };
 
 /**
  * Reads the change log: one JSON object per line. A malformed line is skipped and counted, never trusted.
@@ -76,7 +76,7 @@ export function createChangesServer(mode: ChangesMode, now: () => number = () =>
   const load = (): Change[] => (mode.kind === "replay"
     ? (readToolFile(mode.bundle, "changes.json.gz").events as unknown[]).map((event) => Change.parse(event))
     : readChangeLog(mode.file).changes);
-  const clock = mode.kind === "replay" ? () => replayClock(mode.bundle) : now;
+  const clock = mode.kind === "replay" ? () => replayClock(mode.bundle) + (mode.elapsed?.() ?? 0) : now;
 
   server.registerTool("list_changes", {
     title: "List recent changes",

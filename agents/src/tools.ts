@@ -19,8 +19,8 @@ import type { Tool } from "./investigator.ts";
  * Connects to every tool server replaying one bundle, and returns its tools by qualified name.
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
-export async function replayTools(bundle: string, runbooks: string[]): Promise<Map<string, Tool>> {
-  return (await replayToolset(bundle, runbooks)).tools;
+export async function replayTools(bundle: string, runbooks: string[], elapsed?: () => number): Promise<Map<string, Tool>> {
+  return (await replayToolset(bundle, runbooks, elapsed)).tools;
 }
 
 export interface ToolDefinition {
@@ -31,14 +31,15 @@ export interface ToolDefinition {
 
 /**
  * Like replayTools, and also returns each tool's description and JSON input schema, for a model provider.
+ * `elapsed` gives the seconds since the alert, so the replayed clock moves with the investigation.
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
-export async function replayToolset(bundle: string, runbooks: string[]): Promise<{ tools: Map<string, Tool>; definitions: ToolDefinition[] }> {
+export async function replayToolset(bundle: string, runbooks: string[], elapsed?: () => number): Promise<{ tools: Map<string, Tool>; definitions: ToolDefinition[] }> {
   const servers: [string, McpServer][] = [
-    ["metrics", createMetricsServer({ kind: "replay", bundle })],
-    ["logs", createLogsServer({ kind: "replay", bundle })],
-    ["traces", createTracesServer({ kind: "replay", bundle })],
-    ["changes", createChangesServer({ kind: "replay", bundle })],
+    ["metrics", createMetricsServer({ kind: "replay", bundle, elapsed })],
+    ["logs", createLogsServer({ kind: "replay", bundle, elapsed })],
+    ["traces", createTracesServer({ kind: "replay", bundle, elapsed })],
+    ["changes", createChangesServer({ kind: "replay", bundle, elapsed })],
     ["runbooks", createRunbooksServer(runbooks)],
   ];
   const tools = new Map<string, Tool>();

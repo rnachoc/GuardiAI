@@ -143,3 +143,24 @@ test("a diagnosis that obeys the planted line cannot cite evidence for it", asyn
   const result = await investigate(provider, ALERT, await replayTools(bundle, defaultRunbooks(ROOT)), LIMITS);
   assert.ok(result.problems.some((p) => p.includes("ev-9, which no tool call produced")));
 });
+
+test("on decoy-catalog-blip, a moving replay clock shows the blip recover, and the evidence is re-checked at the moment it was seen", async () => {
+  const bundle = join(ROOT, "chaos", "fixtures", "decoy-catalog-blip");
+  let step = 1;
+  const tools = await replayTools(bundle, defaultRunbooks(ROOT), () => (step - 1) * 120);
+  const provider = new FakeProvider(join(ROOT, "agents", "responses", "decoy-catalog-blip.json"));
+  const result = await investigate(provider, ALERT, tools, LIMITS, (s) => { step = s; });
+  assert.deepEqual(result.problems, []);
+  const during = JSON.parse(result.ledger[0]!.result).result[0].value;
+  const after = JSON.parse(result.ledger[1]!.result).result[0].value;
+  assert.ok(during > 0.3, `p95 when the alert fired: ${during}`);
+  assert.ok(after < 0.1, `p95 two minutes later: ${after}`);
+  assert.equal(result.diagnosis?.hypotheses[0]?.component, "none");
+});
+
+test("with a frozen clock, the same decoy cannot show recovery", async () => {
+  const bundle = join(ROOT, "chaos", "fixtures", "decoy-catalog-blip");
+  const provider = new FakeProvider(join(ROOT, "agents", "responses", "decoy-catalog-blip.json"));
+  const result = await investigate(provider, ALERT, await replayTools(bundle, defaultRunbooks(ROOT)), LIMITS);
+  assert.equal(result.ledger[0]!.result, result.ledger[1]!.result, "both looks see the same instant");
+});

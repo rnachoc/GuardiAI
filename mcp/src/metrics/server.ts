@@ -49,7 +49,7 @@ async function prometheus(baseUrl: string, path: string, params: Record<string, 
 export function createMetricsServer(mode: Mode, now: () => number = () => Math.floor(Date.now() / 1000)): McpServer {
   const server = new McpServer({ name: "mcp-metrics", version: "0.3.0" });
   const series: Series[] = mode.kind === "replay" ? readToolFile(mode.bundle, "metrics.json.gz").series : [];
-  const clock = mode.kind === "replay" ? () => replayClock(mode.bundle) : now;
+  const clock = mode.kind === "replay" ? () => replayClock(mode.bundle) + (mode.elapsed?.() ?? 0) : now;
 
   server.registerTool("query_metrics", {
     title: "Instant PromQL query",

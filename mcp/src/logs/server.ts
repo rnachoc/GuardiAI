@@ -154,7 +154,7 @@ function present(line: LogLine) {
 export function createLogsServer(mode: Mode, now: () => number = () => Math.floor(Date.now() / 1000)): McpServer {
   const server = new McpServer({ name: "mcp-logs", version: "0.3.0" });
   const lines: LogLine[] = mode.kind === "replay" ? readToolFile(mode.bundle, "logs.json.gz").lines : [];
-  const clock = mode.kind === "replay" ? () => replayClock(mode.bundle) : now;
+  const clock = mode.kind === "replay" ? () => replayClock(mode.bundle) + (mode.elapsed?.() ?? 0) : now;
 
   server.registerTool("query_logs", {
     title: "Search logs",
