@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 
+# Caches for containerised builds
+.cache/
+
 # Java
 target/
 *.class

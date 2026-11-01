@@ -8,7 +8,7 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 4
 
-[*.{yml,yaml,json,md,html,css,js,jsx,ts,tsx,toml}]
+[*.{yml,yaml,json,md,html,css,js,jsx,ts,tsx,toml,xml}]
 indent_size = 2
 
 # Shell scripts, including the git hooks, which have no extension.

@@ -6,6 +6,8 @@ rules:
     check-keys: false
   line-length:
     max: 120
+    # An image pinned by digest is one long word that cannot be broken.
+    allow-non-breakable-inline-mappings: true
   document-start: disable
   comments:
     min-spaces-from-content: 1
