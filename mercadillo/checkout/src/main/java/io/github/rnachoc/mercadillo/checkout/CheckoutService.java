@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 
 /**
  * Turns a cart into an order: prices it from the catalog, holds the stock, charges the shopper, records the
@@ -71,6 +72,12 @@ public class CheckoutService {
         } catch (CheckoutException failure) {
             metrics.record(failure.outcome());
             throw failure;
+        } catch (RestClientException unreachable) {
+            // A service did not answer, or answered too late. The shopper gets a clean 502, and the log line
+            // names the call that failed, which is what an on-call engineer needs first.
+            metrics.record("dependency_failed");
+            LOG.warn("Checkout of cart {} failed calling a dependency: {}", cartId, unreachable.getMessage());
+            throw new CheckoutException(HttpStatus.BAD_GATEWAY, "dependency_failed", "a service did not answer in time");
         } catch (RuntimeException failure) {
             metrics.record("failed");
             throw failure;

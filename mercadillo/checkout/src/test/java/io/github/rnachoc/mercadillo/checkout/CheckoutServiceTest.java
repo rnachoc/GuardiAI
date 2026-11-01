@@ -109,7 +109,7 @@ class CheckoutServiceTest {
     }
 
     /**
-     * When the payment provider cannot be reached, the stock is given back and the shopper sees the failure.
+     * When the payment provider cannot be reached, the stock is given back and the shopper gets a 502.
      *
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
@@ -120,10 +120,11 @@ class CheckoutServiceTest {
                 .thenThrow(new org.springframework.web.client.ResourceAccessException("timed out"));
 
         assertThatThrownBy(() -> service.checkout("cart-1", "tok_ok"))
-                .isInstanceOf(org.springframework.web.client.ResourceAccessException.class);
+                .isInstanceOfSatisfying(CheckoutException.class,
+                        failure -> assertThat(failure.status()).isEqualTo(HttpStatus.BAD_GATEWAY));
 
         verify(inventory).release(anyString());
-        verify(metrics).record("failed");
+        verify(metrics).record("dependency_failed");
     }
 
     /**
