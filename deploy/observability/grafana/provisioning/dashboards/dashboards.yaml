@@ -1,0 +1,12 @@
+# Loads the dashboards in /var/lib/grafana/dashboards, read-only, into the Mercadillo folder.
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+apiVersion: 1
+
+providers:
+  - name: mercadillo
+    folder: Mercadillo
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards
