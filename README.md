@@ -39,7 +39,7 @@ make up && make test
 | 2 | Chaos and snapshots | Done | 10 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 30 scenarios to go. |
 | 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
 | 4 | Investigator | In progress | Bounded loop, evidence ledger, validator, and an Anthropic provider that records for replay. No real model run yet: it needs a key. |
-| 5 | Policy engine | Not started | Nothing. |
+| 5 | Policy engine | In progress | Catalog, blast radius and decisions, test-first; forbidden and over-blast actions are rejected. No audit log yet. |
 | 6 | Remediation and verification | Not started | Nothing. |
 | 7 | Evaluation | Not started | Nothing. No number has been measured. |
 | 8 | Console, postmortem and replay | Not started | Nothing. |
@@ -55,8 +55,10 @@ What could go wrong, and what will stop it. Until the security tests of Phase 9 
 | A real secret is committed | gitleaks on staged changes and on the whole history | [`.githooks/pre-commit`](.githooks/pre-commit), [CI](.github/workflows/ci.yml) | Yes |
 | A credential is placed in the example configuration | A test that only allows empty or `local-only` values for secret-like keys | [`tests/test_foundations.py`](tests/test_foundations.py) | Yes |
 | A shopper reaches an internal endpoint through the gateway | Each public route names one endpoint, and path variables are encoded | [`GatewayController`](mercadillo/gateway/src/main/java/io/github/rnachoc/mercadillo/gateway/GatewayController.java), [its test](mercadillo/gateway/src/test/java/io/github/rnachoc/mercadillo/gateway/GatewayControllerTest.java) | Yes |
-| An agent changes a system | Agents only reach read-only tools; actions are proposals that the policy engine decides | [ADR 2](docs/adr/0002-the-model-proposes-the-code-decides.md) | Not built yet |
-| Text in logs, commits, traces or alerts steers an agent | Untrusted text is wrapped and flagged; attack scenarios in the evaluation bank | [ADR 2](docs/adr/0002-the-model-proposes-the-code-decides.md) | Not built yet |
+| An agent changes a system | Agents only reach read-only tools; actions are proposals that the policy engine decides | [ADR 2](docs/adr/0002-the-model-proposes-the-code-decides.md), [`PolicyEngine`](policy/src/main/java/io/github/rnachoc/guardia/policy/PolicyEngine.java) | Partly: the tools are read-only and the engine rejects in tests; nothing executes yet |
+| An agent chains an action outside the catalog, or names another service to act on | Exact-name catalog lookup, allowed targets per action, and a blast-radius limit from the dependency graph | [`PolicyEngineTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/PolicyEngineTest.java) | Yes, in tests |
+| Text in logs, commits, traces or alerts steers an agent | Untrusted text is redacted, wrapped and flagged by every tool server; two injection scenarios are recorded | [`untrusted.ts`](mcp/src/shared/untrusted.ts), [ADR 11](docs/adr/0011-read-only-tool-servers-with-one-grammar-for-both-modes.md) | Partly: wrapped and flagged in tests; no model has been measured against it |
+| A diagnosis claims something it cannot show | Every claim cites ledger IDs; invented, failed or changed evidence is rejected | [`investigator.ts`](agents/src/investigator.ts) | Yes, in tests |
 
 ## Repository layout
 

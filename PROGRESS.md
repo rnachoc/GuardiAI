@@ -11,7 +11,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 2 | Chaos and snapshots | Done | v0.2.0 at the commit that marks it done, not tagged yet |
 | 3 | Read-only tool servers | Done | v0.3.0 at the commit that marks it done, not tagged yet |
 | 4 | Investigator | In progress | — |
-| 5 | Policy engine | Not started | — |
+| 5 | Policy engine | In progress | — |
 | 6 | Remediation and verification | Not started | — |
 | 7 | Evaluation | Not started | — |
 | 8 | Console, postmortem and replay | Not started | — |
@@ -155,6 +155,19 @@ Done and tested ([ADR 13](docs/adr/0013-the-investigator-and-its-evidence-ledger
 Not done, and why:
 
 - **The responses are scripted by hand, not recorded from a model.** The brief asks for recorded responses. That needs an Anthropic provider and a key under the spend cap, which is the owner's decision. Until then, the passing run proves the loop and the validator, not a model's ability to diagnose.
+
+## Phase 5: Policy engine
+
+**Acceptance:** forbidden and over-blast actions are rejected in tests. Tests first.
+
+Done, test-first ([ADR 15](docs/adr/0015-a-policy-engine-that-gathers-every-reason.md)):
+
+- The versioned catalog of nine actions and the dependency graph. The engine rejects with every reason: kill switch, unknown action, disallowed target, failed or unknown precondition, hourly limit, blast radius. Suggest and autonomous modes.
+- 9 tests, written before the engine. They found two catalog entries that could never run, which were fixed. **The acceptance criterion holds.**
+
+Not done:
+
+- The hash-chained audit log, which the phase also lists, and the Spring Boot service around the engine.
 
 ## Next
 
