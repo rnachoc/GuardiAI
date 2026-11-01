@@ -20,6 +20,20 @@ import type { Tool } from "./investigator.ts";
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
 export async function replayTools(bundle: string, runbooks: string[]): Promise<Map<string, Tool>> {
+  return (await replayToolset(bundle, runbooks)).tools;
+}
+
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+/**
+ * Like replayTools, and also returns each tool's description and JSON input schema, for a model provider.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+export async function replayToolset(bundle: string, runbooks: string[]): Promise<{ tools: Map<string, Tool>; definitions: ToolDefinition[] }> {
   const servers: [string, McpServer][] = [
     ["metrics", createMetricsServer({ kind: "replay", bundle })],
     ["logs", createLogsServer({ kind: "replay", bundle })],
@@ -28,19 +42,21 @@ export async function replayTools(bundle: string, runbooks: string[]): Promise<M
     ["runbooks", createRunbooksServer(runbooks)],
   ];
   const tools = new Map<string, Tool>();
+  const definitions: ToolDefinition[] = [];
   for (const [prefix, server] of servers) {
     const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();
     await server.connect(serverSide);
     const client = new Client({ name: "guardia-investigator", version: "0.4.0" });
     await client.connect(clientSide);
     for (const tool of (await client.listTools()).tools) {
+      definitions.push({ name: `${prefix}.${tool.name}`, description: tool.description ?? "", inputSchema: tool.inputSchema as Record<string, unknown> });
       tools.set(`${prefix}.${tool.name}`, async (args) => {
         const result = await client.callTool({ name: tool.name, arguments: args });
         return { text: (result.content as { text: string }[])[0]?.text ?? "", isError: result.isError === true };
       });
     }
   }
-  return tools;
+  return { tools, definitions };
 }
 
 /**

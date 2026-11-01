@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos test-mcp test-agents chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos test-mcp test-agents investigate chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -85,6 +85,12 @@ test-agents: ## Type-check and test the investigator, against a recorded bundle 
 	mkdir -p .cache/npm
 	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
 		--workdir /repo $(NODE_IMAGE) sh -c 'cd mcp && npm ci --no-audit --no-fund && cd ../agents && npm ci --no-audit --no-fund && npm run typecheck && npm test'
+
+investigate: ## Investigate a recorded scenario. Free by default; GUARDIA_MODEL_PROVIDER=anthropic spends, under GUARDIA_MAX_SPEND_USD.
+	@test -n "$(SCENARIO)" || (echo "name a scenario: make investigate SCENARIO=<id>" >&2; exit 1)
+	test -d agents/node_modules || $(MAKE) test-agents
+	$(DOCKER_RUN) --env GUARDIA_MODEL_PROVIDER --env GUARDIA_MAX_SPEND_USD --env ANTHROPIC_API_KEY $(NPM_DOCKER_FLAGS) \
+		--workdir /repo/agents $(NODE_IMAGE) node src/cli.ts $(SCENARIO)
 
 chaos: ## Run one scenario against the running stack: make chaos SCENARIO=payments-latency
 	@test -n "$(SCENARIO)" || (echo "name a scenario: make chaos SCENARIO=<id>" >&2; exit 1)
