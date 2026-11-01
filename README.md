@@ -27,7 +27,7 @@ make up && make test
 
 | Phase | Scope | Status | What exists today |
 | --- | --- | --- | --- |
-| 0 | Foundations | In progress | Checks, CI workflow, ADRs 1 to 3, and a stack with PostgreSQL, Redis and Kafka. CI has not run on GitHub yet. |
+| 0 | Foundations | Done | Checks and CI, ADRs 1 to 3, and a stack with PostgreSQL, Redis and Kafka that `make smoke` proves works. |
 | 1 | Mercadillo and observability | Not started | Nothing. |
 | 2 | Chaos and snapshots | Not started | Nothing. |
 | 3 | Read-only tool servers | Not started | Nothing. |
@@ -45,7 +45,7 @@ What could go wrong, and what will stop it. Until the security tests of Phase 9 
 
 | Risk | What will stop it | Where | Enforced |
 | --- | --- | --- | --- |
-| A real secret is committed | gitleaks on staged changes and on the whole history | [`.githooks/pre-commit`](.githooks/pre-commit), [CI](.github/workflows/ci.yml) | Locally. Not yet on GitHub. |
+| A real secret is committed | gitleaks on staged changes and on the whole history | [`.githooks/pre-commit`](.githooks/pre-commit), [CI](.github/workflows/ci.yml) | Yes |
 | A credential is placed in the example configuration | A test that only allows empty or `local-only` values for secret-like keys | [`tests/test_foundations.py`](tests/test_foundations.py) | Yes |
 | An agent changes a system | Agents only reach read-only tools; actions are proposals that the policy engine decides | [ADR 2](docs/adr/0002-the-model-proposes-the-code-decides.md) | Not built yet |
 | Text in logs, commits, traces or alerts steers an agent | Untrusted text is wrapped and flagged; attack scenarios in the evaluation bank | [ADR 2](docs/adr/0002-the-model-proposes-the-code-decides.md) | Not built yet |

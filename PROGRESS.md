@@ -6,7 +6,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 
 | Phase | Name | Status | Release |
 | --- | --- | --- | --- |
-| 0 | Foundations | In progress | — |
+| 0 | Foundations | Done | v0.0.0 |
 | 1 | Mercadillo and observability | Not started | — |
 | 2 | Chaos and snapshots | Not started | — |
 | 3 | Read-only tool servers | Not started | — |
@@ -24,7 +24,7 @@ Phases 0 to 7 are the minimum publishable version.
 
 **Acceptance:** `make up` starts the skeleton and CI is green.
 
-Done and checked locally:
+Done, checked locally and in CI:
 
 - Repository, MIT licence, `.editorconfig`, `.gitattributes`, `.gitignore` and an `.env.example` with local-only placeholders.
 - `Makefile` whose targets run every check in a pinned container, so Docker and make are the only prerequisites ([ADR 3](docs/adr/0003-docker-and-make-are-the-only-prerequisites.md)).
@@ -34,10 +34,7 @@ Done and checked locally:
 - Foundation tests that enforce the rules above: placeholders only, everything pinned, decision records complete, this table in step with the README.
 - ADRs 1 to 3.
 
-Still to do before Phase 0 is done:
-
-- Push to GitHub and see CI green. CI has not run yet, because the repository is not on GitHub yet.
-- Tag `v0.0.0`.
+Verified: the [first CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41301400487) passed all four jobs. The secret scan read all 7 commits, the 13 foundation tests ran, and the stack started and passed the smoke test on a GitHub runner.
 
 ## Next
 
