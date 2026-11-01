@@ -1,0 +1,6 @@
+[
+  { "name": "checkout-payments", "listen": "0.0.0.0:8666", "upstream": "payments:8080", "enabled": true },
+  { "name": "checkout-inventory", "listen": "0.0.0.0:8667", "upstream": "inventory:8080", "enabled": true },
+  { "name": "catalog-postgres", "listen": "0.0.0.0:15432", "upstream": "postgres:5432", "enabled": true },
+  { "name": "cart-redis", "listen": "0.0.0.0:16379", "upstream": "redis:6379", "enabled": true }
+]

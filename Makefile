@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos chaos chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -75,6 +75,15 @@ test-chaos: ## Type-check guardia-chaos, test it, and validate every scenario.
 	mkdir -p .cache/npm
 	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
 		--workdir /repo/chaos $(NODE_IMAGE) sh -c 'npm ci --no-audit --no-fund && npm run typecheck && npm test && npm run validate'
+
+chaos: ## Run one scenario against the running stack: make chaos SCENARIO=payments-latency
+	@test -n "$(SCENARIO)" || (echo "name a scenario: make chaos SCENARIO=<id>" >&2; exit 1)
+	test -d chaos/node_modules || $(MAKE) test-chaos
+	docker run --rm --init --network guardia_default --volume "$(CURDIR)/chaos":/chaos \
+		--volume /var/run/docker.sock:/var/run/docker.sock --workdir /chaos $(NODE_IMAGE) node src/cli.ts run $(SCENARIO)
+
+chaos-reset: ## Remove every network fault guardia-chaos may have left behind.
+	docker run --rm --network guardia_default --volume "$(CURDIR)/chaos":/chaos --workdir /chaos $(NODE_IMAGE) node src/cli.ts reset
 
 dashboard: ## Regenerate the Grafana dashboard from scripts/build_dashboard.py.
 	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 scripts/build_dashboard.py

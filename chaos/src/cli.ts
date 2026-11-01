@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * guardia-chaos: the command line for Guardia's incident scenarios. This version validates scenarios; the
- * injector and the snapshot recorder are being built (PROGRESS.md, Phase 2).
+ * guardia-chaos: the command line for Guardia's incident scenarios. It validates scenarios, runs one
+ * against the live stack, and resets every fault. The snapshot recorder is being built (PROGRESS.md).
  *
  * Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
@@ -9,7 +9,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ZodError } from "zod";
 import { loadScenario, type Scenario } from "./scenario.ts";
-import { readdirSync } from "node:fs";
+import { mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { endpointsFromEnvironment, runScenario } from "./run.ts";
+import { resetToxics } from "./stack.ts";
 
 const DEFAULT_FOLDER = join(dirname(fileURLToPath(import.meta.url)), "..", "scenarios");
 
@@ -51,18 +53,37 @@ export function validate(folder: string, print: (line: string) => void = console
 }
 
 /**
- * Runs a command from the arguments.
+ * Runs a command from the arguments and returns the exit code.
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
-function main(args: string[]): number {
-  const [command, folder] = args;
+async function main(args: string[]): Promise<number> {
+  const [command, argument] = args;
   if (command === "validate") {
-    return validate(folder ?? DEFAULT_FOLDER);
+    return validate(argument ?? DEFAULT_FOLDER);
   }
-  console.error("usage: guardia-chaos validate [folder]");
+  if (command === "run" && argument) {
+    const scenario = loadScenario(join(DEFAULT_FOLDER, `${argument}.yaml`));
+    const controller = new AbortController();
+    process.once("SIGINT", () => controller.abort());
+    process.once("SIGTERM", () => controller.abort());
+    console.log(`running ${scenario.id} for ${scenario.durationSeconds}s`);
+    const record = await runScenario(scenario, endpointsFromEnvironment(), controller.signal);
+    const folder = process.env.RUNS_FOLDER ?? join(DEFAULT_FOLDER, "..", "runs");
+    mkdirSync(folder, { recursive: true });
+    const path = join(folder, `${scenario.id}.json`);
+    writeFileSync(path, `${JSON.stringify(record, null, 2)}\n`);
+    console.log(`${record.interrupted ? "interrupted; every fault reverted" : "done"}; run record in ${path}`);
+    return record.interrupted ? 130 : 0;
+  }
+  if (command === "reset") {
+    await resetToxics(endpointsFromEnvironment());
+    console.log("every toxic removed");
+    return 0;
+  }
+  console.error("usage: guardia-chaos validate [folder] | run <scenario-id> | reset");
   return 2;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  process.exitCode = main(process.argv.slice(2));
+  process.exitCode = await main(process.argv.slice(2));
 }

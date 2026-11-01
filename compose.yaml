@@ -97,7 +97,12 @@ services:
       args:
         SERVICE: catalog
         MAVEN_OPTS: ${GUARDIA_BUILD_MAVEN_OPTS:-}
+    environment:
+      <<: *mercadillo-environment
+      DATABASE_URL: jdbc:postgresql://catalog-db-proxy:15432/${POSTGRES_DB}
     depends_on:
+      toxiproxy:
+        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
@@ -136,7 +141,13 @@ services:
       args:
         SERVICE: cart
         MAVEN_OPTS: ${GUARDIA_BUILD_MAVEN_OPTS:-}
+    environment:
+      <<: *mercadillo-environment
+      REDIS_HOST: cart-redis-proxy
+      REDIS_PORT: "16379"
     depends_on:
+      toxiproxy:
+        condition: service_healthy
       redis:
         condition: service_healthy
       catalog:
@@ -151,7 +162,13 @@ services:
       args:
         SERVICE: checkout
         MAVEN_OPTS: ${GUARDIA_BUILD_MAVEN_OPTS:-}
+    environment:
+      <<: *mercadillo-environment
+      PAYMENTS_URL: http://payments-proxy:8666
+      INVENTORY_URL: http://inventory-proxy:8667
     depends_on:
+      toxiproxy:
+        condition: service_healthy
       postgres:
         condition: service_healthy
       kafka:
@@ -198,6 +215,37 @@ services:
         condition: service_started
     ports:
       - "127.0.0.1:8080:8080"
+
+  kafka-exporter:
+    # Measures consumer lag from the broker's side. The notifier reports its own lag too, but a frozen
+    # or dead consumer cannot report anything, which is exactly when lag matters.
+    image: danielqsj/kafka-exporter:v1.10.0@sha256:346a53c2489a3530790d01f7b96632496d0d58926662f4c35bb65f569db2ab42
+    command: ["--kafka.server=kafka:9092", "--topic.filter=orders.*", "--group.filter=notifier"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9308/metrics"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  toxiproxy:
+    # Sits on four connections inside Mercadillo, so guardia-chaos can slow or cut each one (ADR 8).
+    # Each connection has its own network name, which is what callers see as the server address.
+    image: ghcr.io/shopify/toxiproxy:2.13.0@sha256:5d3dae09bc185dcc5ff6cf43abf6062a4a720aff0c4306a471e773acdcd107aa
+    command: ["-host=0.0.0.0", "-config=/etc/toxiproxy/toxiproxy.json"]
+    volumes:
+      - ./deploy/chaos/toxiproxy.json:/etc/toxiproxy/toxiproxy.json:ro
+    networks:
+      default:
+        aliases: [payments-proxy, inventory-proxy, catalog-db-proxy, cart-redis-proxy]
+    healthcheck:
+      test: ["CMD", "/toxiproxy-cli", "list"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
 
   otel-collector:
     # The image has no shell or HTTP client for a healthcheck. Services depend on it being started,

@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 
+# Run records of guardia-chaos, written on every run
+chaos/runs/
+
 # Caches for containerised builds
 .cache/
 
