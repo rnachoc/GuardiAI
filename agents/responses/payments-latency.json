@@ -1,0 +1,45 @@
+{
+  "scenario": "payments-latency",
+  "provenance": "Scripted by hand by Ignacio Rodriguez Caro to exercise the loop and the validator. Not recorded from a model: no real model run exists yet, and none of these turns measures model quality.",
+  "turns": [
+    {
+      "toolCalls": [
+        { "tool": "metrics.query_metrics", "args": { "query": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name=\"checkout\", http_route=\"/checkouts\"}[1m])))" } },
+        { "tool": "metrics.query_metrics", "args": { "query": "histogram_quantile(0.95, sum by (le, server_address) (rate(http_client_request_duration_seconds_bucket{service_name=\"checkout\"}[1m])))" } }
+      ],
+      "usage": { "inputTokens": 2400, "outputTokens": 180 }
+    },
+    {
+      "toolCalls": [
+        { "tool": "metrics.query_metrics", "args": { "query": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name=\"payments\", http_route=\"/charges\"}[1m])))" } },
+        { "tool": "changes.list_changes", "args": { "sinceSeconds": 86400 } },
+        { "tool": "runbooks.search_runbooks", "args": { "query": "checkout slow, calls to payments slow" } }
+      ],
+      "usage": { "inputTokens": 3900, "outputTokens": 210 }
+    },
+    {
+      "final": {
+        "hypotheses": [
+          {
+            "rank": 1,
+            "component": "payments",
+            "mechanism": "network_latency",
+            "statement": "Checkout waits over a second for payments on the way there: its client p95 to payments-proxy is high while payments' own p95 stays near 70 ms, and no change was deployed.",
+            "confidence": 0.8,
+            "evidence": ["ev-2", "ev-3", "ev-4"]
+          },
+          {
+            "rank": 2,
+            "component": "checkout",
+            "mechanism": "application_slowdown",
+            "statement": "Checkout itself could be slow, but its p95 matches the time spent waiting for payments, which leaves little for its own work.",
+            "confidence": 0.1,
+            "evidence": ["ev-1", "ev-2"]
+          }
+        ],
+        "unknowns": ["Why the connection to payments is slow: there are no network metrics for that path."]
+      },
+      "usage": { "inputTokens": 5200, "outputTokens": 420 }
+    }
+  ]
+}

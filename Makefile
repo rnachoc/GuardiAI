@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos test-mcp chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos test-mcp test-agents chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -61,7 +61,7 @@ verify: ## Prove the running stack meets Phase 1: a purchase, live traffic, a tr
 	docker run --rm --network guardia_default --volume "$(CURDIR)/scripts":/scripts:ro \
 		--env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 /scripts/verify_stack.py
 
-test: test-repo test-mercadillo test-chaos test-mcp ## Run every test suite. Needs no API key and no running stack.
+test: test-repo test-mercadillo test-chaos test-mcp test-agents ## Run every test suite. Needs no API key and no running stack.
 
 test-repo: ## Test the repository's own rules and tools.
 	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 -m unittest discover --start-directory tests --verbose
@@ -80,6 +80,11 @@ test-mcp: ## Type-check and test the tool servers, against the recorded bundles.
 	mkdir -p .cache/npm
 	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
 		--workdir /repo/mcp $(NODE_IMAGE) sh -c 'npm ci --no-audit --no-fund && npm run typecheck && npm test'
+
+test-agents: ## Type-check and test the investigator, against a recorded bundle and scripted turns.
+	mkdir -p .cache/npm
+	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
+		--workdir /repo $(NODE_IMAGE) sh -c 'cd mcp && npm ci --no-audit --no-fund && cd ../agents && npm ci --no-audit --no-fund && npm run typecheck && npm test'
 
 chaos: ## Run one scenario against the running stack: make chaos SCENARIO=payments-latency
 	@test -n "$(SCENARIO)" || (echo "name a scenario: make chaos SCENARIO=<id>" >&2; exit 1)
