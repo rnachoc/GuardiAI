@@ -1,0 +1,121 @@
+# The action catalog, version 1. Nothing outside this file can ever run. Each action has a risk tier,
+# preconditions, a frequency limit, a maximum blast radius, an approval rule, a verification query with a
+# timeout, and the condition that reverts it. Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+version: 1
+approval:
+  low: none_in_autonomous_mode
+  medium: one_human
+  high: two_humans
+actions:
+  - name: restart_service
+    tier: medium
+    targets: [gateway, catalog, cart, checkout, payments, inventory, notifier]
+    preconditions: [no_deploy_freeze, other_replicas_healthy]
+    maxPerHour: 3
+    maxBlastRadius: 3
+    verification:
+      query: >-
+        sum(rate(http_server_request_duration_seconds_count{service_name="$target"}[1m]))
+      expect: "> 0"
+      timeoutSeconds: 120
+    autoRevert: none
+  - name: scale_deployment
+    tier: low
+    targets: [gateway, catalog, cart, checkout, payments, inventory, notifier]
+    preconditions: [within_replica_bounds]
+    maxPerHour: 6
+    maxBlastRadius: 3
+    verification:
+      query: >-
+        up{service_name="$target"}
+      expect: ">= 1"
+      timeoutSeconds: 120
+    autoRevert: scale_back
+  - name: rollback_deploy
+    tier: high
+    targets: [gateway, catalog, cart, checkout, payments, inventory, notifier]
+    preconditions: [no_deploy_freeze, previous_version_exists]
+    maxPerHour: 1
+    maxBlastRadius: 3
+    verification:
+      query: >-
+        sum(rate(http_server_request_duration_seconds_count{service_name="$target",
+        http_response_status_code=~"5.."}[1m]))
+      expect: "== 0"
+      timeoutSeconds: 300
+    autoRevert: redeploy_previous
+  - name: toggle_flag
+    tier: low
+    targets: [catalog, cart, checkout, payments, inventory, notifier]
+    preconditions: [flag_exists]
+    maxPerHour: 6
+    maxBlastRadius: 4
+    verification:
+      query: >-
+        sum(rate(http_server_request_duration_seconds_count{service_name="$target",
+        http_response_status_code=~"5.."}[1m]))
+      expect: "== 0"
+      timeoutSeconds: 120
+    autoRevert: toggle_back
+  - name: clear_cache
+    tier: low
+    targets: [catalog]
+    preconditions: [database_healthy]
+    maxPerHour: 2
+    maxBlastRadius: 4
+    verification:
+      query: >-
+        histogram_quantile(0.95,
+        sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="catalog"}[1m])))
+      expect: "< 0.3"
+      timeoutSeconds: 120
+    autoRevert: none
+  - name: pause_consumer
+    tier: medium
+    targets: [notifier]
+    preconditions: [lag_below_retention]
+    maxPerHour: 2
+    maxBlastRadius: 1
+    verification:
+      query: >-
+        sum(kafka_consumergroup_lag{consumergroup="notifier"})
+      expect: ">= 0"
+      timeoutSeconds: 60
+    autoRevert: resume_consumer
+  - name: resume_consumer
+    tier: low
+    targets: [notifier]
+    preconditions: []
+    maxPerHour: 6
+    maxBlastRadius: 1
+    verification:
+      query: >-
+        sum(kafka_consumergroup_lag{consumergroup="notifier"})
+      expect: "< 50"
+      timeoutSeconds: 300
+    autoRevert: none
+  - name: increase_pool_size
+    tier: medium
+    targets: [catalog, inventory, checkout]
+    preconditions: [within_pool_bounds, database_healthy]
+    maxPerHour: 2
+    maxBlastRadius: 3
+    verification:
+      query: >-
+        sum by (service_name) (db_client_connections_usage{state="used", service_name="$target"})
+      expect: ">= 0"
+      timeoutSeconds: 120
+    autoRevert: restore_pool_size
+  - name: failover
+    tier: high
+    targets: [payments]
+    preconditions: [standby_healthy]
+    maxPerHour: 1
+    maxBlastRadius: 3
+    verification:
+      query: >-
+        sum(rate(http_server_request_duration_seconds_count{service_name="checkout",
+        http_response_status_code=~"5.."}[1m]))
+      expect: "== 0"
+      timeoutSeconds: 180
+    autoRevert: fail_back

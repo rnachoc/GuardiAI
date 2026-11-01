@@ -1,0 +1,10 @@
+# Who calls whom in Mercadillo. An action's blast radius is its target plus every service that depends
+# on it, directly or not. Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+calls:
+  gateway: [catalog, cart, checkout]
+  cart: [catalog, redis]
+  checkout: [cart, catalog, inventory, payments, postgres, kafka]
+  catalog: [postgres, redis]
+  inventory: [postgres]
+  notifier: [kafka]
+  payments: []
