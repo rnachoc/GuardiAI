@@ -1,6 +1,6 @@
 # Mercadillo
 
-The system Guardia watches: a fictional online marketplace in Java 21 and Spring Boot 3.5, on PostgreSQL, Redis and Kafka, observed with OpenTelemetry ([ADR 4](../docs/adr/0004-mercadillo-as-one-spring-boot-build.md), [ADR 5](../docs/adr/0005-opentelemetry-agent-and-one-collector.md)).
+The system GuardiAI watches: a fictional online marketplace in Java 21 and Spring Boot 3.5, on PostgreSQL, Redis and Kafka, observed with OpenTelemetry ([ADR 4](../docs/adr/0004-mercadillo-as-one-spring-boot-build.md), [ADR 5](../docs/adr/0005-opentelemetry-agent-and-one-collector.md)).
 
 | Service | What it does | Talks to |
 | --- | --- | --- |

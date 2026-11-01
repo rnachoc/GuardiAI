@@ -1,5 +1,5 @@
 /**
- * The names Guardia's scenarios may use: the services of Mercadillo, the faults the injector knows, and
+ * The names GuardiAI's scenarios may use: the services of Mercadillo, the faults the injector knows, and
  * the actions of the policy engine's catalog. Kept in one place so a scenario cannot name something that
  * does not exist.
  *

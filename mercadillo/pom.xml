@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Mercadillo: the fictional marketplace Guardia watches. One build for every service (ADR 4).
+<!-- Mercadillo: the fictional marketplace GuardiAI watches. One build for every service (ADR 4).
      Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com> -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

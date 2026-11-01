@@ -1,4 +1,4 @@
-# Guardia. Docker and make are the only tools a machine needs (ADR 3): every check below runs
+# GuardiAI. Docker and make are the only tools a machine needs (ADR 3): every check below runs
 # in a container whose image is pinned by digest. `make` alone lists the targets.
 #
 # Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>

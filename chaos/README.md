@@ -1,6 +1,6 @@
 # Chaos
 
-`guardia-chaos` and Guardia's incident scenarios ([ADR 7](../docs/adr/0007-scenarios-as-validated-yaml-in-typescript.md)).
+`guardia-chaos` and GuardiAI's incident scenarios ([ADR 7](../docs/adr/0007-scenarios-as-validated-yaml-in-typescript.md)).
 
 **Status: in progress (Phase 2).**
 

@@ -252,7 +252,7 @@ def build() -> dict:
     return {
         "uid": "mercadillo-overview",
         "title": "Mercadillo · Overview",
-        "description": "Live health of the fictional marketplace Guardia watches.",
+        "description": "Live health of the fictional marketplace GuardiAI watches.",
         "tags": ["mercadillo", "guardia"],
         "editable": False,
         "graphTooltip": 1,

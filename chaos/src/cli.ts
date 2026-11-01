@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * guardia-chaos: the command line for Guardia's incident scenarios. It validates scenarios, runs one
+ * guardia-chaos: the command line for GuardiAI's incident scenarios. It validates scenarios, runs one
  * against the live stack, and resets every fault. The snapshot recorder is being built (PROGRESS.md).
  *
  * Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>

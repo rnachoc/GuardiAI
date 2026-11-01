@@ -1,4 +1,4 @@
-# Guardia
+# GuardiAI
 
 [![CI](https://github.com/rnachoc/GuardiAI/actions/workflows/ci.yml/badge.svg)](https://github.com/rnachoc/GuardiAI/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -7,11 +7,11 @@ An AI on-call engineer for a microservice system. When an alert fires, a small c
 
 **The model proposes, the code decides.** No agent can run a command or change a system. It can only propose, and code decides ([ADR 2](docs/adr/0002-the-model-proposes-the-code-decides.md)).
 
-Guardia is judged on three things: it finds the right cause, it never does anything unsafe, and it proves both with measured numbers. No number has been measured yet, so none is published.
+GuardiAI is judged on three things: it finds the right cause, it never does anything unsafe, and it proves both with measured numbers. No number has been measured yet, so none is published.
 
-> **Status: Phase 1, Mercadillo and observability.** The marketplace Guardia will watch runs with steady synthetic shoppers, and its traces, metrics and logs reach Grafana. Guardia itself (agents, tools, policy engine, evaluations) does not exist yet. The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
+> **Status: Phase 1, Mercadillo and observability.** The marketplace GuardiAI will watch runs with steady synthetic shoppers, and its traces, metrics and logs reach Grafana. GuardiAI itself (agents, tools, policy engine, evaluations) does not exist yet. The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
 
-> **Synthetic only.** Mercadillo, the system Guardia watches, is a fictional marketplace. There are no real credentials anywhere in this repository.
+> **Synthetic only.** Mercadillo, the system GuardiAI watches, is a fictional marketplace. There are no real credentials anywhere in this repository.
 
 ## Quick start
 
@@ -62,7 +62,7 @@ What could go wrong, and what will stop it. Until the security tests of Phase 9 
 
 | Folder | What it holds |
 | --- | --- |
-| [`mercadillo/`](mercadillo) | The fictional marketplace Guardia watches |
+| [`mercadillo/`](mercadillo) | The fictional marketplace GuardiAI watches |
 | [`chaos/`](chaos) | Fault injector, incident scenarios and the snapshot recorder |
 | [`mcp/`](mcp) | Read-only tool servers, and the one that only creates proposals |
 | [`agents/`](agents) | Triage, investigator, planner, critic and postmortem writer |

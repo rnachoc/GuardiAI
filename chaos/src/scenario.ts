@@ -1,6 +1,6 @@
 /**
  * The scenario format: what a scenario does to Mercadillo, the alert it raises, and the ground truth an
- * evaluation grades Guardia against. Parsed with a strict schema, so an unknown field, service, fault or
+ * evaluation grades GuardiAI against. Parsed with a strict schema, so an unknown field, service, fault or
  * action is an error rather than a silent typo.
  *
  * Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>

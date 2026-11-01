@@ -18,7 +18,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 9 | Security pack, model matrix, cost report | Not started | — |
 | 10 | Release | Not started | — |
 
-Phases 0 to 7 are the minimum publishable version. The session that builds Guardia cannot push tags, so the owner creates each release tag on the commit named here.
+Phases 0 to 7 are the minimum publishable version. The session that builds GuardiAI cannot push tags, so the owner creates each release tag on the commit named here.
 
 ## Phase 0: Foundations
 
