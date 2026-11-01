@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos test-mcp test-agents investigate chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents investigate chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -61,7 +61,7 @@ verify: ## Prove the running stack meets Phase 1: a purchase, live traffic, a tr
 	docker run --rm --network guardia_default --volume "$(CURDIR)/scripts":/scripts:ro \
 		--env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 /scripts/verify_stack.py
 
-test: test-repo test-mercadillo test-chaos test-mcp test-agents ## Run every test suite. Needs no API key and no running stack.
+test: test-repo test-mercadillo test-chaos test-mcp test-agents test-policy ## Run every test suite. Needs no API key and no running stack.
 
 test-repo: ## Test the repository's own rules and tools.
 	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 -m unittest discover --start-directory tests --verbose
@@ -70,6 +70,11 @@ test-mercadillo: ## Compile and test the Mercadillo services.
 	mkdir -p .cache/m2
 	$(DOCKER_RUN) --env MAVEN_CONFIG=/var/maven/.m2 --volume "$(CURDIR)/.cache/m2":/var/maven/.m2 $(MAVEN_DOCKER_FLAGS) \
 		--workdir /repo/mercadillo $(MAVEN_IMAGE) mvn --batch-mode --no-transfer-progress --strict-checksums -Duser.home=/var/maven verify
+
+test-policy: ## Test the policy engine, whose tests were written first.
+	mkdir -p .cache/m2
+	$(DOCKER_RUN) --env MAVEN_CONFIG=/var/maven/.m2 --volume "$(CURDIR)/.cache/m2":/var/maven/.m2 $(MAVEN_DOCKER_FLAGS) \
+		--workdir /repo/policy $(MAVEN_IMAGE) mvn --batch-mode --no-transfer-progress --strict-checksums -Duser.home=/var/maven verify
 
 test-chaos: ## Type-check guardia-chaos, test it, validate every scenario and verify every recording.
 	mkdir -p .cache/npm
