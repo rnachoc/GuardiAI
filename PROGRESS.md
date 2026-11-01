@@ -10,7 +10,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 1 | Mercadillo and observability | Done | v0.1.0 at the commit that marks it done, not tagged yet |
 | 2 | Chaos and snapshots | Done | v0.2.0 at the commit that marks it done, not tagged yet |
 | 3 | Read-only tool servers | Done | v0.3.0 at the commit that marks it done, not tagged yet |
-| 4 | Investigator | Not started | — |
+| 4 | Investigator | In progress | — |
 | 5 | Policy engine | Not started | — |
 | 6 | Remediation and verification | Not started | — |
 | 7 | Evaluation | Not started | — |
@@ -140,6 +140,20 @@ Known limits:
 - Nothing writes the live change log yet. The scenarios that change deploys, configs and flags come with the other 30, so live `mcp-changes` answers with an empty history until then.
 - `docs/incidents` is empty until postmortems exist (Phase 8).
 
+## Phase 4: Investigator
+
+**Acceptance:** end to end on one scenario, with the fake provider and recorded responses; done when the diagnosis cites valid evidence.
+
+Done and tested ([ADR 13](docs/adr/0013-the-investigator-and-its-evidence-ledger.md)):
+
+- The bounded investigator loop, the evidence ledger and the deterministic validator. The fake provider and the spend cap.
+- On the `payments-latency` recording, the investigator ran 3 steps and 5 tool calls over MCP. Its diagnosis cites valid evidence and ranks payments, `network_latency`, first.
+- 8 tests prove each rejection: an invented ID, a refused call, a claim without evidence, evidence whose answer changed, ranks out of order, an unknown component. They also prove that the step limit, the token budget, the tool-call limit and the spend cap each stop a run.
+
+Not done, and why:
+
+- **The responses are scripted by hand, not recorded from a model.** The brief asks for recorded responses. That needs an Anthropic provider and a key under the spend cap, which is the owner's decision. Until then, the passing run proves the loop and the validator, not a model's ability to diagnose.
+
 ## Next
 
-Phase 4: the investigator, end to end on one scenario, with a fake model provider that replays recorded responses. Done when the diagnosis cites valid evidence.
+Phase 4: an Anthropic provider behind `GUARDIA_MODEL_PROVIDER=anthropic` and the spend cap, and a first recorded run of `payments-latency`.

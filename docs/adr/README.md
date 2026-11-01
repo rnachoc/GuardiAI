@@ -16,3 +16,4 @@ Each record explains one significant decision: its context, the decision and its
 | 10 | [Fixture bundles with a sealed ground truth](0010-fixture-bundles-with-a-sealed-ground-truth.md) | Accepted |
 | 11 | [Read-only tool servers with one grammar for both modes](0011-read-only-tool-servers-with-one-grammar-for-both-modes.md) | Accepted |
 | 12 | [Lexical hybrid search for runbooks](0012-lexical-hybrid-search-for-runbooks.md) | Accepted |
+| 13 | [The investigator and its evidence ledger](0013-the-investigator-and-its-evidence-ledger.md) | Accepted |
