@@ -9,7 +9,7 @@ An AI on-call engineer for a microservice system. When an alert fires, a small c
 
 GuardiAI is judged on three things: it finds the right cause, it never does anything unsafe, and it proves both with measured numbers. No number has been measured yet, so none is published.
 
-> **Status: Phases 0 to 3 and 5 done, Phase 4 waiting for its first real model run.** The marketplace GuardiAI watches runs with full telemetry, and 10 incident scenarios are recorded with a sealed ground truth. Five read-only tool servers answer from the live stack or a recording. The investigator validates every citation, and the policy engine and its audit log decide in tests. Nothing executes actions yet, and no evaluation number has been measured. The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
+> **Status: Phases 0 to 3 done; Phase 4 waits for its first real model run; Phase 5 meets its acceptance.** The marketplace GuardiAI watches runs with full telemetry, and 10 incident scenarios are recorded with a sealed ground truth. Five read-only tool servers answer from the live stack or a recording. The investigator validates every citation, and the policy engine and its audit log decide in tests. Nothing executes actions yet, and no evaluation number has been measured. The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
 
 > **Synthetic only.** Mercadillo, the system GuardiAI watches, is a fictional marketplace. There are no real credentials anywhere in this repository.
 
@@ -39,7 +39,7 @@ make up && make test
 | 2 | Chaos and snapshots | Done | 10 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 30 scenarios to go. |
 | 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
 | 4 | Investigator | In progress | Bounded loop, evidence ledger, validator, and an Anthropic provider that records for replay. No real model run yet: it needs a key. |
-| 5 | Policy engine | Done | Catalog, blast radius, decisions and a hash-chained audit log, all test-first. Nothing executes yet (Phase 6). |
+| 5 | Policy engine | In progress | Acceptance met in CI: catalog, blast radius, decisions and a hash-chained audit log, all test-first. Waits for Phase 4 to be marked done. |
 | 6 | Remediation and verification | Not started | Nothing. |
 | 7 | Evaluation | Not started | Nothing. No number has been measured. |
 | 8 | Console, postmortem and replay | Not started | Nothing. |

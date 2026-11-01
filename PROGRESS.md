@@ -11,7 +11,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 2 | Chaos and snapshots | Done | v0.2.0 at the commit that marks it done, not tagged yet |
 | 3 | Read-only tool servers | Done | v0.3.0 at the commit that marks it done, not tagged yet |
 | 4 | Investigator | In progress | — |
-| 5 | Policy engine | Done | v0.5.0 at the commit that marks it done, not tagged yet |
+| 5 | Policy engine | In progress | — |
 | 6 | Remediation and verification | Not started | — |
 | 7 | Evaluation | Not started | — |
 | 8 | Console, postmortem and replay | Not started | — |
@@ -166,7 +166,7 @@ Done, test-first ([ADR 15](docs/adr/0015-a-policy-engine-that-gathers-every-reas
 - 9 tests, written before the engine. They found two catalog entries that could never run, which were fixed. **The acceptance criterion holds.**
 - The append-only, hash-chained audit log, also test-first. Its 5 tests show that editing, deleting, reordering, or rewriting an entry with a recomputed hash all break the chain, and that reopening the file continues it.
 
-Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41321942814) ran all 14 policy tests, green.
+Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41321942814) ran all 14 policy tests, green. Phase 5's acceptance holds, but the phase stays in progress until Phase 4 is done, since phases are finished in order. Phase 5 was started while Phase 4 waits for a real model run, which needs the owner's key.
 
 Left for Phase 6, which executes actions: the Spring Boot service around the engine, `mcp-actions`, idempotent execution, verification and automatic revert.
 
