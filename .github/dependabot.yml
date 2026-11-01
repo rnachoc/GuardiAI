@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+# The tool images pinned in the Makefile are not covered by Dependabot. They are updated by hand,
+# and the Makefile is the only place that names them.
