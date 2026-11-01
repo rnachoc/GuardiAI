@@ -193,8 +193,8 @@ def build() -> dict:
     grid.add(stat("Payments declined", "Checkouts declined by the payment provider, per minute.",
                   'sum(rate(mercadillo_checkouts_total{outcome="declined"}[$__rate_interval])) * 60 or vector(0)',
                   "none", "#FFB547"), 4, 5)
-    grid.add(stat("Notifier lag", "Order events waiting for the notifier, summed over partitions.",
-                  'sum(kafka_consumer_records_lag_max{service_name="notifier"}) or vector(0)', "none", "#3DD68C", 0,
+    grid.add(stat("Notifier lag", "Order events waiting for the notifier, measured by the broker.",
+                  'sum(kafka_consumergroup_lag{consumergroup="notifier"}) or vector(0)', "none", "#3DD68C", 0,
                   [{"color": "#3DD68C", "value": None}, {"color": "#FFB547", "value": 50}, {"color": "#FF5C5C", "value": 500}]), 4, 5)
 
     grid.section("Services")
@@ -225,8 +225,8 @@ def build() -> dict:
                     [target('sum by (service_name) (db_client_connections_usage{state="used"}) '
                             "/ sum by (service_name) (db_client_connections_max)", "{{service_name}}")],
                     "percentunit", soft_max=1), 12, 7)
-    grid.add(series("Kafka consumer lag", "Order events the notifier has not processed yet.",
-                    [target('sum by (topic) (kafka_consumer_records_lag_max{service_name="notifier"})', "{{topic}}")],
+    grid.add(series("Kafka consumer lag", "Order events the notifier has not processed yet, measured by the broker.",
+                    [target('sum by (topic) (kafka_consumergroup_lag{consumergroup="notifier"})', "{{topic}}")],
                     "none", decimals=0, soft_max=10), 12, 7)
 
     grid.section("Runtime")

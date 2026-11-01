@@ -387,7 +387,7 @@
     {
       "type": "stat",
       "title": "Notifier lag",
-      "description": "Order events waiting for the notifier, summed over partitions.",
+      "description": "Order events waiting for the notifier, measured by the broker.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -399,7 +399,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum(kafka_consumer_records_lag_max{service_name=\"notifier\"}) or vector(0)",
+          "expr": "sum(kafka_consumergroup_lag{consumergroup=\"notifier\"}) or vector(0)",
           "legendFormat": "__auto",
           "range": true,
           "instant": false
@@ -1010,7 +1010,7 @@
     {
       "type": "timeseries",
       "title": "Kafka consumer lag",
-      "description": "Order events the notifier has not processed yet.",
+      "description": "Order events the notifier has not processed yet, measured by the broker.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -1022,7 +1022,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum by (topic) (kafka_consumer_records_lag_max{service_name=\"notifier\"})",
+          "expr": "sum by (topic) (kafka_consumergroup_lag{consumergroup=\"notifier\"})",
           "legendFormat": "{{topic}}",
           "range": true,
           "instant": false

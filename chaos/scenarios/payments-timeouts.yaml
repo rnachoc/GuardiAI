@@ -32,5 +32,5 @@ groundTruth:
       expect: above zero while the fault is active
     - id: checkout-payment-timeout-logs
       kind: log
-      query: '{service_name="checkout"} |~ "(?i)timed out|read timed out|payments"'
-      expect: lines that name a timeout calling payments
+      query: '{service_name="checkout"} |= "failed calling a dependency" |= "payments-proxy"'
+      expect: lines that name the call to payments that timed out

@@ -27,5 +27,5 @@ groundTruth:
   evidence:
     - id: lag-drained
       kind: metric
-      query: sum(kafka_consumer_records_lag_max{service_name="notifier"})
-      expect: back to zero by the end of the scenario
+      query: sum(kafka_consumergroup_lag{consumergroup="notifier", topic="orders.placed"})
+      expect: rises during the pause, then back to zero by the end of the scenario
