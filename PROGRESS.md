@@ -6,8 +6,8 @@ The single source of truth for what is done and what is next. A phase is marked 
 
 | Phase | Name | Status | Release |
 | --- | --- | --- | --- |
-| 0 | Foundations | Done | v0.0.0 |
-| 1 | Mercadillo and observability | In progress | — |
+| 0 | Foundations | Done | v0.0.0 at `5e0cf37`, not tagged yet |
+| 1 | Mercadillo and observability | Done | v0.1.0 at the commit that marks it done, not tagged yet |
 | 2 | Chaos and snapshots | Not started | — |
 | 3 | Read-only tool servers | Not started | — |
 | 4 | Investigator | Not started | — |
@@ -18,7 +18,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 9 | Security pack, model matrix, cost report | Not started | — |
 | 10 | Release | Not started | — |
 
-Phases 0 to 7 are the minimum publishable version.
+Phases 0 to 7 are the minimum publishable version. The session that builds Guardia cannot push tags, so the owner creates each release tag on the commit named here.
 
 ## Phase 0: Foundations
 
@@ -42,7 +42,7 @@ Verified: the [first CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41
 
 **Plan.** Seven Spring Boot services in one Maven build and one Dockerfile ([ADR 4](docs/adr/0004-mercadillo-as-one-spring-boot-build.md)); the OpenTelemetry agent in every service, one Collector, and Prometheus, Loki, Tempo and Grafana ([ADR 5](docs/adr/0005-opentelemetry-agent-and-one-collector.md)); k6 for steady shoppers ([ADR 6](docs/adr/0006-k6-for-steady-shoppers.md)); a check that proves the criteria on the running stack.
 
-Done and checked locally:
+Done, checked locally and in CI:
 
 - `gateway`, `catalog`, `cart`, `checkout`, `payments`, `inventory` and `notifier`, with 30 unit tests. `make test-mercadillo` compiles them with every warning treated as an error, and runs the tests in a container.
 - The full stack starts with `make up`. Every Mercadillo service reports healthy, and k6 sends 4 shoppers per second.
@@ -55,7 +55,7 @@ Done and checked locally:
 - Every status code in the [public API table](mercadillo/README.md#public-api) was checked against the running stack, including out of stock.
 - `make verify` fails when the gateway is stopped, so it does not pass on a broken stack.
 
-Still to do before Phase 1 is done: see CI run `make verify` green on GitHub, then tag `v0.1.0`.
+Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41305120651) passed all four jobs. On the runner, `make verify` measured a checkout trace across all 7 services, logs from all 7, and all 14 dashboard queries returning data.
 
 ## Next
 

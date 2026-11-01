@@ -35,7 +35,7 @@ make up && make test
 | Phase | Scope | Status | What exists today |
 | --- | --- | --- | --- |
 | 0 | Foundations | Done | Checks and CI, ADRs 1 to 3, and a stack with PostgreSQL, Redis and Kafka that `make smoke` proves works. |
-| 1 | Mercadillo and observability | In progress | Seven services, steady load, and traces, metrics and logs in Grafana. `make verify` passes locally; CI has not run it yet. |
+| 1 | Mercadillo and observability | Done | Seven services, steady load, and traces, metrics and logs in Grafana. `make verify` proves it on every CI run. |
 | 2 | Chaos and snapshots | Not started | Nothing. |
 | 3 | Read-only tool servers | Not started | Nothing. |
 | 4 | Investigator | Not started | Nothing. |
