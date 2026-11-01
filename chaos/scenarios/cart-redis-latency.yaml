@@ -32,5 +32,5 @@ groundTruth:
       expect: above 0.25 seconds while the fault is active
     - id: cart-redis-spans
       kind: trace
-      query: '{ resource.service.name = "cart" && span.db.system.name = "redis" && duration > 250ms }'
+      query: '{ resource.service.name = "cart" && span.db.system = "redis" && duration > 250ms }'
       expect: Redis spans of the cart service that each take longer than 250 milliseconds

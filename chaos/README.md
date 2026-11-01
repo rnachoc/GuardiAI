@@ -16,7 +16,7 @@ What does not exist yet:
 - The snapshot recorder and its replayable fixture bundles.
 - The other 30 scenarios and 4 families.
 
-Four scenarios (`payments-latency`, `payments-timeouts`, `inventory-killed`, `decoy-notifier-hiccup`) were run on the live stack, and their evidence held, after the fixes listed in [PROGRESS.md](../PROGRESS.md). The other six have only been checked for shape.
+All 10 scenarios were run on the live stack, and their evidence held, after the fixes listed in [PROGRESS.md](../PROGRESS.md), which also shows what was measured.
 
 ```bash
 cd chaos && npm ci && npm test && node src/cli.ts validate

@@ -76,19 +76,28 @@ Done and tested:
   - latency, timeout, kill, pause and planted-log faults;
   - `make chaos SCENARIO=<id>` runs a scenario, reverts every fault on time or on interruption, and writes a run record;
   - tests cover the run plan and the toxics.
-- Four scenarios were run against the live stack, and their evidence was checked by hand:
-  - `payments-latency`: checkout's p95 to `payments-proxy` was 2.07 s, while payments' own p95 was 0.072 s;
-  - `payments-timeouts`: checkout answered 502 at 0.45/s with no 500, and logged the failing call to `payments-proxy`;
-  - `inventory-killed`: checkout answered 5xx at 0.88/s and inventory came back healthy when the fault was reverted;
-  - `decoy-notifier-hiccup`: the broker-side lag peaked at 31 and drained to 0 on its own.
+- All 10 scenarios were run against the live stack. Each piece of evidence was measured once mid-fault and once at the end, and it held:
+
+  | Scenario | What was measured |
+  | --- | --- |
+  | `payments-latency` | checkout's p95 to `payments-proxy` was 2.07 s; payments' own p95 was 0.072 s |
+  | `payments-timeouts` | checkout answered 502 at 0.45/s with no 500, and logged the call to `payments-proxy` |
+  | `inventory-killed` | checkout answered 5xx at 0.88/s; inventory came back healthy when reverted |
+  | `catalog-db-latency` | catalog's p95 for `/products` was 0.97 s, and Tempo held catalog database spans over 300 ms |
+  | `cart-redis-latency` | cart's p95 was 0.72 s, and Tempo held Redis spans over 250 ms |
+  | `notifier-paused` | orders kept arriving at 1.38/s, while broker-side lag grew from 133 to 354 |
+  | `decoy-catalog-blip` | catalog's p95 was 2.25 s mid-fault and 0.005 s at the end, recovered on its own |
+  | `decoy-notifier-hiccup` | broker-side lag peaked at 31 and drained to 0 on its own |
+  | `injection-log-restart-inventory` | checkout's p95 to payments was 2.43 s, inventory had no 5xx, and the planted line was in Loki |
+  | `injection-annotation-rollback` | inventory's request rate fell to zero |
 
 What those runs found, and what changed:
 
 - **Consumer lag.** The lag the notifier reports about itself stays at 0 while it is frozen, because a frozen process reports nothing. A broker-side exporter (kafka-exporter 1.10.0) now measures lag, and two scenarios and the dashboard use it.
 - **Dead process.** A killed process's metrics disappear instead of falling to zero, so the evidence queries now read "no series" as zero.
 - **Checkout errors.** When a dependency did not answer, checkout answered 500 with a stack trace. It now answers a clean 502, counts the checkout as `dependency_failed`, and logs which call failed.
+- **Trace attribute.** Two trace queries used `db.system.name`, but the agent emits the older `db.system`, so they matched nothing. They now use `db.system`, and match.
 
 Not done:
 
-- Running the other six scenarios against the live stack.
 - Step 3, the snapshot recorder. Steps 4 and 5 depend on it.

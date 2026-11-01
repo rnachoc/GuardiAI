@@ -32,5 +32,5 @@ groundTruth:
       expect: above 0.3 seconds while the fault is active
     - id: catalog-db-span-duration
       kind: trace
-      query: '{ resource.service.name = "catalog" && span.db.system.name = "postgresql" && duration > 300ms }'
+      query: '{ resource.service.name = "catalog" && span.db.system = "postgresql" && duration > 300ms }'
       expect: database spans of the catalog that each take longer than 300 milliseconds
