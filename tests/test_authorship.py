@@ -114,6 +114,12 @@ class JavaTest(unittest.TestCase):
                 List<String> names() {
                     return List.of();
                 }
+
+                /**
+                 * @author {AUTHOR}
+                 */
+                private final Shop other =
+                        new Shop(new Repository(Duration.ZERO, "x"));
             }
             """)
         problems = check_authorship.check_java(path)

@@ -109,9 +109,29 @@ class PinningTest(unittest.TestCase):
         Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
         """
         images = re.findall(r"^\s*image:\s*(\S+)\s*$", read("compose.yaml"), re.MULTILINE)
-        self.assertTrue(images, "compose.yaml names no image")
-        for image in images:
+        pulled = [image for image in images if not image.startswith("guardia/")]
+        self.assertTrue(pulled, "compose.yaml names no image")
+        for image in pulled:
             self.assertRegex(image, DIGEST, f"{image} is not pinned by digest")
+
+    def test_images_built_here_are_only_local(self):
+        """An image Compose builds is tagged local, so it can never be mistaken for a pulled one.
+
+        Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+        """
+        for image in re.findall(r"^\s*image:\s*(guardia/\S+)\s*$", read("compose.yaml"), re.MULTILINE):
+            self.assertRegex(image, r"^guardia/[a-z-]+:local$")
+
+    def test_dockerfile_base_images_are_pinned_by_digest(self):
+        """Each FROM line in every Dockerfile is pinned by digest.
+
+        Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+        """
+        dockerfiles = [path for path in ROOT.rglob("Dockerfile") if "node_modules" not in path.parts]
+        self.assertTrue(dockerfiles)
+        for dockerfile in dockerfiles:
+            for image in re.findall(r"^FROM\s+(\S+)", dockerfile.read_text(encoding="utf-8"), re.MULTILINE):
+                self.assertRegex(image, DIGEST, f"{dockerfile}: {image} is not pinned by digest")
 
     def test_tool_images_are_pinned_by_digest(self):
         """Each tool image in the Makefile is pinned by digest.

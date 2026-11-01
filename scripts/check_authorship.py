@@ -95,7 +95,9 @@ def check_java(path: Path) -> list[str]:
             elif depth >= 1:
                 method = JAVA_METHOD.match(code)
                 constructor = JAVA_CONSTRUCTOR.match(code)
-                if constructor or (method and method.group(1) not in JAVA_NOT_A_METHOD and "=" not in code.split("(")[0]):
+                first_word = code.split()[0] if code.split() else ""
+                if constructor or (method and method.group(1) not in JAVA_NOT_A_METHOD
+                                   and first_word not in JAVA_NOT_A_METHOD and "=" not in code.split("(")[0]):
                     is_declaration = depth == 1 or bool(re.match(r"^\s*(public|protected|private|static)\b", code))
         if is_declaration and AUTHOR not in preceding_comment(lines, index, "/**", "*/"):
             problems.append(f"{path}:{index + 1}: declaration has no Javadoc with the author: {stripped[:70]}")
@@ -151,7 +153,7 @@ def main() -> int:
         problems += check_python(path)
     for path in files(root, (".java",)):
         problems += check_java(path)
-    for path in files(root, (".ts", ".tsx")):
+    for path in files(root, (".ts", ".tsx", ".js", ".mjs")):
         if not path.name.endswith(".d.ts"):
             problems += check_typescript(path)
     for path in files(root, (".sh",)) + [root / ".githooks" / "pre-commit"]:
