@@ -70,8 +70,25 @@ Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41
 
 Done and tested:
 
-- Step 1. The strict scenario schema, 10 scenarios (6 incidents, 2 decoys, 2 injections), `guardia-chaos validate`, and 10 tests. `make test` runs them in a container ([ADR 7](docs/adr/0007-scenarios-as-validated-yaml-in-typescript.md)).
+- Step 1. The strict scenario schema, 10 scenarios (6 incidents, 2 decoys, 2 injections), `guardia-chaos validate`, and tests. `make test` runs them in a container ([ADR 7](docs/adr/0007-scenarios-as-validated-yaml-in-typescript.md)).
+- Step 2. The injector ([ADR 8](docs/adr/0008-faults-through-toxiproxy-and-the-docker-api.md)):
+  - Toxiproxy sits on four connections;
+  - latency, timeout, kill, pause and planted-log faults;
+  - `make chaos SCENARIO=<id>` runs a scenario, reverts every fault on time or on interruption, and writes a run record;
+  - tests cover the run plan and the toxics.
+- Four scenarios were run against the live stack, and their evidence was checked by hand:
+  - `payments-latency`: checkout's p95 to `payments-proxy` was 2.07 s, while payments' own p95 was 0.072 s;
+  - `payments-timeouts`: checkout answered 502 at 0.45/s with no 500, and logged the failing call to `payments-proxy`;
+  - `inventory-killed`: checkout answered 5xx at 0.88/s and inventory came back healthy when the fault was reverted;
+  - `decoy-notifier-hiccup`: the broker-side lag peaked at 31 and drained to 0 on its own.
+
+What those runs found, and what changed:
+
+- **Consumer lag.** The lag the notifier reports about itself stays at 0 while it is frozen, because a frozen process reports nothing. A broker-side exporter (kafka-exporter 1.10.0) now measures lag, and two scenarios and the dashboard use it.
+- **Dead process.** A killed process's metrics disappear instead of falling to zero, so the evidence queries now read "no series" as zero.
+- **Checkout errors.** When a dependency did not answer, checkout answered 500 with a stack trace. It now answers a clean 502, counts the checkout as `dependency_failed`, and logs which call failed.
 
 Not done:
 
-- Steps 2 to 5. No evidence query has been run against a recording yet.
+- Running the other six scenarios against the live stack.
+- Step 3, the snapshot recorder. Steps 4 and 5 depend on it.

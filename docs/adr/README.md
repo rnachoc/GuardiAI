@@ -11,3 +11,4 @@ Each record explains one significant decision: its context, the decision and its
 | 5 | [The OpenTelemetry agent and one Collector](0005-opentelemetry-agent-and-one-collector.md) | Accepted |
 | 6 | [k6 for steady shoppers](0006-k6-for-steady-shoppers.md) | Accepted |
 | 7 | [Scenarios as validated YAML, with tooling in TypeScript](0007-scenarios-as-validated-yaml-in-typescript.md) | Accepted |
+| 8 | [Faults through Toxiproxy and the Docker API](0008-faults-through-toxiproxy-and-the-docker-api.md) | Accepted |
