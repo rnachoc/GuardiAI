@@ -14,7 +14,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 3 Read-only tool servers | Done | `mcp/src/{metrics,logs,traces,changes,runbooks}/` |
 | 4 Investigator | Done, on scripted turns (ADR 16) | `agents/src/`, `agents/responses/` |
 | 5 Policy engine | Done as a library | `policy/src/main/java/.../policy/` |
-| 6 Remediation and verification | Not started | — |
+| 6 Remediation and verification | In progress: `mcp-actions` built | `mcp/src/actions/` |
 | 7 Evaluation | Not started | — |
 | 8 Console, postmortem, replay | Not started | — |
 | 9 Security pack, model matrix, cost report | Not started | — |
@@ -99,7 +99,7 @@ The brief asks for 40 scenarios across 8 families, with 6 decoys and 6 injection
 
 Acceptance (brief): planner, executor, verification, automatic revert.
 
-1. **`mcp-actions`** (`mcp/src/actions/server.ts`) has a single tool, `propose_action({action, target, reason, evidence[]})`. It validates the shape and writes the proposal to a queue, a JSON Lines file or an HTTP POST to the policy service, and returns a proposal ID. It executes nothing. Its tests prove it never touches Docker or any backend.
+1. **Done:** **`mcp-actions`** (`mcp/src/actions/server.ts`) has a single tool, `propose_action({action, target, reason, evidence[]})`. It validates the shape and writes the proposal to a queue, a JSON Lines file or an HTTP POST to the policy service, and returns a proposal ID. It executes nothing. Its tests prove it never touches Docker or any backend.
 2. **Policy service:** wrap `PolicyEngine` and `AuditLog` in Spring Boot (`policy/`, with `spring-boot-starter-web`):
    - `POST /proposals` to judge a proposal;
    - `POST /proposals/{id}/approvals` for people;
@@ -182,4 +182,4 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
 
 1. Create the release tags (section 2).
 2. Fix the frozen replay clock (section 4.1) and add the decoy turns.
-3. Build `mcp-actions` and the Spring Boot policy service, then the executor test-first (section 5.2).
+3. Build the Spring Boot policy service, then the executor test-first (section 5.2). `mcp-actions` is already built.

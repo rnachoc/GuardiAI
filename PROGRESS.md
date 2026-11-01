@@ -12,7 +12,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 3 | Read-only tool servers | Done | v0.3.0 at the commit that marks it done, not tagged yet |
 | 4 | Investigator | Done | v0.4.0 at the commit that marks it done, not tagged yet |
 | 5 | Policy engine | Done | v0.5.0 at the commit that marks it done, not tagged yet |
-| 6 | Remediation and verification | Not started | — |
+| 6 | Remediation and verification | In progress | — |
 | 7 | Evaluation | Not started | — |
 | 8 | Console, postmortem and replay | Not started | — |
 | 9 | Security pack, model matrix, cost report | Not started | — |
@@ -171,6 +171,16 @@ Done, test-first ([ADR 15](docs/adr/0015-a-policy-engine-that-gathers-every-reas
 Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41321942814) ran all 14 policy tests, green.
 
 Left for Phase 6, which executes actions: the Spring Boot service around the engine, `mcp-actions`, idempotent execution, verification and automatic revert.
+
+## Phase 6: Remediation and verification
+
+**Acceptance:** planner, executor, verification, automatic revert.
+
+Done and tested:
+
+- `mcp-actions`: `propose_action` writes a proposal with its evidence and expected effect, returns its ID, and leaves judging to the policy engine. It refuses malformed proposals and caps them at 10 a minute. A test checks that its code has no way to execute anything.
+
+Not done: the Spring Boot policy service, the executor (idempotency, dry run, verification, auto-revert, escalation), the remediation planner and the end-to-end test. The plan is in [docs/HANDOFF.md](docs/HANDOFF.md#52-phase-6-remediation-and-verification).
 
 ## Next
 

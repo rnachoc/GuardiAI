@@ -11,7 +11,7 @@ GuardiAI's read-only MCP servers, in TypeScript on the official SDK ([ADR 11](..
 | `mcp-traces` | `search_traces`, `get_trace`, `critical_path` | Built, live and replay |
 | `mcp-changes` | `list_changes`, `get_change` | Built: live reads an append-only change log, replay the bundle's events |
 | `mcp-runbooks` | `search_runbooks`, `get_runbook` | Built: lexical hybrid search over `docs/runbooks` ([ADR 12](../docs/adr/0012-lexical-hybrid-search-for-runbooks.md)) |
-| `mcp-actions` | `propose_action`, which only creates a proposal | Comes with the policy engine |
+| `mcp-actions` | `propose_action` | Built: writes a proposal and returns its ID; executes nothing, judges nothing, at most 10 a minute |
 
 Every tool is read-only. Each server accepts only an allow-listed query subset with caps on time range and result size, and returns text from the system redacted and wrapped as untrusted data.
 
