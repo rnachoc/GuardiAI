@@ -1,0 +1,33 @@
+# Local configuration. Only the example with placeholders is committed.
+.env
+.env.*
+!.env.example
+
+# Java
+target/
+*.class
+hs_err_pid*.log
+
+# Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Real model runs write their spend here; recorded fixtures live elsewhere.
+.guardia/
+
+# Editors and operating systems
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
