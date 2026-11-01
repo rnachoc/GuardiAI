@@ -10,3 +10,4 @@ Each record explains one significant decision: its context, the decision and its
 | 4 | [Mercadillo as one Spring Boot build](0004-mercadillo-as-one-spring-boot-build.md) | Accepted |
 | 5 | [The OpenTelemetry agent and one Collector](0005-opentelemetry-agent-and-one-collector.md) | Accepted |
 | 6 | [k6 for steady shoppers](0006-k6-for-steady-shoppers.md) | Accepted |
+| 7 | [Scenarios as validated YAML, with tooling in TypeScript](0007-scenarios-as-validated-yaml-in-typescript.md) | Accepted |

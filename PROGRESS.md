@@ -8,7 +8,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | --- | --- | --- | --- |
 | 0 | Foundations | Done | v0.0.0 at `5e0cf37`, not tagged yet |
 | 1 | Mercadillo and observability | Done | v0.1.0 at the commit that marks it done, not tagged yet |
-| 2 | Chaos and snapshots | Not started | — |
+| 2 | Chaos and snapshots | In progress | — |
 | 3 | Read-only tool servers | Not started | — |
 | 4 | Investigator | Not started | — |
 | 5 | Policy engine | Not started | — |
@@ -57,6 +57,21 @@ Done, checked locally and in CI:
 
 Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41305120651) passed all four jobs. On the runner, `make verify` measured a checkout trace across all 7 services, logs from all 7, and all 14 dashboard queries returning data.
 
-## Next
+## Phase 2: Chaos and snapshots
 
-Phase 2: the `guardia-chaos` injector, the first 10 scenarios, and the snapshot recorder. Done when each scenario can be recorded and replayed reproducibly.
+**Acceptance:** each scenario can be recorded and replayed reproducibly.
+
+**Plan.**
+1. Define the scenario format and write the first 10 scenarios.
+2. Build the injector: Toxiproxy on four connections, plus container kill, container pause and planted logs.
+3. Build the snapshot recorder, which stores metrics, logs, traces and change events as a fixture bundle with a hash manifest.
+4. Record each scenario and confirm that its evidence queries return what the scenario expects.
+5. Show that replaying a bundle is byte-for-byte reproducible.
+
+Done and tested:
+
+- Step 1. The strict scenario schema, 10 scenarios (6 incidents, 2 decoys, 2 injections), `guardia-chaos validate`, and 10 tests. `make test` runs them in a container ([ADR 7](docs/adr/0007-scenarios-as-validated-yaml-in-typescript.md)).
+
+Not done:
+
+- Steps 2 to 5. No evidence query has been run against a recording yet.
