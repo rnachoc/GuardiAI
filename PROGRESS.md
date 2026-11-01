@@ -150,10 +150,12 @@ Done and tested ([ADR 13](docs/adr/0013-the-investigator-and-its-evidence-ledger
 - On the `payments-latency` recording, the investigator ran 3 steps and 5 tool calls over MCP. Its diagnosis cites valid evidence and ranks payments, `network_latency`, first.
 - 8 tests prove each rejection: an invented ID, a refused call, a claim without evidence, evidence whose answer changed, ranks out of order, an unknown component. They also prove that the step limit, the token budget, the tool-call limit and the spend cap each stop a run.
 
+- The Anthropic provider on the official SDK records every turn for replay ([ADR 14](docs/adr/0014-claude-through-the-official-sdk-recorded-for-replay.md)). Against a local stand-in for the API, it sends valid requests, matches each tool result to its call, and its recording replays to the same diagnosis. `make investigate SCENARIO=<id>` runs it.
+
 Not done, and why:
 
 - **The responses are scripted by hand, not recorded from a model.** The brief asks for recorded responses. That needs an Anthropic provider and a key under the spend cap, which is the owner's decision. Until then, the passing run proves the loop and the validator, not a model's ability to diagnose.
 
 ## Next
 
-Phase 4: an Anthropic provider behind `GUARDIA_MODEL_PROVIDER=anthropic` and the spend cap, and a first recorded run of `payments-latency`.
+Phase 4: a first recorded run of `payments-latency` with a real key, under the spend cap, which closes the phase. This is the owner's decision, since it spends money.

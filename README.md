@@ -38,7 +38,7 @@ make up && make test
 | 1 | Mercadillo and observability | Done | Seven services, steady load, and traces, metrics and logs in Grafana. `make verify` proves it on every CI run. |
 | 2 | Chaos and snapshots | Done | 10 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 30 scenarios to go. |
 | 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
-| 4 | Investigator | In progress | Bounded loop, evidence ledger and validator, run on one recording with hand-scripted turns. No real model run yet. |
+| 4 | Investigator | In progress | Bounded loop, evidence ledger, validator, and an Anthropic provider that records for replay. No real model run yet: it needs a key. |
 | 5 | Policy engine | Not started | Nothing. |
 | 6 | Remediation and verification | Not started | Nothing. |
 | 7 | Evaluation | Not started | Nothing. No number has been measured. |

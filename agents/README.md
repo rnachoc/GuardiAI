@@ -10,10 +10,15 @@ What exists:
 - The **evidence ledger**: every tool call gets an ID and the hash of its answer.
 - The **validator**: a diagnosis is refused when a claim has no evidence, cites an unknown or failed call, or cites a call whose answer changed when run again.
 - A **fake provider** that replays turns from `responses/`, and a **spend cap** for any provider that charges.
+- An **Anthropic provider** on the official SDK, using `claude-opus-5-5`, that records its turns for replay ([ADR 14](../docs/adr/0014-claude-through-the-official-sdk-recorded-for-replay.md)). It is tested against a local stand-in for the API, and has never called the real one.
 
 What does not exist yet:
 
-- A provider for the Anthropic API, and responses recorded from a real model. The file in `responses/` is scripted by hand and says so in its `provenance`.
+- Responses recorded from a real model. The file in `responses/` is scripted by hand and says so in its `provenance`. To record one:
+
+  ```bash
+  GUARDIA_MODEL_PROVIDER=anthropic GUARDIA_MAX_SPEND_USD=1.00 ANTHROPIC_API_KEY=... make investigate SCENARIO=payments-latency
+  ```
 - Triage, the remediation planner, the critic and the postmortem writer.
 
 `make test-agents` runs the investigator end to end on the `payments-latency` recording, with no API key.
