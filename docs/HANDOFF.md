@@ -113,7 +113,7 @@ Acceptance (brief): planner, executor, verification, automatic revert.
    - if it never holds, run the action's auto-revert and escalate (webhook mock, section 5.4).
    - Every step goes to the audit log.
    - The executor runs with the Docker socket. Nothing else does.
-4. **Remediation planner** (`agents/src/planner.ts`): turns a validated diagnosis into proposals from the catalog only, each with its expected effect, verification query and rollback. Scripted turns, as in ADR 16.
+4. **Partly done:** the gate in `agents/src/planner.ts` (catalog only, allowed targets, real evidence, nothing for `none`, submitted through `mcp-actions`) and its 4 tests. Still to do: scripted drafting turns, and wiring the planner after the investigator. **Remediation planner** (`agents/src/planner.ts`): turns a validated diagnosis into proposals from the catalog only, each with its expected effect, verification query and rollback. Scripted turns, as in ADR 16.
 5. **End-to-end test:**
    1. run `inventory-killed` live;
    2. the planner proposes `restart_service:inventory`;

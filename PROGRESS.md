@@ -184,7 +184,10 @@ Done and tested:
 
 - The executor core, test-first. It runs only what was approved, by the engine or by enough people; once per proposal, with the idempotency key claimed in the audit log so the claim survives a restart; dry run first; then it polls verification. When recovery is not confirmed, it reverts if the catalog allows and escalates. 6 tests, 23 in the service.
 
+- The remediation planner's gate (`agents/src/planner.ts`). It keeps only drafts that name a catalog action on an allowed target, cite evidence in the ledger and state their effect; it admits nothing for a `none` diagnosis; and it sends what passes through `mcp-actions`. It shares the policy engine's catalog file. 4 tests.
+
 Not done:
+- the planner's model turns (scripted, as in ADR 16);
 - the real runner (Docker API, flag file, Redis, Kafka) and verifier (Prometheus);
 - the facts collector and the Compose service;
 - approvals over HTTP;
