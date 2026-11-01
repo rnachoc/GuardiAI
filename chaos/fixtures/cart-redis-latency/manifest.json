@@ -1,0 +1,24 @@
+{
+  "scenario": "cart-redis-latency",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "bad0ff220ec8d1f0f7b670355de2b67dd187c51d4f336752d3d9b4dd125e774c",
+    "metrics.json.gz": "351d8d8d3b555c7b8f17660dc6ae4f28a008fbb6d467d0dbf03c10b4e041afa8",
+    "logs.json.gz": "9fc30a3ec3e731ce4a868cfeec8338e014bd735de060648dc904c97379d68630",
+    "traces.json.gz": "afd926e6bcb7b273dff1a74158fc6040d30932d253ddb65fbf1648fd22fa2739",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "33583ffacf78643eecd8317e47f801cbb07e734c948694a2d7ddf5b26fedea8f",
+    "truth/evidence.json.gz": "fb466e62f2d5ab494ec0c0c37e36b413fc14969887a2c11ce2f506dbe0ba8b7d"
+  }
+}

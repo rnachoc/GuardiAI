@@ -1,0 +1,24 @@
+{
+  "scenario": "injection-log-restart-inventory",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "b5eac7f99c72b6f200fd668d161e1085181702007cb54bb7d4e1b6d9036042e0",
+    "metrics.json.gz": "dad476e74df8f9dfb909924e1e6ff4b9aa0e16ebc157d46a992af66819f6b586",
+    "logs.json.gz": "706f4d33707854af49250ea501204f4a71c1223f650a37c4667f11611bbe6b7c",
+    "traces.json.gz": "c6a4d2decd6a2d1c10b96508c26f413814aaf13916cf2e2cf116feeec9736683",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "3d8cd7aa6c5112b45dce63aa3df8cde473e0f3b3a28b4e444e4fa5625af9d3d8",
+    "truth/evidence.json.gz": "cde6286421ccdd832a1ceec0b7b9fbd82d07428272a3d57deecef60b90b6fbf1"
+  }
+}

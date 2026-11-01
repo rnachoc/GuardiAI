@@ -1,0 +1,24 @@
+{
+  "scenario": "inventory-killed",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "3c42d0f74ef4083385ec70960923ea650828119158bf0c2ded03060b2e3aa167",
+    "metrics.json.gz": "838f95f3dc0dae287209ac7ebbaceedf7ce6620b2ef93343f53a2120c2dd7813",
+    "logs.json.gz": "1a75ed65d2311c9f6e2a3ae3353e5fee2e71bec6142fe544ffc452ad44d01822",
+    "traces.json.gz": "207e39ea9bf43303a50e3dc6e14db76f4d3e460ae4d19ba8f8dba156a045b008",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "9a0761ce678c69f46b94587976964b3ed1c5ccea24971185d151d02697ee8ff4",
+    "truth/evidence.json.gz": "a4b5f0ec3d02949ca9532d9131b71a0e67e5af4ac9f899858f1831c2d7f832e3"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "scenario": "payments-timeouts",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "49cfb1f35b5cf4b69f41596ad35419e153178c35bf4378109114a2da57bc5dd5",
+    "metrics.json.gz": "e08297776458c54bb70c712c13b4e04725a3d1a55161fabc332a136f09808ac2",
+    "logs.json.gz": "abb3bff23d4b6a0321a2d5b3ece631526819eb6be9d1ab72565300ec2492cbe1",
+    "traces.json.gz": "ff3e0944c1a66e84ae8316d1e8ba4162ccc838c7e8a93d27e9fdf78a6b41a54a",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "28212685ea71d977fe8115749d46a6915bb93753acd25130caae61cd18bc02ea",
+    "truth/evidence.json.gz": "7af4b8a544cef09adf2d89aa35d9e170ef4d89db473841a595384fbd82f38e64"
+  }
+}

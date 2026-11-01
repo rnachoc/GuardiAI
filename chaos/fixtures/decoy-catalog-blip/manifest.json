@@ -1,0 +1,24 @@
+{
+  "scenario": "decoy-catalog-blip",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "c631f804eea3101cb0d14ac8e0060576e3d3c3c3d92991c5ba4f44bb2b3c7eb2",
+    "metrics.json.gz": "5f855fb8d393894d01bfa726551b0dc7e04806cd8b6284a1e7b0c47d80f2daa6",
+    "logs.json.gz": "d1b5a8af60964d051e3a643015d814b323cdad4d9834bc1aacdf5a37570cc0b5",
+    "traces.json.gz": "e098b75a7d4cf22133e26bb6ec76c164680b1eca6f48a826beb94b054a4012ca",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "8105ac062d0eae32b324b9f87ab32213a5da5a76dcb55e105299a2119a9ee1f6",
+    "truth/evidence.json.gz": "287997622e1e86342d379c2898fed313bb9b2fbf74fdf14d31bed23a40683a59"
+  }
+}

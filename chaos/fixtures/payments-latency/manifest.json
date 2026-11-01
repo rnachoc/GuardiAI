@@ -1,0 +1,24 @@
+{
+  "scenario": "payments-latency",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "da76447278e12eedd3ea7ab84314d4e36555baea2e4c4d58d48039872474b705",
+    "metrics.json.gz": "c3fe18caed6b7774daa5d4806ef910d6751940eacf1abc7796c804a1f2c66c52",
+    "logs.json.gz": "f254b1377c131367950b158bd04a5ac7fd40c1dd3d81e6abf7276a4ae15b67b7",
+    "traces.json.gz": "d7ec829549da846f912b6cb06b679e82c888fafd0ecba77bbb1c573cb1c8c5d3",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "1fc6d98d269a2b4fdc846b03be401ce6c51e2d3bd2110ce031d67bbde45d2d90",
+    "truth/evidence.json.gz": "6f235dbeb33c4c3d37a157fb5b2262dcf8e12e04125ca97b4f9133ee9441626e"
+  }
+}

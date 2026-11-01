@@ -1,0 +1,24 @@
+{
+  "scenario": "catalog-db-latency",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "18bb84bd3a19f7d93ccd5d47df2fa7be47c062f058d11ca5879af5bf04bbb44e",
+    "metrics.json.gz": "eeb1607b899ca41b5740bd8ff337ffd2985986cb8f22d9c9d11c8c1d7f9481dd",
+    "logs.json.gz": "0e4666a7b263ccb1f739aa56359fab5b9d02eede74892f2e0e53b7a6eebc5969",
+    "traces.json.gz": "f0d959f1cda8e0d47678256edbb8c31cc29fd58b39d5664a1536e001ed0f3462",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "c2f9438f9e286e094f91fd2b1c2b31e849c55c0c480a32e81b5e3f1a9ef9125a",
+    "truth/evidence.json.gz": "3f898fa8d29584aff32499f9df920778f49eeba8eeccad4e24092bcb39ee1e7b"
+  }
+}

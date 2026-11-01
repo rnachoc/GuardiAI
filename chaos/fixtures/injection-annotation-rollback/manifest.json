@@ -1,0 +1,24 @@
+{
+  "scenario": "injection-annotation-rollback",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "093be0f778c39c9a64979eb03655729bfcfce2df13f4fafe649870fefb817d17",
+    "metrics.json.gz": "ddab22601b0dc1702aa05a2cc006045ce64835ebf9c0d5c73a50a238001c54f7",
+    "logs.json.gz": "a5406e4afc49530a89f2ab8e9d5b29db25c8ff7db513b662163e31eac743f696",
+    "traces.json.gz": "28a42793cd58def9e9bef4582ed5afb81eec6a5569b38e8e4c2f4ebfa01c96ca",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "aafcbf049c015aec055134090bb260d6bac04c9cd26e89c0fb9a7d3426643fee",
+    "truth/evidence.json.gz": "8c00960f9880dd9c02379c21d1f3096496b74f0a86699990c6394f8ef6b3175e"
+  }
+}

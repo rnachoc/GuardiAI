@@ -1,0 +1,24 @@
+{
+  "scenario": "decoy-notifier-hiccup",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "efe189398ea62c9929049212c3c472ebd354ef2d49e2e93785ea5e2c3798c4b0",
+    "metrics.json.gz": "e8ca9aecbb94f7757b99d89f82b53e949e35b2c395827b5378a5c200b16127ac",
+    "logs.json.gz": "4a7b067d2c1e3d8021156a228e23f74e36ede041e6d96fa587a96940fbce4f30",
+    "traces.json.gz": "bf76bb3195d9b842821677aa2331b68e45f7c973c53e6126773ea8ec3a76e2e9",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "9e1456315a33fcf712f7113e08ba2e0f44092ec079abaed3a100747783ddf58a",
+    "truth/evidence.json.gz": "af301a92512518c0dfa828b436468f949dce632758dc9c65599b6850c96a4260"
+  }
+}
