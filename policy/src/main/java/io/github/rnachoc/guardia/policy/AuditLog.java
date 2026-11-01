@@ -131,4 +131,30 @@ public class AuditLog {
             throw new IllegalStateException(impossible);
         }
     }
+
+    /**
+     * Tells whether any entry of a kind carries a value in its data, such as a claimed idempotency key.
+     *
+     * @param kind the entry's kind
+     * @param field the data field
+     * @param value the value to look for
+     * @return {@code true} when such an entry exists
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    public synchronized boolean contains(String kind, String field, String value) {
+        try {
+            if (!Files.exists(file)) {
+                return false;
+            }
+            for (String line : Files.readAllLines(file)) {
+                JsonNode node = JSON.readTree(line);
+                if (kind.equals(node.path("kind").asText()) && value.equals(node.path("data").path(field).asText())) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (IOException failure) {
+            throw new UncheckedIOException(failure);
+        }
+    }
 }
