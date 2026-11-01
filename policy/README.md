@@ -10,6 +10,8 @@ What exists, test-first:
 - [`dependency-graph.yaml`](src/main/resources/dependency-graph.yaml), from which each action's blast radius is computed.
 - `PolicyEngine.decide`, which rejects with every reason when the kill switch is on, or when the action is outside the catalog, the target is not allowed, a precondition fails or is unknown, the hourly limit is reached, or the blast radius is too large. In suggest mode, every action needs approval; in autonomous mode, only low-risk ones run alone.
 
-What does not exist yet: the hash-chained audit log, the Spring Boot service, `mcp-actions`, idempotent execution, verification and automatic revert.
+- `AuditLog`: an append-only JSON Lines file. Each entry is chained to the one before it by a SHA-256 hash, and `verify()` reports any edit, deletion, reordering or forged entry.
+
+What does not exist yet: the Spring Boot service, `mcp-actions`, idempotent execution, verification and automatic revert (Phase 6).
 
 `make test-policy` runs the tests in a container.

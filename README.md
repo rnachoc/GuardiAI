@@ -39,7 +39,7 @@ make up && make test
 | 2 | Chaos and snapshots | Done | 10 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 30 scenarios to go. |
 | 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
 | 4 | Investigator | In progress | Bounded loop, evidence ledger, validator, and an Anthropic provider that records for replay. No real model run yet: it needs a key. |
-| 5 | Policy engine | In progress | Catalog, blast radius and decisions, test-first; forbidden and over-blast actions are rejected. No audit log yet. |
+| 5 | Policy engine | In progress | Catalog, blast radius, decisions and a hash-chained audit log, all test-first. CI has not checked the audit log yet. |
 | 6 | Remediation and verification | Not started | Nothing. |
 | 7 | Evaluation | Not started | Nothing. No number has been measured. |
 | 8 | Console, postmortem and replay | Not started | Nothing. |
@@ -58,6 +58,7 @@ What could go wrong, and what will stop it. Until the security tests of Phase 9 
 | An agent changes a system | Agents only reach read-only tools; actions are proposals that the policy engine decides | [ADR 2](docs/adr/0002-the-model-proposes-the-code-decides.md), [`PolicyEngine`](policy/src/main/java/io/github/rnachoc/guardia/policy/PolicyEngine.java) | Partly: the tools are read-only and the engine rejects in tests; nothing executes yet |
 | An agent chains an action outside the catalog, or names another service to act on | Exact-name catalog lookup, allowed targets per action, and a blast-radius limit from the dependency graph | [`PolicyEngineTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/PolicyEngineTest.java) | Yes, in tests |
 | Text in logs, commits, traces or alerts steers an agent | Untrusted text is redacted, wrapped and flagged by every tool server; two injection scenarios are recorded | [`untrusted.ts`](mcp/src/shared/untrusted.ts), [ADR 11](docs/adr/0011-read-only-tool-servers-with-one-grammar-for-both-modes.md) | Partly: wrapped and flagged in tests; no model has been measured against it |
+| Someone tampers with the audit log | Each entry carries the previous entry's SHA-256; any edit, deletion, reordering or forged entry breaks the chain | [`AuditLogTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/AuditLogTest.java) | Yes, in tests |
 | A diagnosis claims something it cannot show | Every claim cites ledger IDs; invented, failed or changed evidence is rejected | [`investigator.ts`](agents/src/investigator.ts) | Yes, in tests |
 
 ## Repository layout

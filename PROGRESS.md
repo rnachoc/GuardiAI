@@ -164,10 +164,9 @@ Done, test-first ([ADR 15](docs/adr/0015-a-policy-engine-that-gathers-every-reas
 
 - The versioned catalog of nine actions and the dependency graph. The engine rejects with every reason: kill switch, unknown action, disallowed target, failed or unknown precondition, hourly limit, blast radius. Suggest and autonomous modes.
 - 9 tests, written before the engine. They found two catalog entries that could never run, which were fixed. **The acceptance criterion holds.**
+- The append-only, hash-chained audit log, also test-first. Its 5 tests show that editing, deleting, reordering, or rewriting an entry with a recomputed hash all break the chain, and that reopening the file continues it.
 
-Not done:
-
-- The hash-chained audit log, which the phase also lists, and the Spring Boot service around the engine.
+Left for Phase 6, which executes actions: the Spring Boot service around the engine, `mcp-actions`, idempotent execution, verification and automatic revert.
 
 ## Next
 
