@@ -9,7 +9,7 @@ An AI on-call engineer for a microservice system. When an alert fires, a small c
 
 GuardiAI is judged on three things: it finds the right cause, it never does anything unsafe, and it proves both with measured numbers. No number has been measured yet, so none is published.
 
-> **Status: Phase 1, Mercadillo and observability.** The marketplace GuardiAI will watch runs with steady synthetic shoppers, and its traces, metrics and logs reach Grafana. GuardiAI itself (agents, tools, policy engine, evaluations) does not exist yet. The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
+> **Status: Phase 2 done.** The marketplace GuardiAI will watch runs with steady synthetic shoppers and full telemetry, and 10 incident scenarios are recorded as replayable bundles with a sealed ground truth. GuardiAI itself (tools, agents, policy engine, evaluations) does not exist yet. The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
 
 > **Synthetic only.** Mercadillo, the system GuardiAI watches, is a fictional marketplace. There are no real credentials anywhere in this repository.
 
@@ -36,7 +36,7 @@ make up && make test
 | --- | --- | --- | --- |
 | 0 | Foundations | Done | Checks and CI, ADRs 1 to 3, and a stack with PostgreSQL, Redis and Kafka that `make smoke` proves works. |
 | 1 | Mercadillo and observability | Done | Seven services, steady load, and traces, metrics and logs in Grafana. `make verify` proves it on every CI run. |
-| 2 | Chaos and snapshots | In progress | 10 scenarios, each run on the live stack with its evidence measured, and an injector that applies and reverts faults. No snapshot recorder yet. |
+| 2 | Chaos and snapshots | Done | 10 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 30 scenarios to go. |
 | 3 | Read-only tool servers | Not started | Nothing. |
 | 4 | Investigator | Not started | Nothing. |
 | 5 | Policy engine | Not started | Nothing. |

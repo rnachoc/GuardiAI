@@ -8,7 +8,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | --- | --- | --- | --- |
 | 0 | Foundations | Done | v0.0.0 at `5e0cf37`, not tagged yet |
 | 1 | Mercadillo and observability | Done | v0.1.0 at the commit that marks it done, not tagged yet |
-| 2 | Chaos and snapshots | In progress | — |
+| 2 | Chaos and snapshots | Done | v0.2.0 at the commit that marks it done, not tagged yet |
 | 3 | Read-only tool servers | Not started | — |
 | 4 | Investigator | Not started | — |
 | 5 | Policy engine | Not started | — |
@@ -105,7 +105,13 @@ What those runs found, and what changed:
   - on every build, `make test` verifies every bundle: its SHA-256 hashes, byte-for-byte replay, the ground truth, that nothing from `truth/` leaks into what tools will serve, and that no secret is hidden inside the compressed files;
   - 23 tests cover the recorder, the plan and the schema.
 
+Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41317723691) validated all 10 scenarios and verified all 10 recordings.
+
 Notes:
 
 - No scenario yet changes a deploy, a config or a flag, so every bundle's change events are empty. The scenarios for bad config, bad deploys and flags come with the other 30.
 - Most services log nothing per request, so their recorded log lines are the warnings and errors. Checkout and the notifier log each order.
+
+## Next
+
+Phase 3: the five read-only tool servers (`mcp-metrics`, `mcp-logs`, `mcp-traces`, `mcp-changes`, `mcp-runbooks`), in live and replay modes, with unit and abuse tests. Replay serves the recorded bundles.
