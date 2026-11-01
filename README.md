@@ -37,7 +37,7 @@ make up && make test
 | 0 | Foundations | Done | Checks and CI, ADRs 1 to 3, and a stack with PostgreSQL, Redis and Kafka that `make smoke` proves works. |
 | 1 | Mercadillo and observability | Done | Seven services, steady load, and traces, metrics and logs in Grafana. `make verify` proves it on every CI run. |
 | 2 | Chaos and snapshots | Done | 10 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 30 scenarios to go. |
-| 3 | Read-only tool servers | Not started | Nothing. |
+| 3 | Read-only tool servers | In progress | Metrics, logs and traces servers, live and replay, with abuse tests. Changes and runbooks not built. |
 | 4 | Investigator | Not started | Nothing. |
 | 5 | Policy engine | Not started | Nothing. |
 | 6 | Remediation and verification | Not started | Nothing. |

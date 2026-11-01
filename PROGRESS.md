@@ -9,7 +9,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 0 | Foundations | Done | v0.0.0 at `5e0cf37`, not tagged yet |
 | 1 | Mercadillo and observability | Done | v0.1.0 at the commit that marks it done, not tagged yet |
 | 2 | Chaos and snapshots | Done | v0.2.0 at the commit that marks it done, not tagged yet |
-| 3 | Read-only tool servers | Not started | — |
+| 3 | Read-only tool servers | In progress | — |
 | 4 | Investigator | Not started | — |
 | 5 | Policy engine | Not started | — |
 | 6 | Remediation and verification | Not started | — |
@@ -111,6 +111,29 @@ Notes:
 
 - No scenario yet changes a deploy, a config or a flag, so every bundle's change events are empty. The scenarios for bad config, bad deploys and flags come with the other 30.
 - Most services log nothing per request, so their recorded log lines are the warnings and errors. Checkout and the notifier log each order.
+
+## Phase 3: Read-only tool servers
+
+**Acceptance:** all five tool servers, in live and replay modes, with unit tests and abuse tests.
+
+**Plan.**
+1. Build a shared replay reader and the untrusted-text handling.
+2. Build `mcp-metrics`, `mcp-logs` and `mcp-traces`.
+3. Build `mcp-changes` and `mcp-runbooks`.
+4. Check every server against the recordings and the live stack.
+
+Done and tested ([ADR 11](docs/adr/0011-read-only-tool-servers-with-one-grammar-for-both-modes.md)):
+
+- The replay reader opens only the tool-facing files of a bundle, after checking their hashes, and refuses `truth/` by name.
+- Untrusted text is redacted, wrapped in delimiters and flagged for known injection patterns. The planted line of `injection-log-restart-inventory` comes back wrapped and flagged.
+- `mcp-metrics` runs an allow-listed PromQL subset with caps.
+  - For every metric of every scenario, replay reached the same verdict as the real Prometheus. Most values were within 1%; the widest gaps were 1.0 against 1.28 for a rate, and 108 against 127 for a fast-growing gauge.
+- `mcp-logs` runs a LogQL subset with redaction and a line cap. `mcp-traces` offers structured search, a trace by ID and the critical path; on `payments-latency`, the critical path runs through the call to `payments-proxy`.
+- 16 tests, and each server was also driven in live mode against the running stack.
+
+Not done:
+
+- Step 3: `mcp-changes` and `mcp-runbooks`.
 
 ## Next
 
