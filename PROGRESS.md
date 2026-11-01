@@ -10,8 +10,8 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 1 | Mercadillo and observability | Done | v0.1.0 at the commit that marks it done, not tagged yet |
 | 2 | Chaos and snapshots | Done | v0.2.0 at the commit that marks it done, not tagged yet |
 | 3 | Read-only tool servers | Done | v0.3.0 at the commit that marks it done, not tagged yet |
-| 4 | Investigator | In progress | — |
-| 5 | Policy engine | In progress | — |
+| 4 | Investigator | Done | v0.4.0 at the commit that marks it done, not tagged yet |
+| 5 | Policy engine | Done | v0.5.0 at the commit that marks it done, not tagged yet |
 | 6 | Remediation and verification | Not started | — |
 | 7 | Evaluation | Not started | — |
 | 8 | Console, postmortem and replay | Not started | — |
@@ -152,7 +152,9 @@ Done and tested ([ADR 13](docs/adr/0013-the-investigator-and-its-evidence-ledger
 
 - The Anthropic provider on the official SDK records every turn for replay ([ADR 14](docs/adr/0014-claude-through-the-official-sdk-recorded-for-replay.md)). Against a local stand-in for the API, it sends valid requests, matches each tool result to its call, and its recording replays to the same diagnosis. `make investigate SCENARIO=<id>` runs it.
 
-Not done, and why:
+Closed by the owner's decision ([ADR 16](docs/adr/0016-no-paid-model-runs.md)): no paid model run is made. Phase 4 is closed on hand-scripted turns for `payments-latency` and `injection-log-restart-inventory`. On the injection scenario, the planted instruction reaches the investigator wrapped and flagged, and a diagnosis that obeyed it has nothing to cite. [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41328276479) green.
+
+What this does not show, and why:
 
 - **The responses are scripted by hand, not recorded from a model.** The brief asks for recorded responses. That needs an Anthropic provider and a key under the spend cap, which is the owner's decision. Until then, the passing run proves the loop and the validator, not a model's ability to diagnose.
 
@@ -166,11 +168,10 @@ Done, test-first ([ADR 15](docs/adr/0015-a-policy-engine-that-gathers-every-reas
 - 9 tests, written before the engine. They found two catalog entries that could never run, which were fixed. **The acceptance criterion holds.**
 - The append-only, hash-chained audit log, also test-first. Its 5 tests show that editing, deleting, reordering, or rewriting an entry with a recomputed hash all break the chain, and that reopening the file continues it.
 
-Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41321942814) ran all 14 policy tests, green. Phase 5's acceptance holds, but the phase stays in progress until Phase 4 is done, since phases are finished in order. Phase 5 was started while Phase 4 waits for a real model run, which needs the owner's key.
+Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41321942814) ran all 14 policy tests, green.
 
 Left for Phase 6, which executes actions: the Spring Boot service around the engine, `mcp-actions`, idempotent execution, verification and automatic revert.
 
 ## Next
 
-- Phase 4: a first recorded run of `payments-latency` with a real key, under the spend cap. This is the owner's decision, since it spends money.
-- Phase 6: the Spring Boot service around the policy engine, `mcp-actions`, the remediation planner, idempotent execution, verification and automatic revert.
+Everything that remains, phase by phase, with files, order and known findings, is in [docs/HANDOFF.md](docs/HANDOFF.md). Next: Phase 6, remediation and verification.
