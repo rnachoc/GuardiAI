@@ -20,3 +20,4 @@ Each record explains one significant decision: its context, the decision and its
 | 14 | [Claude through the official SDK, recorded for replay](0014-claude-through-the-official-sdk-recorded-for-replay.md) | Accepted |
 | 15 | [A policy engine that gathers every reason](0015-a-policy-engine-that-gathers-every-reason.md) | Accepted |
 | 16 | [No paid model runs](0016-no-paid-model-runs.md) | Accepted |
+| 17 | [Replay time moves with the investigation](0017-replay-time-moves-with-the-investigation.md) | Accepted |

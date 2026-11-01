@@ -66,7 +66,7 @@ They are enforced by tests or CI unless noted.
 
 ## 4. Known findings to address
 
-1. **The replay clock is frozen at the alert.** Replay answers as of the moment the alert fired. A decoy that recovers 10 seconds later, such as `decoy-catalog-blip` (fault from 30 s to 70 s, alert at 60 s), still looks broken to an investigator, so it cannot conclude "recovered, do nothing". Fix: advance the replay clock with the investigation, for example by 30 s per step or by the tools' simulated latency, and record why in an ADR. Then script or record the decoys.
+1. **Fixed (ADR 17):** ~~The replay clock is frozen at the alert.~~ It now moves per step, and evidence is pinned to its step. Script or record the remaining decoys the same way. Originally: Replay answers as of the moment the alert fired. A decoy that recovers 10 seconds later, such as `decoy-catalog-blip` (fault from 30 s to 70 s, alert at 60 s), still looks broken to an investigator, so it cannot conclude "recovered, do nothing". Fix: advance the replay clock with the investigation, for example by 30 s per step or by the tools' simulated latency, and record why in an ADR. Then script or record the decoys.
 2. **Rates are not extrapolated in replay** (ADR 11). Fine for verdicts. Worth a note in the evaluation report.
 3. **No scenario changes deploys, configs or flags yet**, so `mcp-changes` serves empty histories. Phase 2's remaining scenarios fix that (section 5.1).
 4. **Most services log nothing per request.** Consider an INFO line per failed downstream call in cart and gateway. That gives investigations log evidence beyond checkout, and needs re-recording the affected bundles.
@@ -181,5 +181,5 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
 ## 6. Suggested first session
 
 1. Create the release tags (section 2).
-2. Fix the frozen replay clock (section 4.1) and add the decoy turns.
+2. Add turns for `decoy-notifier-hiccup`, now that the replay clock moves (ADR 17).
 3. Build the Spring Boot policy service, then the executor test-first (section 5.2). `mcp-actions` is already built.

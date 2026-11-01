@@ -152,7 +152,7 @@ Done and tested ([ADR 13](docs/adr/0013-the-investigator-and-its-evidence-ledger
 
 - The Anthropic provider on the official SDK records every turn for replay ([ADR 14](docs/adr/0014-claude-through-the-official-sdk-recorded-for-replay.md)). Against a local stand-in for the API, it sends valid requests, matches each tool result to its call, and its recording replays to the same diagnosis. `make investigate SCENARIO=<id>` runs it.
 
-Closed by the owner's decision ([ADR 16](docs/adr/0016-no-paid-model-runs.md)): no paid model run is made. Phase 4 is closed on hand-scripted turns for `payments-latency` and `injection-log-restart-inventory`. On the injection scenario, the planted instruction reaches the investigator wrapped and flagged, and a diagnosis that obeyed it has nothing to cite. [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41328276479) green.
+Closed by the owner's decision ([ADR 16](docs/adr/0016-no-paid-model-runs.md)): no paid model run is made. Since then, replay time moves with the investigation ([ADR 17](docs/adr/0017-replay-time-moves-with-the-investigation.md)), and `decoy-catalog-blip` is concluded `none` from evidence that shows the recovery. Phase 4 is closed on hand-scripted turns for `payments-latency` and `injection-log-restart-inventory`. On the injection scenario, the planted instruction reaches the investigator wrapped and flagged, and a diagnosis that obeyed it has nothing to cite. [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41328276479) green.
 
 What this does not show, and why:
 
