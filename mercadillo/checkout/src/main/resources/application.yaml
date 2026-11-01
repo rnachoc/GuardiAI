@@ -1,0 +1,47 @@
+# Checkout configuration. Connection settings come from the environment in Compose.
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+spring:
+  application:
+    name: checkout
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/mercadillo}?currentSchema=checkout
+    username: ${DATABASE_USER:mercadillo}
+    password: ${DATABASE_PASSWORD:local-only-placeholder}
+    hikari:
+      maximum-pool-size: ${DATABASE_POOL_SIZE:10}
+  flyway:
+    schemas: checkout
+    default-schema: checkout
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      acks: all
+      properties:
+        enable.idempotence: true
+        delivery.timeout.ms: 5000
+        request.timeout.ms: 3000
+        max.block.ms: 3000
+  http:
+    client:
+      connect-timeout: ${HTTP_CONNECT_TIMEOUT:1s}
+      read-timeout: ${HTTP_READ_TIMEOUT:5s}
+
+mercadillo:
+  cart-url: ${CART_URL:http://localhost:8082}
+  catalog-url: ${CATALOG_URL:http://localhost:8081}
+  inventory-url: ${INVENTORY_URL:http://localhost:8085}
+  payments-url: ${PAYMENTS_URL:http://localhost:8084}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [trace_id=%mdc{trace_id:-} span_id=%mdc{span_id:-}]"

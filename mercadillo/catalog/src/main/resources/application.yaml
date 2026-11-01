@@ -1,0 +1,34 @@
+# Catalog configuration. Connection settings come from the environment in Compose.
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+spring:
+  application:
+    name: catalog
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/mercadillo}?currentSchema=catalog
+    username: ${DATABASE_USER:mercadillo}
+    password: ${DATABASE_PASSWORD:local-only-placeholder}
+    hikari:
+      maximum-pool-size: ${DATABASE_POOL_SIZE:10}
+  flyway:
+    schemas: catalog
+    default-schema: catalog
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+  cache:
+    redis:
+      time-to-live: 60s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [trace_id=%mdc{trace_id:-} span_id=%mdc{span_id:-}]"

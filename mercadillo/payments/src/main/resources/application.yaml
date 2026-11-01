@@ -1,0 +1,24 @@
+# Payments configuration. The provider is fake: it decides, and moves no money.
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+spring:
+  application:
+    name: payments
+
+payments:
+  min-latency: ${PAYMENTS_MIN_LATENCY:20ms}
+  max-latency: ${PAYMENTS_MAX_LATENCY:60ms}
+  decline-token: tok_decline
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [trace_id=%mdc{trace_id:-} span_id=%mdc{span_id:-}]"

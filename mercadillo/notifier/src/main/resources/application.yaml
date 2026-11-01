@@ -1,0 +1,23 @@
+# Notifier configuration. Connection settings come from the environment in Compose.
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+spring:
+  application:
+    name: notifier
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      auto-offset-reset: earliest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [trace_id=%mdc{trace_id:-} span_id=%mdc{span_id:-}]"
