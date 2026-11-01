@@ -11,6 +11,7 @@ COMPOSE := docker compose
 DOCKER_RUN := docker run --rm --user $$(id -u):$$(id -g) --volume "$(CURDIR)":/repo --workdir /repo
 
 MAVEN_IMAGE := maven:3.9.16-eclipse-temurin-21@sha256:99e61abcff91a9b1333463bd8451fb18495d6eba9250ac66a338b518f8278320
+NODE_IMAGE := node:22.23.4-alpine3.23@sha256:6abbcf5dd6b231da109bcde1181db1d92bf78015ae1a9514d9807c1f857869db
 PYTHON_IMAGE := python:3.13.18-alpine3.23@sha256:e4aeaca9081549f19bd5bc8605ed5ab257ba34f97e0471f8e09161f45b4b08b8
 ACTIONLINT_IMAGE := rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
 YAMLLINT_IMAGE := pipelinecomponents/yamllint:0.35.27@sha256:f7f7b4f8824839e33690a880dbe20944128b0dc9c55522a0b92a29b3a905cecf
@@ -21,13 +22,15 @@ GITLEAKS_IMAGE := zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb
 # Extra flags for the Maven container, for a machine behind a TLS-intercepting proxy, for example
 # MAVEN_DOCKER_FLAGS="--network host -e MAVEN_OPTS=... -v /path/to/truststore:/opt/proxy-truststore:ro"
 MAVEN_DOCKER_FLAGS ?=
+# The same for the Node container, for example NPM_DOCKER_FLAGS="--network host -e HTTPS_PROXY=..."
+NPM_DOCKER_FLAGS ?=
 
 # A local gitleaks binary can replace the container: make secrets GITLEAKS=gitleaks
 GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-chaos dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -58,7 +61,7 @@ verify: ## Prove the running stack meets Phase 1: a purchase, live traffic, a tr
 	docker run --rm --network guardia_default --volume "$(CURDIR)/scripts":/scripts:ro \
 		--env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 /scripts/verify_stack.py
 
-test: test-repo test-mercadillo ## Run every test suite. Needs no API key and no running stack.
+test: test-repo test-mercadillo test-chaos ## Run every test suite. Needs no API key and no running stack.
 
 test-repo: ## Test the repository's own rules and tools.
 	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 -m unittest discover --start-directory tests --verbose
@@ -67,6 +70,11 @@ test-mercadillo: ## Compile and test the Mercadillo services.
 	mkdir -p .cache/m2
 	$(DOCKER_RUN) --env MAVEN_CONFIG=/var/maven/.m2 --volume "$(CURDIR)/.cache/m2":/var/maven/.m2 $(MAVEN_DOCKER_FLAGS) \
 		--workdir /repo/mercadillo $(MAVEN_IMAGE) mvn --batch-mode --no-transfer-progress --strict-checksums -Duser.home=/var/maven verify
+
+test-chaos: ## Type-check guardia-chaos, test it, and validate every scenario.
+	mkdir -p .cache/npm
+	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
+		--workdir /repo/chaos $(NODE_IMAGE) sh -c 'npm ci --no-audit --no-fund && npm run typecheck && npm test && npm run validate'
 
 dashboard: ## Regenerate the Grafana dashboard from scripts/build_dashboard.py.
 	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 scripts/build_dashboard.py

@@ -1,0 +1,28 @@
+{
+  "name": "@guardia/chaos",
+  "version": "0.2.0",
+  "description": "guardia-chaos: incident scenarios for Mercadillo, with their ground truth. Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>",
+  "author": "Ignacio Rodriguez Caro <rnachoccontact@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "bin": {
+    "guardia-chaos": "src/cli.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "validate": "node src/cli.ts validate"
+  },
+  "dependencies": {
+    "yaml": "2.9.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "6.0.3"
+  }
+}

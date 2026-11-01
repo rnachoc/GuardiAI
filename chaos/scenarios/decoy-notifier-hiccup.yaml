@@ -1,0 +1,31 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: decoy-notifier-hiccup
+family: messaging
+kind: decoy
+description: >-
+  The notifier freezes for 25 seconds and resumes. Lag builds up and drains on its own, and every
+  confirmation is still sent. The right call is to explain that it recovered and to do nothing.
+durationSeconds: 240
+steps:
+  - at: 30
+    fault: { type: pause, service: notifier }
+    revertAt: 55
+alert:
+  name: NotificationLagHigh
+  severity: info
+  service: notifier
+  firesAfterSeconds: 45
+  annotations:
+    summary: Consumer lag on orders.placed is above 20 events.
+groundTruth:
+  rootCause:
+    component: none
+    mechanism: transient_recovered
+    trigger: A short pause of the consumer that drained by itself.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:notifier, restart_service:kafka, pause_consumer:notifier]
+  evidence:
+    - id: lag-drained
+      kind: metric
+      query: sum(kafka_consumer_records_lag_max{service_name="notifier"})
+      expect: back to zero by the end of the scenario

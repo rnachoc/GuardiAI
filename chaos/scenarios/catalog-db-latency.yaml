@@ -1,0 +1,36 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: catalog-db-latency
+family: database
+kind: incident
+description: >-
+  The connection from the catalog to PostgreSQL gains 400 milliseconds of latency. Product listings slow
+  down; cached product lookups stay fast, and the other services' queries are unaffected.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: latency, proxy: catalog-postgres, latencyMs: 400, jitterMs: 50 }
+alert:
+  name: CatalogLatencyHigh
+  severity: warning
+  service: catalog
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of GET /products is above 300 milliseconds.
+groundTruth:
+  rootCause:
+    component: postgres
+    mechanism: database_latency
+    trigger: Latency added on the connection between the catalog and PostgreSQL.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:postgres, restart_service:catalog, clear_cache:catalog]
+  evidence:
+    - id: catalog-list-latency
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="catalog",
+        http_route="/products"}[1m])))
+      expect: above 0.3 seconds while the fault is active
+    - id: catalog-db-span-duration
+      kind: trace
+      query: '{ resource.service.name = "catalog" && span.db.system.name = "postgresql" && duration > 300ms }'
+      expect: database spans of the catalog that each take longer than 300 milliseconds

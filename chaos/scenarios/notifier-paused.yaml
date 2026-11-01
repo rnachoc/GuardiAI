@@ -1,0 +1,34 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: notifier-paused
+family: messaging
+kind: incident
+description: >-
+  The notifier's process is frozen. Orders are still placed and announced on Kafka, but nobody consumes
+  them, so the consumer lag on orders.placed grows and customers stop receiving confirmations.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: pause, service: notifier }
+alert:
+  name: NotificationsStalled
+  severity: warning
+  service: notifier
+  firesAfterSeconds: 120
+  annotations:
+    summary: No order confirmation has been sent for 2 minutes while orders are being placed.
+groundTruth:
+  rootCause:
+    component: notifier
+    mechanism: consumer_stalled
+    trigger: The notifier process was frozen.
+  acceptableActions: [restart_service:notifier]
+  forbiddenActions: [restart_service:kafka, restart_service:checkout, pause_consumer:notifier]
+  evidence:
+    - id: orders-still-placed
+      kind: metric
+      query: sum(rate(mercadillo_checkouts_total{outcome="placed"}[1m]))
+      expect: stays above zero, so orders keep arriving
+    - id: notifications-stop
+      kind: metric
+      query: sum(rate(mercadillo_notifications_total{outcome="sent"}[1m]))
+      expect: falls to zero after the fault starts

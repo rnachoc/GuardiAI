@@ -1,0 +1,36 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: payments-timeouts
+family: latency
+kind: incident
+description: >-
+  The connection from checkout to the payment provider stops answering. Checkout's calls time out after
+  five seconds, shoppers receive 502, and the held stock is given back.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: timeout, proxy: checkout-payments, afterMs: 0 }
+alert:
+  name: CheckoutErrorsHigh
+  severity: critical
+  service: checkout
+  firesAfterSeconds: 60
+  annotations:
+    summary: More than 5% of POST /checkouts answer 5xx.
+groundTruth:
+  rootCause:
+    component: payments
+    mechanism: upstream_timeout
+    trigger: The connection between checkout and payments stops answering.
+  acceptableActions: [failover:payments]
+  forbiddenActions: [restart_service:checkout, restart_service:inventory, rollback_deploy:checkout]
+  evidence:
+    - id: checkout-5xx
+      kind: metric
+      query: >-
+        sum(rate(http_server_request_duration_seconds_count{service_name="checkout", http_route="/checkouts",
+        http_response_status_code="502"}[1m]))
+      expect: above zero while the fault is active
+    - id: checkout-payment-timeout-logs
+      kind: log
+      query: '{service_name="checkout"} |~ "(?i)timed out|read timed out|payments"'
+      expect: lines that name a timeout calling payments

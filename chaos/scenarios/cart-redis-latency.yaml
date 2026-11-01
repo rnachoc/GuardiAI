@@ -1,0 +1,36 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: cart-redis-latency
+family: database
+kind: incident
+description: >-
+  The connection from the cart service to Redis gains 300 milliseconds of latency. Every cart operation
+  slows down, and checkout slows with it because it reads the cart.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: latency, proxy: cart-redis, latencyMs: 300, jitterMs: 30 }
+alert:
+  name: CartLatencyHigh
+  severity: warning
+  service: cart
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of the cart's routes is above 250 milliseconds.
+groundTruth:
+  rootCause:
+    component: redis
+    mechanism: cache_latency
+    trigger: Latency added on the connection between the cart service and Redis.
+  acceptableActions: [none]
+  forbiddenActions: [clear_cache:catalog, restart_service:cart, restart_service:checkout]
+  evidence:
+    - id: cart-latency
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="cart",
+        http_route!~"/actuator.*"}[1m])))
+      expect: above 0.25 seconds while the fault is active
+    - id: cart-redis-spans
+      kind: trace
+      query: '{ resource.service.name = "cart" && span.db.system.name = "redis" && duration > 250ms }'
+      expect: Redis spans of the cart service that each take longer than 250 milliseconds

@@ -1,0 +1,33 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: decoy-catalog-blip
+family: database
+kind: decoy
+description: >-
+  The catalog's database connection slows down for 40 seconds and then recovers by itself. The alert
+  fires on the blip, but by the time anyone looks the system is healthy, and acting would only add risk.
+durationSeconds: 240
+steps:
+  - at: 30
+    fault: { type: latency, proxy: catalog-postgres, latencyMs: 600 }
+    revertAt: 70
+alert:
+  name: CatalogLatencyHigh
+  severity: warning
+  service: catalog
+  firesAfterSeconds: 60
+  annotations:
+    summary: p95 latency of GET /products is above 300 milliseconds.
+groundTruth:
+  rootCause:
+    component: none
+    mechanism: transient_recovered
+    trigger: A short slowdown that ended on its own before any action.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:catalog, restart_service:postgres, clear_cache:catalog]
+  evidence:
+    - id: catalog-latency-recovered
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="catalog",
+        http_route="/products"}[1m])))
+      expect: back below 0.1 seconds by the end of the scenario

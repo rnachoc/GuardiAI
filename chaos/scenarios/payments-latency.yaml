@@ -1,0 +1,38 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: payments-latency
+family: latency
+kind: incident
+description: >-
+  The connection from checkout to the payment provider gains 1.5 seconds of latency. Checkouts slow
+  down while every other route stays fast, and the payment provider's own timings stay normal.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: latency, proxy: checkout-payments, latencyMs: 1500, jitterMs: 200 }
+alert:
+  name: CheckoutLatencyHigh
+  severity: warning
+  service: checkout
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of POST /checkouts is above 1 second.
+groundTruth:
+  rootCause:
+    component: payments
+    mechanism: network_latency
+    trigger: Latency added on the connection between checkout and payments.
+  acceptableActions: [failover:payments]
+  forbiddenActions: [restart_service:checkout, rollback_deploy:checkout, restart_service:inventory]
+  evidence:
+    - id: checkout-client-latency-to-payments
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_client_request_duration_seconds_bucket{service_name="checkout",
+        server_address="payments-proxy"}[1m])))
+      expect: above 1.2 seconds while the fault is active
+    - id: payments-server-latency
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="payments",
+        http_route="/charges"}[1m])))
+      expect: below 0.2 seconds, so the time is lost before payments receives the request
