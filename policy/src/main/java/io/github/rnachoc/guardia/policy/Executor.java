@@ -64,7 +64,7 @@ public class Executor {
         runner.run(request.action(), request.target());
         audit.append("execution", Map.of("proposal", request.proposalId(), "outcome", "ran", "action", request.action(), "target", request.target()));
         for (int poll = 1; poll <= polls; poll++) {
-            if (verifier.holds(request.verificationQuery())) {
+            if (verifier.holds(request.verificationQuery(), request.expect())) {
                 audit.append("verification", Map.of("proposal", request.proposalId(), "outcome", "verified", "poll", poll));
                 return new Result(Outcome.VERIFIED);
             }
@@ -87,11 +87,12 @@ public class Executor {
      * @param proposalId the proposal, which is also the idempotency key
      * @param action the action
      * @param target the service
-     * @param verificationQuery the query that must hold once the system recovered
+     * @param verificationQuery the query that shows whether the system recovered
+     * @param expect the condition its value must meet, such as {@code > 0}
      * @param autoRevert the action that undoes it, or {@code none}
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
-    public record Request(String proposalId, String action, String target, String verificationQuery, String autoRevert) {
+    public record Request(String proposalId, String action, String target, String verificationQuery, String expect, String autoRevert) {
     }
 
     /**
@@ -161,12 +162,13 @@ public class Executor {
     public interface Verifier {
 
         /**
-         * Tells whether the query's condition holds now.
+         * Tells whether the query's value meets the condition now.
          *
          * @param query the query
+         * @param expect the condition, such as {@code > 0}
          * @return {@code true} when it holds
          * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
          */
-        boolean holds(String query);
+        boolean holds(String query, String expect);
     }
 }
