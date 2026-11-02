@@ -1,0 +1,278 @@
+<title>GuardiAI Replay</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="author" content="Ignacio Rodriguez Caro <rnachoccontact@gmail.com>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a cinema-dark stage; a hero with the thesis, rows of incident cards that scroll sideways, and one
+   detail stage below them where the selected incident is replayed. Single dark look by design. */
+:root {
+  --bg: #0a0a0c;
+  --stage: #121216;
+  --raised: #1b1b21;
+  --line: #2a2a33;
+  --fg: #f5f5f7;
+  --muted: #9a9aa6;
+  --accent: #ff3b30;
+  --ok: #30d158;
+  --warn: #ffd60a;
+  --info: #64d2ff;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: var(--info); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.brand { font-weight: 700; letter-spacing: -0.02em; font-size: 20px; }
+.brand span { color: var(--accent); }
+.nav small { color: var(--muted); }
+.hero { padding-block: 56px 32px; }
+.hero h1 { font-size: clamp(34px, 6vw, 64px); line-height: 1.04; letter-spacing: -0.035em; margin: 0 0 16px; text-wrap: balance; max-width: 15ch; }
+.hero p { color: var(--muted); font-size: clamp(17px, 2vw, 21px); max-width: 60ch; margin: 0; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 12px; margin-top: 32px; }
+.stat { background: var(--stage); border-radius: 16px; padding: 18px 20px; }
+.stat b { display: block; font-size: 30px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 14px; }
+.notice { margin-top: 20px; color: var(--muted); font-size: 14px; border-left: 2px solid var(--warn); padding-left: 12px; max-width: 80ch; }
+section.row { padding-block: 18px; }
+.row h2 { font-size: 22px; margin: 0 0 12px; letter-spacing: -0.01em; }
+.rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
+.card { scroll-snap-align: start; flex: 0 0 min(300px, 80vw); text-align: left; background: linear-gradient(160deg, var(--raised), var(--stage)); border: 1px solid var(--line); border-radius: 18px; padding: 18px; color: var(--fg); cursor: pointer; transition: transform .25s ease, border-color .25s ease; font: inherit; }
+.card:hover, .card:focus-visible { transform: translateY(-3px) scale(1.015); border-color: var(--accent); outline: none; }
+.card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.card .eyebrow { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.card h3 { margin: 6px 0 10px; font-size: 19px; line-height: 1.2; letter-spacing: -0.01em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: var(--raised); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.chip.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+.chip.bad { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.chip.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, transparent); }
+#detail { padding-block: 28px 80px; }
+.stage { background: var(--stage); border-radius: 24px; padding: clamp(18px, 3vw, 36px); display: grid; gap: 28px; }
+.stage h2 { font-size: clamp(26px, 4vw, 40px); margin: 0; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 72ch; margin: 8px 0 0; }
+.panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 12px; font-weight: 600; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 24px; }
+.grid2 > * { min-width: 0; }
+svg text { fill: var(--muted); font-size: 12px; font-family: var(--font); }
+.stage, .panel, .hyp, .step, .proposal { min-width: 0; }
+.mono { overflow-wrap: anywhere; }
+.chart { width: 100%; height: auto; display: block; }
+.mono { font-family: var(--mono); font-size: 12.5px; }
+.steps { display: grid; gap: 10px; }
+.step { background: var(--raised); border-radius: 14px; padding: 12px 14px; border: 1px solid transparent; transition: border-color .2s; }
+.step.hl { border-color: var(--info); }
+.step .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.step .id { font-family: var(--mono); color: var(--info); font-weight: 600; }
+.step pre { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; color: var(--muted); max-height: 7.5em; overflow: auto; }
+.hyp { background: var(--raised); border-radius: 14px; padding: 14px; display: grid; gap: 8px; }
+.hyp .title { font-weight: 600; font-size: 17px; }
+.evref { font-family: var(--mono); font-size: 12px; background: transparent; color: var(--info); border: 1px solid color-mix(in srgb, var(--info) 45%, transparent); border-radius: 999px; padding: 2px 9px; cursor: pointer; }
+.evref:focus-visible { outline: 2px solid var(--info); }
+.proposal { border-radius: 14px; padding: 12px 14px; background: var(--raised); display: grid; gap: 4px; }
+.proposal.refused { opacity: .8; border: 1px dashed var(--line); background: transparent; }
+.verdict { font-weight: 600; }
+.verdict.ok { color: var(--ok); }
+.verdict.bad { color: var(--accent); }
+.logs { display: grid; gap: 8px; }
+.log { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: start; }
+.log .t { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+.log .x { min-width: 0; overflow-wrap: anywhere; }
+.empty { color: var(--muted); }
+footer { color: var(--muted); font-size: 13px; padding-block: 0 48px; }
+@media (prefers-reduced-motion: reduce) { .card, .step { transition: none; } .card:hover { transform: none; } }
+</style>
+
+<header class="nav"><div class="wrap">
+  <div class="brand">Guardi<span>AI</span> Replay</div>
+  <small>Every incident recorded from the live stack, replayed with its evidence</small>
+</div></header>
+
+<main>
+  <div class="wrap hero">
+    <h1>Watch an on-call AI prove what it claims.</h1>
+    <p>Mercadillo, a fictional marketplace, was broken ten different ways on purpose. Each incident below was recorded from the running system. Pick one to see the alert, the metric, the logs, how GuardiAI investigated and what it proposed, next to what a rule-based automation would have done.</p>
+    <div class="stats" id="stats"></div>
+    <p class="notice">No model was called to build this page. GuardiAI's investigations here replay turns scripted by hand, so they show how the tools, the evidence checks and the safety rules behave, not how well a model diagnoses.</p>
+  </div>
+  <div id="rows"></div>
+  <div class="wrap" id="detail"></div>
+</main>
+<footer class="wrap">GuardiAI by Ignacio Rodriguez Caro · MIT licence · Mercadillo is fictional and holds no real data.</footer>
+
+<script>
+/* Renders the replay console from the data the build embeds below.
+   Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com> */
+const DATA = /*__DATA__*/null;
+const KINDS = [["incident", "Incidents"], ["injection", "Prompt injections"], ["decoy", "Decoys: nothing to fix"]];
+
+/**
+ * Escapes text for safe insertion as HTML.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function esc(text) {
+  return String(text ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+}
+
+/**
+ * Turns a scenario ID into a readable title.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function titleOf(id) {
+  const words = id.replace(/^(decoy|injection)-/, "").split("-").join(" ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/**
+ * Says how GuardiAI did on a scenario, for the cards.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function guardiaChip(s) {
+  if (!s.guardia) return '<span class="chip">Baseline only</span>';
+  const top = s.guardia.diagnosis?.hypotheses?.[0];
+  const right = top && top.component === s.truth.component && top.mechanism === s.truth.mechanism;
+  return right ? '<span class="chip ok">GuardiAI: right cause</span>' : '<span class="chip bad">GuardiAI: wrong cause</span>';
+}
+
+/**
+ * Renders the summary figures at the top.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function renderStats() {
+  const s = DATA.scenarios;
+  const forbidden = s.reduce((n, x) => n + x.rules.forbidden.length, 0);
+  const investigated = s.filter((x) => x.guardia);
+  const unsafe = investigated.reduce((n, x) => n + x.guardia.accepted.filter((a) => x.forbidden.includes(`${a.action}:${a.target}`)).length, 0);
+  document.getElementById("stats").innerHTML = [
+    [s.length, "incidents recorded from the live stack"],
+    [investigated.length, "replayed through GuardiAI"],
+    [unsafe, "unsafe proposals by GuardiAI"],
+    [forbidden, "forbidden actions by the rule baseline"],
+  ].map(([n, label]) => `<div class="stat"><b>${n}</b><span>${label}</span></div>`).join("");
+}
+
+/**
+ * Renders one row of cards per kind of scenario.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function renderRows() {
+  document.getElementById("rows").innerHTML = KINDS.map(([kind, label]) => {
+    const items = DATA.scenarios.filter((s) => s.kind === kind);
+    return `<section class="row"><div class="wrap"><h2>${label}</h2><div class="rail">${items.map((s) => `
+      <button class="card" data-id="${s.id}" aria-pressed="false">
+        <div class="eyebrow">${esc(s.family)} · ${esc(s.alert.name)}</div>
+        <h3>${esc(titleOf(s.id))}</h3>
+        <div class="chips">${guardiaChip(s)}${s.rules.forbidden.length ? '<span class="chip bad">Rules: forbidden action</span>' : '<span class="chip">Rules: allowed</span>'}</div>
+      </button>`).join("")}</div></div></section>`;
+  }).join("");
+  document.querySelectorAll(".card").forEach((card) => card.addEventListener("click", () => { location.hash = card.dataset.id; }));
+}
+
+/**
+ * Draws the scenario's timeline: fault windows and the moment the alert fired.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function timelineSvg(s) {
+  const w = 800, h = 64, pad = 24, d = s.timeline.duration;
+  const x = (t) => pad + (Math.max(0, Math.min(d, t)) / d) * (w - 2 * pad);
+  const faults = s.timeline.faults.map((f) => f.type === "plant_log"
+    ? `<line x1="${x(f.at)}" x2="${x(f.at)}" y1="12" y2="36" stroke="var(--warn)" stroke-width="2"/><text x="${x(f.at) + 4}" y="12">planted log</text>`
+    : `<rect x="${x(f.at)}" y="18" width="${Math.max(2, x(f.until) - x(f.at))}" height="14" rx="4" fill="var(--accent)" fill-opacity=".55"/><text x="${x(f.at)}" y="12">${esc(f.type)}</text>`).join("");
+  const a = x(s.alert.offset);
+  const ticks = [0, d / 4, d / 2, (3 * d) / 4, d].map((t) => `<text x="${x(t)}" y="58" text-anchor="middle">${Math.round(t)} s</text>`).join("");
+  return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="Timeline of the scenario">
+    <rect x="${pad}" y="24" width="${w - 2 * pad}" height="2" fill="var(--line)"/>${faults}
+    <line x1="${a}" x2="${a}" y1="14" y2="44" stroke="var(--info)" stroke-width="2"/><text x="${a + 4}" y="46" fill="var(--info)">alert</text>${ticks}</svg>`;
+}
+
+/**
+ * Draws the key metric over the run, with the fault windows shaded.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function metricSvg(s) {
+  const pts = s.metric.points.filter((p) => p[1] !== null);
+  const w = 520, h = 240, l = 48, r = 12, t = 14, b = 28;
+  const xs = s.metric.points.map((p) => p[0]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const ymax = Math.max(1e-9, ...pts.map((p) => p[1])) * 1.15;
+  const X = (v) => l + ((v - x0) / (x1 - x0)) * (w - l - r);
+  const Y = (v) => t + (1 - v / ymax) * (h - t - b);
+  const shade = s.timeline.faults.filter((f) => f.type !== "plant_log")
+    .map((f) => `<rect x="${X(f.at)}" y="${t}" width="${Math.max(1, X(f.until) - X(f.at))}" height="${h - t - b}" fill="var(--accent)" fill-opacity=".08"/>`).join("");
+  const line = pts.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" ");
+  const area = pts.length ? `${line} L${X(pts[pts.length - 1][0]).toFixed(1)},${Y(0)} L${X(pts[0][0]).toFixed(1)},${Y(0)} Z` : "";
+  const fmt = (v) => (v >= 100 ? v.toFixed(0) : v >= 1 ? v.toFixed(2) : v.toFixed(3));
+  const grid = [0, 0.5, 1].map((f) => `<line x1="${l}" x2="${w - r}" y1="${Y(ymax * f / 1.15)}" y2="${Y(ymax * f / 1.15)}" stroke="var(--line)"/><text x="${l - 8}" y="${Y(ymax * f / 1.15) + 4}" text-anchor="end">${fmt(ymax * f / 1.15)}</text>`).join("");
+  const xt = [x0, 0, Math.round(x1 / 2), x1].map((v) => `<text x="${X(v)}" y="${h - 8}" text-anchor="middle">${v} s</text>`).join("");
+  const last = pts[pts.length - 1];
+  return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(s.metric.label)} over the run">
+    ${shade}${grid}<path d="${area}" fill="var(--info)" fill-opacity=".12"/><path d="${line}" fill="none" stroke="var(--info)" stroke-width="2"/>
+    ${last ? `<circle cx="${X(last[0])}" cy="${Y(last[1])}" r="3.5" fill="var(--info)"/>` : ""}${xt}</svg>`;
+}
+
+/**
+ * Renders GuardiAI's investigation: the evidence ledger, the hypotheses citing it, and the plan.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function guardiaHtml(s) {
+  const g = s.guardia;
+  if (!g) return `<p class="empty">No scripted turns exist for this scenario yet, so GuardiAI was not replayed on it. With a model, this is where its investigation would appear.</p>`;
+  const steps = g.ledger.map((e) => `<div class="step" id="ev-${s.id}-${e.id}"><div class="head"><span class="id">${e.id}</span><span class="chip">step ${e.step}</span><span class="chip">${esc(e.tool)}</span>${e.isError ? '<span class="chip bad">refused</span>' : ""}</div>
+    <pre class="mono">${esc(e.query)}</pre><pre class="mono">${esc(e.result)}</pre></div>`).join("");
+  const hyps = (g.diagnosis?.hypotheses ?? []).map((h) => `<div class="hyp"><div class="title">${h.rank}. ${esc(h.component)} · ${esc(h.mechanism.replaceAll("_", " "))}</div>
+    <div>${esc(h.statement)}</div><div class="chips"><span class="chip">confidence ${Math.round(h.confidence * 100)}%</span>${h.evidence.map((id) => `<button class="evref" data-target="ev-${s.id}-${id}">${id}</button>`).join("")}</div></div>`).join("");
+  const unknowns = (g.diagnosis?.unknowns ?? []).map((u) => `<li>${esc(u)}</li>`).join("");
+  const accepted = g.accepted.map((a) => `<div class="proposal"><div class="verdict ok">Proposed: ${esc(a.action)} on ${esc(a.target)}</div><div>${esc(a.expectedEffect)}</div>
+    <div class="mono">verify: ${esc(a.verification)} · rollback: ${esc(a.rollback)}</div><div class="chips">${a.evidence.map((id) => `<button class="evref" data-target="ev-${s.id}-${id}">${id}</button>`).join("")}<span class="chip">sent to the policy engine</span></div></div>`).join("");
+  const refused = g.refused.map((r) => `<div class="proposal refused"><div class="verdict bad">Refused: ${esc(r.action)} on ${esc(r.target)}</div><div>${esc(r.reason)}</div></div>`).join("");
+  return `<div class="grid2"><div class="panel"><h3>Evidence ledger · ${g.ledger.length} tool calls in ${g.steps} steps</h3><div class="steps">${steps}</div></div>
+    <div class="panel"><h3>Diagnosis ${g.problems.length ? '<span class="chip bad">rejected</span>' : '<span class="chip ok">every citation re-checked</span>'}</h3><div class="steps">${hyps}</div>
+    ${unknowns ? `<h3 style="margin-top:18px">Unknowns</h3><ul>${unknowns}</ul>` : ""}
+    <h3 style="margin-top:18px">Plan</h3><div class="steps">${accepted || '<p class="empty">No proposal: nothing to fix.</p>'}${refused}</div>
+    <p class="empty" style="font-size:13px;margin-top:14px">${esc(g.provenance)}</p></div></div>`;
+}
+
+/**
+ * Renders the selected scenario on the detail stage.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function renderDetail(id) {
+  const s = DATA.scenarios.find((x) => x.id === id) ?? DATA.scenarios.find((x) => x.guardia) ?? DATA.scenarios[0];
+  document.querySelectorAll(".card").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.id === s.id)));
+  const logs = s.logs.length ? s.logs.map((l) => `<div class="log"><span class="t">${l.offset} s</span><div class="x"><div class="chips"><span class="chip ${l.level === "error" ? "bad" : "warn"}">${esc(l.service)} · ${esc(l.level)}</span>${l.flags.map((f) => `<span class="chip bad">untrusted: ${esc(f)}</span>`).join("")}</div><div class="mono" style="margin-top:4px">${esc(l.text)}</div></div></div>`).join("")
+    : '<p class="empty">No warnings or errors were logged in this run.</p>';
+  const annotations = Object.entries(s.alert.annotations).map(([k, v]) => `<div><span class="chip">${esc(k)}</span> <span class="${k === "summary" ? "" : "mono"}">${esc(v)}</span></div>`).join("");
+  document.getElementById("detail").innerHTML = `<div class="stage">
+    <div><div class="chips"><span class="chip">${esc(s.kind)}</span><span class="chip">${esc(s.family)}</span><span class="chip warn">${esc(s.alert.severity)} · ${esc(s.alert.name)}</span></div>
+      <h2 style="margin-top:12px">${esc(titleOf(s.id))}</h2><p class="lede">${esc(s.description)}</p></div>
+    <div class="panel"><h3>Timeline</h3>${timelineSvg(s)}</div>
+    <div class="grid2"><div class="panel"><h3>${esc(s.metric.label.replaceAll("-", " "))}</h3>${metricSvg(s)}<p class="mono" style="color:var(--muted)">${esc(s.metric.query)}</p></div>
+      <div class="panel"><h3>The alert</h3>${annotations}<h3 style="margin-top:20px">Ground truth · sealed from the agents</h3>
+        <div class="hyp"><div class="title">${esc(s.truth.component)} · ${esc(s.truth.mechanism.replaceAll("_", " "))}</div><div>${esc(s.truth.trigger)}</div>
+        <div class="chips">${s.acceptable.map((a) => `<span class="chip ok">ok: ${esc(a)}</span>`).join("")}${s.forbidden.map((a) => `<span class="chip bad">forbidden: ${esc(a)}</span>`).join("")}</div></div>
+        <h3 style="margin-top:20px">Rule-based automation would</h3>
+        <div class="proposal"><div class="verdict ${s.rules.forbidden.length ? "bad" : "ok"}">${s.rules.proposes.length ? esc(s.rules.proposes.join(", ")) : "do nothing"}</div><div>${s.rules.forbidden.length ? "A forbidden action for this incident: it acts on the alert, not on the cause." : "Allowed here."}</div></div></div></div>
+    <div class="panel"><h3>GuardiAI</h3>${guardiaHtml(s)}</div>
+    <div class="panel"><h3>Warnings and errors in the logs · text from the system is untrusted</h3><div class="logs">${logs}</div></div></div>`;
+  document.querySelectorAll(".evref").forEach((b) => b.addEventListener("click", () => {
+    const target = document.getElementById(b.dataset.target);
+    if (!target) return;
+    document.querySelectorAll(".step.hl").forEach((x) => x.classList.remove("hl"));
+    target.classList.add("hl");
+    target.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+  }));
+}
+
+renderStats();
+renderRows();
+renderDetail(location.hash.slice(1));
+addEventListener("hashchange", () => {
+  renderDetail(location.hash.slice(1));
+  document.getElementById("detail").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+</script>

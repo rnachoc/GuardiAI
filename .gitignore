@@ -6,6 +6,9 @@
 # Run records of guardia-chaos, written on every run
 chaos/runs/
 
+# The built replay console
+console/dist/
+
 # Caches for containerised builds
 .cache/
 
