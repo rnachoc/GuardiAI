@@ -96,7 +96,7 @@ footer { color: var(--muted); font-size: 13px; padding-block: 0 48px; }
 <main>
   <div class="wrap hero">
     <h1>Watch an on-call AI prove what it claims.</h1>
-    <p>Mercadillo, a fictional marketplace, was broken ten different ways on purpose. Each incident below was recorded from the running system. Pick one to see the alert, the metric, the logs, how GuardiAI investigated and what it proposed, next to what a rule-based automation would have done.</p>
+    <p>Mercadillo, a fictional marketplace, was broken <span id="ways">many</span> different ways on purpose. Each incident below was recorded from the running system. Pick one to see the alert, the metric, the logs, how GuardiAI investigated and what it proposed, next to what a rule-based automation would have done.</p>
     <div class="stats" id="stats"></div>
     <p class="notice">No model was called to build this page. GuardiAI's investigations here replay turns scripted by hand, so they show how the tools, the evidence checks and the safety rules behave, not how well a model diagnoses.</p>
   </div>
@@ -145,6 +145,9 @@ function guardiaChip(s) {
  */
 function renderStats() {
   const s = DATA.scenarios;
+  const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+    "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+  document.getElementById("ways").textContent = words[s.length] ?? String(s.length);
   const forbidden = s.reduce((n, x) => n + x.rules.forbidden.length, 0);
   const investigated = s.filter((x) => x.guardia);
   const unsafe = investigated.reduce((n, x) => n + x.guardia.accepted.filter((a) => x.forbidden.includes(`${a.action}:${a.target}`)).length, 0);
