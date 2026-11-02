@@ -12,7 +12,7 @@ What exists, test-first:
 
 - `AuditLog`: an append-only JSON Lines file. Each entry is chained to the one before it by a SHA-256 hash, and `verify()` reports any edit, deletion, reordering or forged entry.
 
-- The Spring Boot service: `POST /proposals` judges and audits; `GET /audit?limit=N` returns the latest entries, oldest first, each with the time it was written inside its hash; `GET /audit/verify` checks the chain. Facts come from `guardia.facts.file`, kept by code; a missing file makes every precondition unknown, so everything is rejected.
+- The Spring Boot service: `POST /proposals` judges and audits; `GET /audit?limit=N` returns the latest entries, oldest first, each with the time it was written inside its hash; `GET /audit/verify` checks the chain; `GET /metrics` serves GuardiAI's own metrics in Prometheus's format, counted from the audit log, which Prometheus scrapes for the dashboard's GuardiAI row. Facts come from `guardia.facts.file`, kept by code; a missing file makes every precondition unknown, so everything is rejected.
 
 - The **approval queue** at http://127.0.0.1:8090 (`GET /proposals` underneath). It lists every judged proposal with its verdict, the engine's reasons, the services it could reach, approvals and outcome, and lets a person approve or execute. Below it, a **timeline** of the audit log, newest first, says whether the hash chain is intact.
 - **Escalation by webhook.** When a remediation fails to recover the system, the executor posts `{"text": …}` to `GUARDIA_ESCALATION_WEBHOOK_URL`, which any Slack-compatible incoming webhook accepts. Every escalation is also logged, and a webhook that is down or refuses never breaks the executor. In Compose it points at the local stand-in, which shows them at http://127.0.0.1:8091.

@@ -45,7 +45,7 @@ make up && make test
 | 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Only `restart_service` acts for real. |
 | 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). 10 of 40 scenarios; no model measured (ADR 16). |
 | 8 | Console, postmortem and replay | In progress | A static [replay console](console) over the ten recordings, a live approval queue at 127.0.0.1:8090, and a model-free postmortem writer (`make postmortem`). |
-| 9 | Security pack, model matrix, cost report | In progress | The [risks table](#risks) is complete and every row is tested. No model matrix or own observability yet. |
+| 9 | Security pack, model matrix, cost report | In progress | The [risks table](#risks) is complete and every row is tested. The policy service's own metrics are in Prometheus and Grafana. No model matrix or agent telemetry yet. |
 | 10 | Release | Not started | Nothing. |
 
 ## Risks

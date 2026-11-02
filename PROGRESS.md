@@ -254,7 +254,9 @@ Done:
 - Trace attribute injection: a hostile `exception.message` is wrapped and flagged, other attributes cut short.
 - Alert annotations are now redacted, wrapped and flagged before a model sees them (`agents/src/alert.ts`), and the alert's fixed fields must match their shape.
 
-Not done: the model matrix and cost report (not measurable under ADR 16, but the report could be written with the harness ready), and GuardiAI's own observability.
+- GuardiAI's own metrics: the policy service serves `/metrics` in Prometheus's format, counted from its audit log (proposals, verdicts, approvals, executions, verifications, reverts, escalations, and whether the chain is intact). Prometheus scrapes it, and the Grafana dashboard has a GuardiAI row. Checked live: the target is up, and `make verify` finds data behind all 20 dashboard queries.
+
+Not done: the model matrix and cost report (not measurable under ADR 16, but the report could be written with the harness ready), and the agents' own telemetry (time to diagnosis, steps, tokens, evidence-validity rate) with OpenTelemetry's GenAI conventions.
 
 ## Next
 
