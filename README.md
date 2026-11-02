@@ -45,23 +45,28 @@ make up && make test
 | 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Only `restart_service` acts for real. |
 | 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). 10 of 40 scenarios; no model measured (ADR 16). |
 | 8 | Console, postmortem and replay | In progress | A static [replay console](console) over the ten recordings, a live approval queue at 127.0.0.1:8090, and a model-free postmortem writer (`make postmortem`). |
-| 9 | Security pack, model matrix, cost report | Not started | Nothing. |
+| 9 | Security pack, model matrix, cost report | In progress | The [risks table](#risks) is complete and every row is tested. No model matrix or own observability yet. |
 | 10 | Release | Not started | Nothing. |
 
 ## Risks
 
-What could go wrong, and what will stop it. Until the security tests of Phase 9 exist, no line in this table is enforced, and each says so.
+What could go wrong, and what stops it. Every row links to the tests that enforce it, and `make test` runs them all. No row has been measured against a real model (ADR 16): the agents' side is tested with scripted turns.
 
-| Risk | What will stop it | Where | Enforced |
+| Risk | What stops it | Tests | Enforced |
 | --- | --- | --- | --- |
+| Prompt injection through logs, commits, trace attributes or alert annotations | Every tool server, and the alert's annotations, have free text redacted, wrapped as untrusted and flagged for injection patterns. A hypothesis whose only evidence is flagged text is rejected. Actions may only target a service a validated hypothesis names. The postmortem never repeats tool output | [logs and traces](mcp/test/logs-traces.test.ts), [changes](mcp/test/changes-runbooks.test.ts), [across components](agents/test/security.test.ts), [pipeline](agents/test/remediate.test.ts), [postmortem](agents/test/postmortem.test.ts) | Yes, with scripted turns |
+| Expensive or abusive queries | PromQL and LogQL subsets parsed before anything runs, with caps on time range, points, series and lines | [metrics](mcp/test/metrics.test.ts), [logs](mcp/test/logs-traces.test.ts) | Yes |
+| Secrets leak through logs | Redaction before any model sees text; an eval gate that fails on a leaked secret; gitleaks on every commit and in CI | [redaction](mcp/test/logs-traces.test.ts), [eval gate](evals/thresholds.yaml), [`.githooks/pre-commit`](.githooks/pre-commit) | Yes |
+| An agent chains actions outside the catalog | The planner drops anything outside the catalog; the engine rejects it again; agents can only propose, never execute | [planner](agents/test/planner.test.ts), [`PolicyEngineTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/PolicyEngineTest.java), [mcp-actions](mcp/test/actions.test.ts) | Yes |
+| A confused deputy: an agent names another service to act on | A proposal may only target a component a validated hypothesis names, checked before it reaches mcp-actions; the engine checks allowed targets and blast radius | [planner](agents/test/planner.test.ts), [through mcp-actions](agents/test/remediate.test.ts), [`PolicyEngineTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/PolicyEngineTest.java) | Yes |
+| Runaway loops | Step, token and tool-call limits per investigation; a per-minute cap on proposals; an hourly limit per action; an idempotency key so nothing runs twice | [investigator](agents/test/investigator.test.ts), [mcp-actions](mcp/test/actions.test.ts), [`PolicyEngineTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/PolicyEngineTest.java), [`ExecutorTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/ExecutorTest.java) | Yes |
+| Budget exhaustion | A token budget per investigation, and a spend cap that aborts before a turn could cross it | [investigator](agents/test/investigator.test.ts), [Anthropic provider](agents/test/anthropic.test.ts) | Yes, against a stand-in for the API |
+| Someone tampers with the audit log | Each entry carries its time and the previous entry's SHA-256; any edit, deletion, reordering, redating or forged entry breaks the chain | [`AuditLogTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/AuditLogTest.java), [`e2e_remediation.sh`](scripts/e2e_remediation.sh) | Yes, and end to end in CI |
+| A diagnosis claims something it cannot show | Every claim cites ledger IDs; invented, failed or changed evidence is rejected | [investigator](agents/test/investigator.test.ts) | Yes |
+| An agent changes a system | Only the policy service executes, after its checks and approval ([ADR 18](docs/adr/0018-execution-through-one-service-with-the-docker-socket.md)) | [`ExecutionControllerTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/ExecutionControllerTest.java), [`e2e_remediation.sh`](scripts/e2e_remediation.sh) | Yes, and end to end in CI |
 | A real secret is committed | gitleaks on staged changes and on the whole history | [`.githooks/pre-commit`](.githooks/pre-commit), [CI](.github/workflows/ci.yml) | Yes |
-| A credential is placed in the example configuration | A test that only allows empty or `local-only` values for secret-like keys | [`tests/test_foundations.py`](tests/test_foundations.py) | Yes |
-| A shopper reaches an internal endpoint through the gateway | Each public route names one endpoint, and path variables are encoded | [`GatewayController`](mercadillo/gateway/src/main/java/io/github/rnachoc/mercadillo/gateway/GatewayController.java), [its test](mercadillo/gateway/src/test/java/io/github/rnachoc/mercadillo/gateway/GatewayControllerTest.java) | Yes |
-| An agent changes a system | Agents only reach read-only tools and `mcp-actions`, which only records proposals; only the policy service executes, after its checks and approval | [ADR 18](docs/adr/0018-execution-through-one-service-with-the-docker-socket.md), [`e2e_remediation.sh`](scripts/e2e_remediation.sh) | Yes: in tests and end to end in CI |
-| An agent chains an action outside the catalog, or names another service to act on | The planner only proposes on a component a validated hypothesis names; the engine checks the catalog, allowed targets and blast radius | [`planner.ts`](agents/src/planner.ts), [`PolicyEngineTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/PolicyEngineTest.java) | Yes, in tests |
-| Text in logs, commits, traces or alerts steers an agent | Untrusted text is redacted, wrapped and flagged by every tool server; two injection scenarios are recorded | [`untrusted.ts`](mcp/src/shared/untrusted.ts), [ADR 11](docs/adr/0011-read-only-tool-servers-with-one-grammar-for-both-modes.md) | Partly: wrapped and flagged in tests; no model has been measured against it |
-| Someone tampers with the audit log | Each entry carries the previous entry's SHA-256; any edit, deletion, reordering or forged entry breaks the chain | [`AuditLogTest`](policy/src/test/java/io/github/rnachoc/guardia/policy/AuditLogTest.java) | Yes, in tests |
-| A diagnosis claims something it cannot show | Every claim cites ledger IDs; invented, failed or changed evidence is rejected | [`investigator.ts`](agents/src/investigator.ts) | Yes, in tests |
+| A credential is placed in the example configuration | Only empty or `local-only` values are allowed for secret-like keys | [`tests/test_foundations.py`](tests/test_foundations.py) | Yes |
+| A shopper reaches an internal endpoint through the gateway | Each public route names one endpoint, and path variables are encoded | [`GatewayControllerTest`](mercadillo/gateway/src/test/java/io/github/rnachoc/mercadillo/gateway/GatewayControllerTest.java) | Yes |
 
 ## Repository layout
 

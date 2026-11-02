@@ -15,7 +15,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 6 | Remediation and verification | Done | v0.6.0 at the commit that marks it done, not tagged yet |
 | 7 | Evaluation | In progress | — |
 | 8 | Console, postmortem and replay | In progress | — |
-| 9 | Security pack, model matrix, cost report | Not started | — |
+| 9 | Security pack, model matrix, cost report | In progress | — |
 | 10 | Release | Not started | — |
 
 Phases 0 to 7 are the minimum publishable version. The session that builds GuardiAI cannot push tags, so the owner creates each release tag on the commit named here.
@@ -244,6 +244,18 @@ Done:
 
 Not done: in the postmortem, the audit timeline and runbook suggestions; the React console that brings the views together.
 
+## Phase 9: Security pack, model matrix, cost report
+
+Done:
+
+- The risks table in the README covers every risk the brief lists, each row linking the tests that enforce it.
+- A new rule in the validator: a hypothesis whose only evidence is text a tool server flagged as a possible injection is rejected. Flagged text may still be cited beside evidence that stands on its own.
+- Cross-component tests (`agents/test/security.test.ts`): a hostile commit message travels through the real mcp-changes server into the investigator wrapped and flagged, cannot carry a claim alone, and never reappears in the postmortem.
+- Trace attribute injection: a hostile `exception.message` is wrapped and flagged, other attributes cut short.
+- Alert annotations are now redacted, wrapped and flagged before a model sees them (`agents/src/alert.ts`), and the alert's fixed fields must match their shape.
+
+Not done: the model matrix and cost report (not measurable under ADR 16, but the report could be written with the harness ready), and GuardiAI's own observability.
+
 ## Next
 
-Phase 7, evaluation: the harness over the recorded scenarios, deterministic graders, a rule-based baseline, thresholds in CI and a generated `evals/REPORT.md`. The rest of the plan is in [docs/HANDOFF.md](docs/HANDOFF.md).
+The remaining work, phase by phase, is in [docs/HANDOFF.md](docs/HANDOFF.md).

@@ -17,7 +17,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 6 Remediation and verification | Done; only `restart_service` acts for real | `mcp/src/actions/`, `policy/`, `agents/src/remediate.ts`, `scripts/e2e_remediation.sh` |
 | 7 Evaluation | In progress: harness, graders, gate and report exist | `evals/` |
 | 8 Console, postmortem, replay | In progress: static replay console, live approval queue, postmortem writer | `console/`, `policy/src/main/resources/static/` |
-| 9 Security pack, model matrix, cost report | Not started | — |
+| 9 Security pack, model matrix, cost report | In progress: security tests and risks table done | `agents/test/security.test.ts`, README Risks |
 | 10 Release | Not started | — |
 
 Phases 0 to 7 are the minimum publishable version, so phases 6 and 7 come first.
@@ -173,7 +173,7 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
    - runaway loops;
    - budget exhaustion;
    - audit log tampering.
-   Most already have a test; the table in the README lists them. Add the missing ones: trace attribute injection, a commit message injection end to end, and the confused deputy through `mcp-actions`.
+   **Done.** Every row of the README's risks table links its tests, including trace attribute injection, a commit message injection end to end, alert annotations and the confused deputy through `mcp-actions`. A hypothesis resting only on flagged text is now rejected.
 2. **Model matrix and cost report:** "not measured" under ADR 16. Write the report with the harness ready, so a key fills it.
 3. **GuardiAI's own observability:** instrument the agents with OpenTelemetry's GenAI semantic conventions, and add a Grafana dashboard for time to diagnosis, steps, tokens, cost per incident, evidence-validity rate and unsafe-proposal count.
 
