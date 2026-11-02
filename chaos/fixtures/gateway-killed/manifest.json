@@ -1,0 +1,24 @@
+{
+  "scenario": "gateway-killed",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "f6abd4b0cd6efd3b67794485fc1d9aaea681d5b444c9fca4a233c3cfee6a81a9",
+    "metrics.json.gz": "632edf4a777a35cff051d8e1d8b54df53d04a4c388291c874db7bef2526a0d41",
+    "logs.json.gz": "cee0b98bd5d4e1779ce926334b91801ca60cb73c2a0ec7167a435d385ef740e8",
+    "traces.json.gz": "0faa5168d50d2afa3dc89c96f7249621ecf248a075dd35c1d19bcc69a761a46d",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "67114fab3cdbb56955f554b61f789bebe05a6f0cde5eb359b4b171824fd0209f",
+    "truth/evidence.json.gz": "c98b614ceae6ee0ba2eb1882cbab289083b1aa1d601359328bfe8e39b3ad14e6"
+  }
+}

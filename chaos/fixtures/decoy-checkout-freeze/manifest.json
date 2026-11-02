@@ -1,0 +1,24 @@
+{
+  "scenario": "decoy-checkout-freeze",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "585e20b6ca656da6ab1afe5ce28e322d89f9190b98a18d4b979788a4ef1cebc4",
+    "metrics.json.gz": "25f68378c5dd5565bf30e20616a0d0f82a9526d40f0377ba00fd1b0c28aebf48",
+    "logs.json.gz": "50aae94265b39368d7ad01f23c63fc34e39065fd6972b38941022aa0c7caa7b6",
+    "traces.json.gz": "73870f510146135bcc008372559c44703d10b6f042dee24aab99b018d5c68ec7",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "2cbdfbe618422ee9649c29831e4d05d2f56ae0d703e0ab2d3d22fd1237701044",
+    "truth/evidence.json.gz": "da761ec31c57ffe57412acf43be796da52350fd5050d51e253f2c19073c2672e"
+  }
+}

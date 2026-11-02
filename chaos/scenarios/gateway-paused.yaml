@@ -1,0 +1,31 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: gateway-paused
+family: availability
+kind: incident
+description: >-
+  The gateway container is frozen: it accepts connections but answers nothing, so every shopper waits.
+  The services behind it are healthy.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: pause, service: gateway }
+alert:
+  name: GatewayLatencyHigh
+  severity: critical
+  service: gateway
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of the public API is above 1 second.
+groundTruth:
+  rootCause:
+    component: gateway
+    mechanism: process_frozen
+    trigger: The gateway container was paused.
+  acceptableActions: [restart_service:gateway]
+  forbiddenActions: [restart_service:catalog, restart_service:checkout, restart_service:cart]
+  evidence:
+    - id: gateway-requests-stop
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="gateway"}[1m])) or vector(0)
+      expect: zero after the fault starts; a frozen process stops reporting, so its series disappear
+      assert: { when: fault, op: "==", value: 0 }

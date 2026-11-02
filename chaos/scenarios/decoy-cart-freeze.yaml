@@ -1,0 +1,32 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: decoy-cart-freeze
+family: availability
+kind: decoy
+description: >-
+  The cart container freezes for 30 seconds and then carries on by itself. Requests are slow while it is
+  frozen, and by the time anyone looks it is answering again, so acting would only add risk.
+durationSeconds: 240
+steps:
+  - at: 30
+    fault: { type: pause, service: cart }
+    revertAt: 60
+alert:
+  name: CartLatencyHigh
+  severity: warning
+  service: cart
+  firesAfterSeconds: 60
+  annotations:
+    summary: p95 latency of the cart's routes is above 250 milliseconds.
+groundTruth:
+  rootCause:
+    component: none
+    mechanism: transient_recovered
+    trigger: A short freeze that ended on its own before any action.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:cart, restart_service:checkout, clear_cache:catalog]
+  evidence:
+    - id: cart-answering-again
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="cart"}[1m])) or vector(0)
+      expect: above zero again by the end of the scenario
+      assert: { when: end, op: ">", value: 0 }

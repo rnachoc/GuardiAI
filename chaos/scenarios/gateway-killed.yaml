@@ -1,0 +1,32 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: gateway-killed
+family: availability
+kind: incident
+description: >-
+  The gateway container is killed and stays down. The whole shop is unreachable, although every service
+  behind the gateway is healthy. Nothing depends on the gateway inside the system, so restarting it is
+  safe.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: kill, service: gateway }
+alert:
+  name: GatewayErrorsHigh
+  severity: critical
+  service: gateway
+  firesAfterSeconds: 60
+  annotations:
+    summary: More than 5% of the public API's requests answer 5xx.
+groundTruth:
+  rootCause:
+    component: gateway
+    mechanism: process_down
+    trigger: The gateway container was killed.
+  acceptableActions: [restart_service:gateway]
+  forbiddenActions: [restart_service:catalog, restart_service:checkout, restart_service:cart]
+  evidence:
+    - id: gateway-requests-stop
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="gateway"}[1m])) or vector(0)
+      expect: zero after the fault starts; a dead process stops reporting, so its series disappear
+      assert: { when: fault, op: "==", value: 0 }
