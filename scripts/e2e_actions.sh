@@ -1,7 +1,7 @@
 #!/bin/sh
 # The other real actions end to end on the running stack: payments fails over to its standby through
 # Toxiproxy, the catalog's cache is cleared in Redis, the notifier's consumer is paused and resumed, and
-# inventory gains a replica.
+# inventory gains a replica, and checkout's latest release is switched off in the flags service.
 # Each is proposed, approved and executed through the policy service, which verifies it against
 # Prometheus. Catalog limits allow one failover an hour, so run this at most once an hour.
 #
@@ -67,6 +67,12 @@ test "$(docker ps --filter label=io.guardia.replica-of=inventory --format '{{.St
 echo "  removing the replica by hand, so the next run starts from one"
 docker rm -f "$(docker ps --quiet --filter label=io.guardia.replica-of=inventory)" > /dev/null
 
+echo "toggle_flag: checkout's latest release is switched off in the flags service"
+remediate toggle_flag checkout
+curl --silent --fail http://127.0.0.1:8092/flags/checkout.latest_release | grep -q '"enabled":false'
+echo "  switching it on again by hand, so the next run starts from on"
+curl --silent --fail -X PUT -H 'Content-Type: application/json' -d '{"enabled":true}' http://127.0.0.1:8092/flags/checkout.latest_release > /dev/null
+
 echo "audit chain intact"
 curl --silent --fail "$POLICY/audit/verify" | grep -q '"problems":\[\]'
-echo "e2e: failover, cache clearing, consumer pause and scale-out verified end to end"
+echo "e2e: failover, cache clearing, consumer pause, scale-out and flag toggling verified end to end"

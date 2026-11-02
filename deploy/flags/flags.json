@@ -1,0 +1,8 @@
+{
+  "catalog.latest_release": true,
+  "cart.latest_release": true,
+  "checkout.latest_release": true,
+  "payments.latest_release": true,
+  "inventory.latest_release": true,
+  "notifier.latest_release": true
+}

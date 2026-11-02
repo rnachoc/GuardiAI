@@ -63,6 +63,7 @@ public class PolicyApplication {
      * @param socket the Docker daemon's socket
      * @param project the Compose project it may act on
      * @param toxiproxy Toxiproxy's API, through which payments fails over
+     * @param flags the flags service
      * @return the runner
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
@@ -70,14 +71,16 @@ public class PolicyApplication {
     Executor.Runner runner(@Value("${guardia.runner:none}") String kind,
                            @Value("${guardia.docker.socket:/var/run/docker.sock}") Path socket,
                            @Value("${guardia.docker.project:guardia}") String project,
-                           @Value("${guardia.toxiproxy.url:http://toxiproxy:8474}") String toxiproxy) {
+                           @Value("${guardia.toxiproxy.url:http://toxiproxy:8474}") String toxiproxy,
+                           @Value("${guardia.flags.url:http://flags:8092}") String flags) {
         if ("docker".equals(kind)) {
             DockerRunner docker = new DockerRunner(socket, project);
             ToxiproxyRunner proxies = new ToxiproxyRunner(toxiproxy);
+            FlagsRunner switches = new FlagsRunner(flags);
             return new RoutingRunner(
                     java.util.Map.of("restart_service", docker, "pause_consumer", docker, "resume_consumer", docker,
-                            "clear_cache", docker, "scale_deployment", docker, "failover", proxies),
-                    java.util.Map.of("resume_consumer", docker, "scale_back", docker, "fail_back", proxies));
+                            "clear_cache", docker, "scale_deployment", docker, "failover", proxies, "toggle_flag", switches),
+                    java.util.Map.of("resume_consumer", docker, "scale_back", docker, "fail_back", proxies, "toggle_back", switches));
         }
         return new Executor.Runner() {
             /**
@@ -163,7 +166,8 @@ public class PolicyApplication {
 
     /**
      * Reads the facts preconditions are judged on: from a JSON file, and, with the Docker runner, from Docker's
-     * health status for the facts it can measure, which then override the file. A missing or unreadable file
+     * health status for the facts it can measure (the standby, the database and the flags service), which then
+     * override the file. A missing or unreadable file
      * yields no facts, so every precondition is unknown and every proposal is rejected.
      *
      * @param file the facts file
@@ -191,6 +195,7 @@ public class PolicyApplication {
             if (docker != null && !facts.isEmpty()) {
                 facts.put("standby_healthy", docker.healthy("payments-standby"));
                 facts.put("database_healthy", docker.healthy("postgres"));
+                facts.put("flag_exists", docker.healthy("flags"));
             }
             return Map.copyOf(facts);
         };

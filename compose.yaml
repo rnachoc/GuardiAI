@@ -390,6 +390,23 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  flags:
+    # Mercadillo's feature flags, which GuardiAI's toggle_flag turns off and on (ADR 21).
+    image: node:22.23.4-alpine3.23@sha256:6abbcf5dd6b231da109bcde1181db1d92bf78015ae1a9514d9807c1f857869db
+    command: ["node", "/app/server.mjs"]
+    user: "node"
+    read_only: true
+    volumes:
+      - ./deploy/flags:/app:ro
+    ports:
+      - "127.0.0.1:8092:8092"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8092/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   webhook-mock:
     # A stand-in for a Slack incoming webhook, showing GuardiAI's escalations at http://127.0.0.1:8091.
     image: node:22.23.4-alpine3.23@sha256:6abbcf5dd6b231da109bcde1181db1d92bf78015ae1a9514d9807c1f857869db

@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh scripts/e2e_remediation.sh scripts/e2e_actions.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke e2e-remediation e2e-actions verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents test-evals test-webhook-mock eval console investigate postmortem chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke e2e-remediation e2e-actions verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents test-evals test-webhook-mock test-flags eval console investigate postmortem chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -67,7 +67,7 @@ verify: ## Prove the running stack meets Phase 1: a purchase, live traffic, a tr
 	docker run --rm --network guardia_default --volume "$(CURDIR)/scripts":/scripts:ro \
 		--env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 /scripts/verify_stack.py
 
-test: test-repo test-mercadillo test-chaos test-mcp test-agents test-policy test-evals test-webhook-mock ## Run every test suite. Needs no API key and no running stack.
+test: test-repo test-mercadillo test-chaos test-mcp test-agents test-policy test-evals test-webhook-mock test-flags ## Run every test suite. Needs no API key and no running stack.
 
 test-repo: ## Test the repository's own rules and tools.
 	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 -m unittest discover --start-directory tests --verbose
@@ -76,6 +76,9 @@ test-mercadillo: ## Compile and test the Mercadillo services.
 	mkdir -p .cache/m2
 	$(DOCKER_RUN) --env MAVEN_CONFIG=/var/maven/.m2 --volume "$(CURDIR)/.cache/m2":/var/maven/.m2 $(MAVEN_DOCKER_FLAGS) \
 		--workdir /repo/mercadillo $(MAVEN_IMAGE) mvn --batch-mode --no-transfer-progress --strict-checksums -Duser.home=/var/maven verify
+
+test-flags: ## Test the feature-flags service that toggle_flag acts on.
+	$(DOCKER_RUN) --workdir /repo/deploy/flags $(NODE_IMAGE) node --test server.test.mjs
 
 test-webhook-mock: ## Test the stand-in for a Slack webhook that shows escalations.
 	$(DOCKER_RUN) --workdir /repo/deploy/webhook-mock $(NODE_IMAGE) node --test server.test.mjs
