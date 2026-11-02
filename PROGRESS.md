@@ -178,21 +178,31 @@ Left for Phase 6, which executes actions: the Spring Boot service around the eng
 
 Done and tested:
 
-- `mcp-actions`: `propose_action` writes a proposal with its evidence and expected effect, returns its ID, and leaves judging to the policy engine. It refuses malformed proposals and caps them at 10 a minute. A test checks that its code has no way to execute anything.
+- `mcp-actions` creates proposals and nothing more. It caps them at 10 a minute, and a test checks that its code cannot execute.
+- The planner's gate keeps only drafts that name a catalog action on an allowed target, cite ledger evidence and state their effect. It admits nothing for `none`, and submits through `mcp-actions`.
+- The policy service judges and audits (`POST /proposals`), records distinct approvers (`/approvals`), and executes (`/execute`). Preconditions come from a facts file kept by code ([ADR 18](docs/adr/0018-execution-through-one-service-with-the-docker-socket.md)).
+- The executor, test-first:
+  - it runs only what was allowed, once per idempotency key claimed in the audit log;
+  - it dry-runs first;
+  - it waits a settle period, then verifies against Prometheus;
+  - it reverts where the catalog allows, and escalates.
+- `DockerRunner` restarts Compose services over the Docker API. Every action it does not implement fails its dry run.
+- **End to end on the live stack** (`make e2e-remediation`, also in CI):
+  1. inventory was killed;
+  2. the restart was refused before approval;
+  3. after one approval it was executed, really restarted, and verified after the 70 s settle period, in 1 min 21 s;
+  4. a second execution ran nothing;
+  5. the audit chain verified.
+- 33 tests in the policy service.
 
-- The Spring Boot policy service. `POST /proposals` judges a proposal and writes it and its decision to the audit log; `GET /audit/verify` checks the chain. Preconditions come from a facts file kept by code, never from the request; without it, every proposal is rejected. 3 HTTP tests, 17 in the service.
+What the end-to-end test found: verification passed in 11 s at first, because a killed service's samples from before the kill still filled the one-minute rate window. The settle period fixes it, and a test covers it.
 
-- The executor core, test-first. It runs only what was approved, by the engine or by enough people; once per proposal, with the idempotency key claimed in the audit log so the claim survives a restart; dry run first; then it polls verification. When recovery is not confirmed, it reverts if the catalog allows and escalates. 6 tests, 23 in the service.
+Known limits:
 
-- The remediation planner's gate (`agents/src/planner.ts`). It keeps only drafts that name a catalog action on an allowed target, cite evidence in the ledger and state their effect; it admits nothing for a `none` diagnosis; and it sends what passes through `mcp-actions`. It shares the policy engine's catalog file. 4 tests.
-
-Not done:
-- the planner's model turns (scripted, as in ADR 16);
-- the real runner (Docker API, flag file, Redis, Kafka) and verifier (Prometheus);
-- the facts collector and the Compose service;
-- approvals over HTTP;
-- the remediation planner;
-- the end-to-end test. The plan is in [docs/HANDOFF.md](docs/HANDOFF.md#52-phase-6-remediation-and-verification).
+- The live runner implements only `restart_service`. Automatic revert is proven in the executor's tests, not live, because no live action has a revert yet.
+- The planner's drafting turns are not wired after the investigator.
+- The local facts file is static.
+- Escalations go to the service's log, until the webhook mock of Phase 8.
 
 ## Next
 

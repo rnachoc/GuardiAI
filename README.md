@@ -40,7 +40,7 @@ make up && make test
 | 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
 | 4 | Investigator | Done | Bounded loop, evidence ledger and validator, run on hand-scripted turns. No model is called, by the owner's decision ([ADR 16](docs/adr/0016-no-paid-model-runs.md)). |
 | 5 | Policy engine | Done | Catalog, blast radius, decisions and a hash-chained audit log, all test-first. Nothing executes yet (Phase 6). |
-| 6 | Remediation and verification | In progress | `mcp-actions`, the planner's gate, the policy service and the executor core (idempotency, dry run, verification, revert), test-first. Not wired to the real system yet. |
+| 6 | Remediation and verification | In progress | Proposals, approvals and execution work end to end on the live stack: a killed service is restarted after approval and verified against Prometheus. Only `restart_service` acts for real. |
 | 7 | Evaluation | Not started | Nothing. No number has been measured. |
 | 8 | Console, postmortem and replay | Not started | Nothing. |
 | 9 | Security pack, model matrix, cost report | Not started | Nothing. |

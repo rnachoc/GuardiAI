@@ -21,3 +21,4 @@ Each record explains one significant decision: its context, the decision and its
 | 15 | [A policy engine that gathers every reason](0015-a-policy-engine-that-gathers-every-reason.md) | Accepted |
 | 16 | [No paid model runs](0016-no-paid-model-runs.md) | Accepted |
 | 17 | [Replay time moves with the investigation](0017-replay-time-moves-with-the-investigation.md) | Accepted |
+| 18 | [Execution through one service with the Docker socket](0018-execution-through-one-service-with-the-docker-socket.md) | Accepted |
