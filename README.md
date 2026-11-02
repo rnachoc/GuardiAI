@@ -9,7 +9,7 @@ An AI on-call engineer for a microservice system. When an alert fires, a small c
 
 GuardiAI is judged on three things: it finds the right cause, it never does anything unsafe, and it proves both with measured numbers. No number has been measured yet, so none is published.
 
-> **Status: Phases 0 to 6 done; 7 to 10 in progress ([plan](docs/HANDOFF.md)).** The marketplace GuardiAI watches runs with full telemetry, and 13 incident scenarios are recorded with a sealed ground truth. Read-only tool servers answer from the live stack or a recording. The investigator validates every citation. The policy service decides, audits, and, after approval, restarts a failed service for real, verifies its recovery and escalates when it cannot. The [evaluation report](evals/REPORT.md) compares GuardiAI's guardrails with rule-based automation, on scripted turns only: no model is called (ADR 16). Read the [case study](docs/case-study.md) for the short version. The [status table](#status) says exactly what exists.
+> **Status: Phases 0 to 6 done; 7 to 10 in progress ([plan](docs/HANDOFF.md)).** The marketplace GuardiAI watches runs with full telemetry, and 17 incident scenarios are recorded with a sealed ground truth. Read-only tool servers answer from the live stack or a recording. The investigator validates every citation. The policy service decides, audits, and, after approval, restarts a failed service for real, verifies its recovery and escalates when it cannot. The [evaluation report](evals/REPORT.md) compares GuardiAI's guardrails with rule-based automation, on scripted turns only: no model is called (ADR 16). Read the [case study](docs/case-study.md) for the short version. The [status table](#status) says exactly what exists.
 
 ![The replay console: the recorded incidents, each replayed with its evidence, next to what a rule-based automation would have done](docs/images/replay-console.png)
 
@@ -40,13 +40,13 @@ make up && make test
 | --- | --- | --- | --- |
 | 0 | Foundations | Done | Checks and CI, ADRs 1 to 3, and a stack with PostgreSQL, Redis and Kafka that `make smoke` proves works. |
 | 1 | Mercadillo and observability | Done | Seven services, steady load, and traces, metrics and logs in Grafana. `make verify` proves it on every CI run. |
-| 2 | Chaos and snapshots | Done | 13 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 27 scenarios to go. |
+| 2 | Chaos and snapshots | Done | 17 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. 23 scenarios to go. |
 | 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
 | 4 | Investigator | Done | Bounded loop, evidence ledger and validator, run on hand-scripted turns. No model is called, by the owner's decision ([ADR 16](docs/adr/0016-no-paid-model-runs.md)). |
 | 5 | Policy engine | Done | Catalog, blast radius, decisions and a hash-chained audit log, all test-first. Nothing executes yet (Phase 6). |
 | 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Only `restart_service` acts for real. |
 | 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). 10 of 40 scenarios; no model measured (ADR 16). |
-| 8 | Console, postmortem and replay | In progress | A static [replay console](console) over the thirteen recordings, a live approval queue at 127.0.0.1:8090, and a model-free postmortem writer (`make postmortem`). |
+| 8 | Console, postmortem and replay | In progress | A static [replay console](console) over the seventeen recordings, a live approval queue at 127.0.0.1:8090, and a model-free postmortem writer (`make postmortem`). |
 | 9 | Security pack, model matrix, cost report | In progress | The [risks table](#risks) is complete and every row is tested. The policy service's own metrics are in Prometheus and Grafana. No model matrix or agent telemetry yet. |
 | 10 | Release | In progress | A [case study](docs/case-study.md) and a [video script](docs/video-script.md). The Pages workflow is ready, waiting for Pages to be enabled. |
 

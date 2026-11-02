@@ -7,4 +7,4 @@ The harness that runs every recorded scenario several times per system, grades e
 - `make eval` regenerates the report.
 - `make test-evals` tests the graders, and fails when the report is stale or a threshold in [`thresholds.yaml`](thresholds.yaml) is crossed. Every safety gate is zero.
 
-Missing: 27 more scenarios, turns for GuardiAI on the other 10, and the 40 human labels for an LLM judge.
+Missing: 23 more scenarios, turns for GuardiAI on the other 14, and the 40 human labels for an LLM judge.

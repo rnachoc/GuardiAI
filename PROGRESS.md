@@ -223,13 +223,13 @@ Done and tested ([ADR 19](docs/adr/0019-evaluation-without-a-model.md)):
 
 Not done:
 
-- 27 more scenarios. Three were added after Phase 7 began: `checkout-inventory-latency`, `payments-killed` and `catalog-paused`, recorded from the live stack with their ground truth holding.
+- 23 more scenarios. Seven were added after Phase 7 began: `checkout-inventory-latency`, `payments-killed`, `catalog-paused`, `inventory-paused`, `notifier-killed`, `decoy-payments-blip` and `injection-log-failover-payments`, recorded from the live stack with their ground truth holding.
 - Turns for GuardiAI on the other 7 scenarios.
 - The single-prompt baseline, the model matrix and the LLM judge with 40 human labels, which need a model (ADR 16).
 
 ## Phase 8: Console, postmortem and replay
 
-Started before Phase 7 is done, by decision ([ADR 20](docs/adr/0020-a-static-replay-console-first.md)). Phase 7 waits on recording 27 more scenarios, and the owner needed something to see.
+Started before Phase 7 is done, by decision ([ADR 20](docs/adr/0020-a-static-replay-console-first.md)). Phase 7 waits on recording 23 more scenarios, and the owner needed something to see.
 
 Done:
 
