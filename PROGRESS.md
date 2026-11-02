@@ -238,9 +238,9 @@ Done:
 - The approval queue, served by the policy service at http://127.0.0.1:8090. It shows each judged proposal with its verdict, reasons, blast radius, approvals and outcome, and lets a person approve and execute. Tested over HTTP, and checked in a browser against the live stack after `make e2e-remediation`.
 
 - The postmortem writer (`agents/src/postmortem.ts`, `make postmortem SCENARIO=<id>`), deterministic and model-free. It cites only ledger evidence, lists refused drafts with the gate's reason, and never repeats tool output. Tested on the incident, injection and decoy recordings, including that the planted instruction never appears.
-- Escalation through a Slack-style webhook (`GUARDIA_ESCALATION_WEBHOOK_URL`), tested against a stand-in webhook, including one that refuses and one that is down.
+- Escalation through a Slack-style webhook (`GUARDIA_ESCALATION_WEBHOOK_URL`), tested against a stand-in webhook, including one that refuses and one that is down. In Compose the messages go to a stand-in for Slack (`deploy/webhook-mock`) that shows them at http://127.0.0.1:8091, checked in the live stack.
 
-Not done: the live incident timeline, a webhook mock in Compose to show the messages, and in the postmortem, the audit timeline and runbook suggestions.
+Not done: the live incident timeline, and in the postmortem, the audit timeline and runbook suggestions.
 
 ## Next
 
