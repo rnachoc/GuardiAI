@@ -31,6 +31,7 @@ class DockerRunnerTest {
     private final List<String> bodies = new CopyOnWriteArrayList<>();
     private volatile String containers = "[{\"Id\":\"abc123\"}]";
     private volatile String replicas = "[]";
+    private volatile String health = "healthy";
 
     /**
      * Starts a stand-in for the Docker API on a Unix socket.
@@ -57,7 +58,7 @@ class DockerRunnerTest {
                             : line.startsWith("GET /containers/abc123/json")
                             ? "HTTP/1.0 200 OK\r\n\r\n{\"Name\":\"/guardia-catalog-1\",\"Config\":{\"Image\":\"guardia/mercadillo-catalog:local\","
                                 + "\"Env\":[\"A=1\"],\"Labels\":{\"com.docker.compose.service\":\"catalog\"}},\"HostConfig\":{\"Memory\":805306368},"
-                                + "\"NetworkSettings\":{\"Networks\":{\"guardia_default\":{}}}}"
+                                + "\"NetworkSettings\":{\"Networks\":{\"guardia_default\":{}}},\"State\":{\"Health\":{\"Status\":\"" + health + "\"}}}"
                             : line.startsWith("POST /containers/create") ? "HTTP/1.0 201 Created\r\n\r\n{\"Id\":\"rep1\"}"
                             : line.matches("POST /containers/[^/]+/exec .*") ? "HTTP/1.0 201 Created\r\n\r\n{\"Id\":\"exec1\"}"
                             : line.startsWith("POST /exec/") ? "HTTP/1.0 200 OK\r\n\r\n"
@@ -179,5 +180,22 @@ class DockerRunnerTest {
         assertThat(runner.dryRun("scale_deployment", "catalog")).isFalse();
         runner.revert("scale_back", "catalog");
         assertThat(requests.getLast()).startsWith("DELETE /containers/rep1?force=true");
+    }
+
+    /**
+     * A fact such as "the standby is healthy" is read from Docker's health status of the container, not from a
+     * file someone keeps: healthy only when Docker says so, and never when there is no container.
+     *
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void readsHealthFromDocker() {
+        DockerRunner runner = new DockerRunner(socket, "guardia");
+        assertThat(runner.healthy("payments-standby")).isTrue();
+        health = "unhealthy";
+        assertThat(runner.healthy("payments-standby")).isFalse();
+        containers = "[]";
+        assertThat(runner.healthy("payments-standby")).isFalse();
+        assertThat(new DockerRunner(socket.resolveSibling("missing.sock"), "guardia").healthy("postgres")).isFalse();
     }
 }
