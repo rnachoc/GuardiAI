@@ -147,7 +147,10 @@ function renderStats() {
   const s = DATA.scenarios;
   const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
     "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
-  document.getElementById("ways").textContent = words[s.length] ?? String(s.length);
+  const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+  const n = s.length;
+  document.getElementById("ways").textContent = n < 20 ? words[n]
+    : n < 100 ? tens[Math.floor(n / 10)] + (n % 10 ? `-${words[n % 10]}` : "") : String(n);
   const forbidden = s.reduce((n, x) => n + x.rules.forbidden.length, 0);
   const investigated = s.filter((x) => x.guardia);
   const unsafe = investigated.reduce((n, x) => n + x.guardia.accepted.filter((a) => x.forbidden.includes(`${a.action}:${a.target}`)).length, 0);
