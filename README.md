@@ -47,7 +47,7 @@ make up && make test
 | 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Five of the nine catalog actions act for real, including a failover to a standby payments. |
 | 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). All 40 scenarios recorded; GuardiAI has scripted turns for 3 of them, and no model has been measured (ADR 16). |
 | 8 | Console, postmortem and replay | In progress | A static [replay console](console) over all forty recordings, a live approval queue at 127.0.0.1:8090, and a model-free postmortem writer (`make postmortem`). |
-| 9 | Security pack, model matrix, cost report | In progress | The [risks table](#risks) is complete and every row is tested. The policy service's own metrics are in Prometheus and Grafana. No model matrix or agent telemetry yet. |
+| 9 | Security pack, model matrix, cost report | In progress | The [risks table](#risks) is complete and every row is tested. GuardiAI's own metrics and the agents' GenAI telemetry are in Prometheus, Tempo and Grafana. No model matrix (needs a model). |
 | 10 | Release | In progress | A [case study](docs/case-study.md) and a [video script](docs/video-script.md). The Pages workflow is ready, waiting for Pages to be enabled. |
 
 ## Risks

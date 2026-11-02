@@ -259,7 +259,9 @@ Done:
 
 - GuardiAI's own metrics: the policy service serves `/metrics` in Prometheus's format, counted from its audit log (proposals, verdicts, approvals, executions, verifications, reverts, escalations, and whether the chain is intact). Prometheus scrapes it, and the Grafana dashboard has a GuardiAI row. Checked live: the target is up, and `make verify` finds data behind all 20 dashboard queries.
 
-Not done: the model matrix and cost report (not measurable under ADR 16, but the report could be written with the harness ready), and the agents' own telemetry (time to diagnosis, steps, tokens, evidence-validity rate) with OpenTelemetry's GenAI conventions.
+- The agents' own telemetry: each investigation is sent as an OTLP trace (`invoke_agent investigator`, one `execute_tool` span per call) and OTLP metrics with OpenTelemetry's GenAI conventions (`gen_ai.client.token.usage`, `gen_ai.client.operation.duration`) plus `guardia.investigations` and `guardia.investigation.steps`, with no SDK (`agents/src/telemetry.ts`). `make investigate` sends it whenever the stack runs, and the dashboard's "GuardiAI agents" row shows investigations, evidence validity, steps, tokens and time to diagnosis. Checked live in Prometheus and Tempo; CI sends one before `make verify`. Found on the way: Prometheus rejects delta temporality over OTLP, so every metric is cumulative, and a test holds that.
+
+Not done: the model matrix and cost report (not measurable under ADR 16, but the report could be written with the harness ready), and the cost per incident in money, which all need a model.
 
 ## Phase 10: Release
 

@@ -17,7 +17,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 6 Remediation and verification | Done; 5 of 9 actions act for real | `mcp/src/actions/`, `policy/`, `agents/src/remediate.ts`, `scripts/e2e_remediation.sh` |
 | 7 Evaluation | In progress: harness, graders, gate and report exist | `evals/` |
 | 8 Console, postmortem, replay | In progress: static replay console, live approval queue, postmortem writer | `console/`, `policy/src/main/resources/static/` |
-| 9 Security pack, model matrix, cost report | In progress: security tests, risks table and policy metrics done | `agents/test/security.test.ts`, README Risks |
+| 9 Security pack, model matrix, cost report | In progress: only the model matrix and cost report are left, and they need a model | `agents/test/security.test.ts`, README Risks |
 | 10 Release | In progress: case study and video script | `docs/` |
 
 Phases 0 to 7 are the minimum publishable version, so phases 6 and 7 come first.
@@ -175,7 +175,7 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
    - audit log tampering.
    **Done.** Every row of the README's risks table links its tests, including trace attribute injection, a commit message injection end to end, alert annotations and the confused deputy through `mcp-actions`. A hypothesis resting only on flagged text is now rejected.
 2. **Model matrix and cost report:** "not measured" under ADR 16. To make it fillable: let `AnthropicProvider` take the model ID from `GUARDIA_MODEL` (an allow-list of the Claude 5 family), record turns to `agents/responses/<model>/<scenario>.json`, run the harness once per model, and add a matrix section to `evals/src/report.ts` that prints "not measured" for any model without recordings. Check the current prices with Anthropic's pricing page before computing cost; `OPUS_PRICES` in `agents/src/anthropic.ts` must be verified too.
-3. **GuardiAI's own observability:** the policy side is done (`MetricsController.java`, the GuardiAI row in Grafana). Still to do: instrument the agents with OpenTelemetry's GenAI semantic conventions, and add a Grafana dashboard for time to diagnosis, steps, tokens, cost per incident, evidence-validity rate and unsafe-proposal count.
+3. **GuardiAI's own observability:** the policy side is done (`MetricsController.java`, the GuardiAI row in Grafana). Done since: the agents are instrumented too (`agents/src/telemetry.ts`, the "GuardiAI agents" row). What was planned: instrument the agents with OpenTelemetry's GenAI semantic conventions, and add a Grafana dashboard for time to diagnosis, steps, tokens, cost per incident, evidence-validity rate and unsafe-proposal count.
 
 ### 5.6 Phase 10: release
 
