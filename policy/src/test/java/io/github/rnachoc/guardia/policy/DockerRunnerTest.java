@@ -30,6 +30,7 @@ class DockerRunnerTest {
     private final List<String> requests = new CopyOnWriteArrayList<>();
     private final List<String> bodies = new CopyOnWriteArrayList<>();
     private volatile String containers = "[{\"Id\":\"abc123\"}]";
+    private volatile String replicas = "[]";
 
     /**
      * Starts a stand-in for the Docker API on a Unix socket.
@@ -49,8 +50,15 @@ class DockerRunnerTest {
                     String line = request.lines().findFirst().orElse("");
                     requests.add(line);
                     bodies.add(request.substring(request.indexOf("\r\n\r\n") + 4));
-                    String response = line.startsWith("GET /containers/json")
+                    String response = line.startsWith("GET /containers/json") && line.contains("replica-of")
+                            ? "HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n" + replicas
+                            : line.startsWith("GET /containers/json")
                             ? "HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n" + containers
+                            : line.startsWith("GET /containers/abc123/json")
+                            ? "HTTP/1.0 200 OK\r\n\r\n{\"Name\":\"/guardia-catalog-1\",\"Config\":{\"Image\":\"guardia/mercadillo-catalog:local\","
+                                + "\"Env\":[\"A=1\"],\"Labels\":{\"com.docker.compose.service\":\"catalog\"}},\"HostConfig\":{\"Memory\":805306368},"
+                                + "\"NetworkSettings\":{\"Networks\":{\"guardia_default\":{}}}}"
+                            : line.startsWith("POST /containers/create") ? "HTTP/1.0 201 Created\r\n\r\n{\"Id\":\"rep1\"}"
                             : line.matches("POST /containers/[^/]+/exec .*") ? "HTTP/1.0 201 Created\r\n\r\n{\"Id\":\"exec1\"}"
                             : line.startsWith("POST /exec/") ? "HTTP/1.0 200 OK\r\n\r\n"
                             : "HTTP/1.0 204 No Content\r\n\r\n";
@@ -146,5 +154,30 @@ class DockerRunnerTest {
         assertThat(requests).anyMatch(r -> r.startsWith("POST /containers/abc123/exec"));
         assertThat(String.join("\n", bodies)).contains("products::*");
         assertThat(requests.getLast()).startsWith("POST /exec/exec1/start");
+    }
+
+    /**
+     * Scaling adds one replica: a copy of the service's container, without Compose's labels so the service still
+     * has one container of its own, on the same network under the service's name so DNS spreads the calls.
+     * Scaling back removes it, and a second scale-up is refused while a replica runs.
+     *
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void scalesOutByOneReplicaAndBack() {
+        DockerRunner runner = new DockerRunner(socket, "guardia");
+        assertThat(runner.dryRun("scale_deployment", "catalog")).isTrue();
+        requests.clear();
+        bodies.clear();
+        runner.run("scale_deployment", "catalog");
+        String create = bodies.get(requests.indexOf(requests.stream().filter(r -> r.startsWith("POST /containers/create")).findFirst().orElseThrow()));
+        assertThat(requests).anyMatch(r -> r.startsWith("POST /containers/create?name=guardia-catalog-replica"));
+        assertThat(create).contains("guardia/mercadillo-catalog:local").contains("\"io.guardia.replica-of\":\"catalog\"")
+                .contains("\"Aliases\":[\"catalog\"]").doesNotContain("com.docker.compose");
+        assertThat(requests.getLast()).startsWith("POST /containers/rep1/start");
+        replicas = "[{\"Id\":\"rep1\"}]";
+        assertThat(runner.dryRun("scale_deployment", "catalog")).isFalse();
+        runner.revert("scale_back", "catalog");
+        assertThat(requests.getLast()).startsWith("DELETE /containers/rep1?force=true");
     }
 }
