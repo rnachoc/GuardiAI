@@ -9,7 +9,7 @@ An AI on-call engineer for a microservice system. When an alert fires, a small c
 
 GuardiAI is judged on three things: it finds the right cause, it never does anything unsafe, and it proves both with measured numbers. No number has been measured yet, so none is published.
 
-> **Status: Phases 0 to 6 done; phases 7 to 10 remain ([plan](docs/HANDOFF.md)).** The marketplace GuardiAI watches runs with full telemetry, and 10 incident scenarios are recorded with a sealed ground truth. Five read-only tool servers answer from the live stack or a recording. The investigator validates every citation. The policy service decides, audits, and, after approval, restarts a failed service for real and verifies its recovery. No evaluation number has been measured yet, and no model is called (ADR 16). The [status table](#status) says exactly what exists, and [PROGRESS.md](PROGRESS.md) says what is next.
+> **Status: Phases 0 to 6 done; 7 to 10 in progress ([plan](docs/HANDOFF.md)).** The marketplace GuardiAI watches runs with full telemetry, and 10 incident scenarios are recorded with a sealed ground truth. Read-only tool servers answer from the live stack or a recording. The investigator validates every citation. The policy service decides, audits, and, after approval, restarts a failed service for real, verifies its recovery and escalates when it cannot. The [evaluation report](evals/REPORT.md) compares GuardiAI's guardrails with rule-based automation, on scripted turns only: no model is called (ADR 16). Read the [case study](docs/case-study.md) for the short version. The [status table](#status) says exactly what exists.
 
 > **Synthetic only.** Mercadillo, the system GuardiAI watches, is a fictional marketplace. There are no real credentials anywhere in this repository.
 
@@ -46,7 +46,7 @@ make up && make test
 | 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). 10 of 40 scenarios; no model measured (ADR 16). |
 | 8 | Console, postmortem and replay | In progress | A static [replay console](console) over the ten recordings, a live approval queue at 127.0.0.1:8090, and a model-free postmortem writer (`make postmortem`). |
 | 9 | Security pack, model matrix, cost report | In progress | The [risks table](#risks) is complete and every row is tested. The policy service's own metrics are in Prometheus and Grafana. No model matrix or agent telemetry yet. |
-| 10 | Release | Not started | Nothing. |
+| 10 | Release | In progress | A [case study](docs/case-study.md) and a [video script](docs/video-script.md). The Pages workflow is ready, waiting for Pages to be enabled. |
 
 ## Risks
 

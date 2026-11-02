@@ -18,7 +18,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 7 Evaluation | In progress: harness, graders, gate and report exist | `evals/` |
 | 8 Console, postmortem, replay | In progress: static replay console, live approval queue, postmortem writer | `console/`, `policy/src/main/resources/static/` |
 | 9 Security pack, model matrix, cost report | In progress: security tests, risks table and policy metrics done | `agents/test/security.test.ts`, README Risks |
-| 10 Release | Not started | — |
+| 10 Release | In progress: case study and video script | `docs/` |
 
 Phases 0 to 7 are the minimum publishable version, so phases 6 and 7 come first.
 
@@ -174,13 +174,13 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
    - budget exhaustion;
    - audit log tampering.
    **Done.** Every row of the README's risks table links its tests, including trace attribute injection, a commit message injection end to end, alert annotations and the confused deputy through `mcp-actions`. A hypothesis resting only on flagged text is now rejected.
-2. **Model matrix and cost report:** "not measured" under ADR 16. Write the report with the harness ready, so a key fills it.
+2. **Model matrix and cost report:** "not measured" under ADR 16. To make it fillable: let `AnthropicProvider` take the model ID from `GUARDIA_MODEL` (an allow-list of the Claude 5 family), record turns to `agents/responses/<model>/<scenario>.json`, run the harness once per model, and add a matrix section to `evals/src/report.ts` that prints "not measured" for any model without recordings. Check the current prices with Anthropic's pricing page before computing cost; `OPUS_PRICES` in `agents/src/anthropic.ts` must be verified too.
 3. **GuardiAI's own observability:** the policy side is done (`MetricsController.java`, the GuardiAI row in Grafana). Still to do: instrument the agents with OpenTelemetry's GenAI semantic conventions, and add a Grafana dashboard for time to diagnosis, steps, tokens, cost per incident, evidence-validity rate and unsafe-proposal count.
 
 ### 5.6 Phase 10: release
 
 1. **Static public demo** on GitHub Pages: a build of the console in replay-only mode, reading the bundles and recorded investigations, with no backend. This is the page anyone can open in a browser. Add a Pages workflow, with its actions pinned to commits.
-2. **A three-minute video script**, a one-page case study with real numbers and one failure explained (the frozen replay clock, or the consumer lag that read zero, are good candidates), and the final ADRs.
+2. **Done:** [`docs/video-script.md`](video-script.md) and [`docs/case-study.md`](case-study.md), with real numbers and one failure explained (verification that passed on stale data). Still to do: refresh both if the numbers change, and the final ADRs.
 3. **README:** what it is, a screenshot, a one-command start, the status table and the risks table, as the brief's definition of done asks.
 4. **Optional:** Helm and kind (`deploy/`).
 

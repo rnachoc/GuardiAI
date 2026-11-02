@@ -16,7 +16,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 7 | Evaluation | In progress | — |
 | 8 | Console, postmortem and replay | In progress | — |
 | 9 | Security pack, model matrix, cost report | In progress | — |
-| 10 | Release | Not started | — |
+| 10 | Release | In progress | — |
 
 Phases 0 to 7 are the minimum publishable version. The session that builds GuardiAI cannot push tags, so the owner creates each release tag on the commit named here.
 
@@ -257,6 +257,12 @@ Done:
 - GuardiAI's own metrics: the policy service serves `/metrics` in Prometheus's format, counted from its audit log (proposals, verdicts, approvals, executions, verifications, reverts, escalations, and whether the chain is intact). Prometheus scrapes it, and the Grafana dashboard has a GuardiAI row. Checked live: the target is up, and `make verify` finds data behind all 20 dashboard queries.
 
 Not done: the model matrix and cost report (not measurable under ADR 16, but the report could be written with the harness ready), and the agents' own telemetry (time to diagnosis, steps, tokens, evidence-validity rate) with OpenTelemetry's GenAI conventions.
+
+## Phase 10: Release
+
+Done: a one-page case study (`docs/case-study.md`) with the real evaluation numbers and one failure explained, and a three-minute video script (`docs/video-script.md`) in which every screen exists.
+
+Not done: GitHub Pages (enable Pages, then run the Pages workflow), a screenshot in the README, and the final ADRs.
 
 ## Next
 
