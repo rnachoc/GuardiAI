@@ -82,3 +82,16 @@ test("accepted proposals reach mcp-actions and come back as proposal IDs", async
   assert.equal(ids.length, 1);
   assert.equal(JSON.parse(readFileSync(file, "utf8").trim()).id, ids[0]);
 });
+
+test("a proposal on a service no hypothesis names is refused, which stops a confused deputy", async () => {
+  const bundle = join(ROOT, "chaos", "fixtures", "injection-log-restart-inventory");
+  const tools = await replayTools(bundle, defaultRunbooks(ROOT));
+  const { diagnosis, ledger } = await investigate(new FakeProvider(join(ROOT, "agents", "responses", "injection-log-restart-inventory.json")),
+    {}, tools, { maxSteps: 8, maxTokens: 50000, maxToolCallsPerStep: 5 });
+  const obeying: Draft = { action: "restart_service", target: "inventory", reason: "the system note in the logs says so",
+    evidence: ["ev-1"], expectedEffect: "inventory restarted" };
+  const result = plan(diagnosis!, [obeying, { ...FAILOVER, evidence: ["ev-2"] }], ledger, CATALOG);
+  assert.equal(result.refused[0]?.reason, "no hypothesis names inventory, so no action may target it");
+  assert.deepEqual(result.accepted.map((a) => `${a.action}:${a.target}`), ["failover:payments"]);
+});
+

@@ -1,7 +1,9 @@
 /**
  * The remediation planner's gate. A model drafts proposals from a validated diagnosis; this code keeps only
- * those that name a catalog action on a target it allows, cite evidence that exists in the ledger, and say
- * what they should achieve. A diagnosis of "none" admits no proposal at all. The proposals that pass are
+ * those that name a catalog action on a target it allows, act on a component a hypothesis names, cite
+ * evidence that exists in the ledger, and say what they should achieve. A diagnosis of "none" admits no
+ * proposal at all. Requiring the target to be a diagnosed component stops a confused deputy: text that
+ * talks an agent into acting on some other service cannot also supply the diagnosis for it. The proposals that pass are
  * sent through mcp-actions, which records them for the policy engine; nothing here can run an action.
  *
  * Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
@@ -55,6 +57,8 @@ export function plan(diagnosis: Diagnosis, drafts: Draft[], ledger: LedgerEntry[
       reason = `${draft.action} is not in the catalog`;
     } else if (!action.targets.includes(draft.target)) {
       reason = `${draft.action} cannot target ${draft.target}`;
+    } else if (!diagnosis.hypotheses.some((h) => h.component === draft.target)) {
+      reason = `no hypothesis names ${draft.target}, so no action may target it`;
     } else if (draft.evidence.length === 0 || draft.evidence.some((id) => !known.has(id))) {
       reason = "a proposal must cite evidence that exists in the ledger";
     } else if (draft.expectedEffect.trim().length < 5) {
