@@ -221,4 +221,24 @@ class ExecutionControllerTest {
         http.perform(get("/index.html"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"timeline\"")));
     }
+
+    /**
+     * GuardiAI's own metrics come from the audit log, in Prometheus's text format, with every known outcome present
+     * from the start so rates work, and with whether the chain is intact.
+     *
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void exposesItsOwnMetricsFromTheAuditLog() throws Exception {
+        send("/proposals", "{\"id\":\"prop-31313131-4242-5353-6464-757575757575\",\"action\":\"restart_service\",\"target\":\"inventory\"}");
+        String text = http.perform(get("/metrics")).andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("text/plain")).andReturn().getResponse().getContentAsString();
+        org.assertj.core.api.Assertions.assertThat(text)
+                .contains("# TYPE guardia_decisions_total counter")
+                .containsPattern("guardia_decisions_total\\{verdict=\"NEEDS_APPROVAL\"} [1-9]\\d*\n")
+                .contains("guardia_decisions_total{verdict=\"REJECTED\"} ")
+                .contains("guardia_verifications_total{outcome=\"not_confirmed\"} ")
+                .contains("guardia_escalations_total ")
+                .contains("guardia_audit_chain_intact 1\n");
+    }
 }
