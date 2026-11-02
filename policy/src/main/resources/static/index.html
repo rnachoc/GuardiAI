@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Ignacio Rodriguez Caro <rnachoccontact@gmail.com>">
+<title>GuardiAI Approvals</title>
+<style>
+/* The approval queue: one column of proposal cards, each showing what would run, on what, how far it
+   could reach and why the engine decided as it did. Dark, like the replay console. */
+:root { --bg: #0a0a0c; --stage: #121216; --raised: #1b1b21; --line: #2a2a33; --fg: #f5f5f7; --muted: #9a9aa6;
+  --accent: #ff3b30; --ok: #30d158; --warn: #ffd60a; --info: #64d2ff; color-scheme: dark;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); line-height: 1.5; }
+main { max-width: 900px; margin: 0 auto; padding: 48px max(16px, env(safe-area-inset-left, 0px)) 80px; }
+h1 { font-size: clamp(32px, 5vw, 52px); letter-spacing: -0.035em; margin: 0 0 8px; }
+h1 span { color: var(--accent); }
+.lede { color: var(--muted); margin: 0 0 28px; max-width: 62ch; }
+.who { display: flex; gap: 10px; align-items: center; margin-bottom: 24px; flex-wrap: wrap; }
+input { background: var(--raised); color: var(--fg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font: inherit; }
+.list { display: grid; gap: 14px; }
+.card { background: var(--stage); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: grid; gap: 10px; }
+.title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: var(--raised); border: 1px solid var(--line); color: var(--muted); }
+.chip.ok { color: var(--ok); } .chip.bad { color: var(--accent); } .chip.warn { color: var(--warn); }
+.reasons { color: var(--muted); font-size: 14px; margin: 0; padding-left: 18px; }
+.mono { font-family: var(--mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+button { font: inherit; border-radius: 999px; padding: 8px 16px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); cursor: pointer; }
+button.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+button:disabled { opacity: .4; cursor: not-allowed; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+.empty { color: var(--muted); }
+.status { min-height: 1.5em; color: var(--info); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Approval <span>queue</span></h1>
+  <p class="lede">Every proposal the policy engine judged. Nothing runs until the engine allows it and enough distinct people approve it; executing then restarts the service for real and checks recovery against Prometheus before calling it done.</p>
+  <div class="who"><label for="approver">Approving as</label><input id="approver" value="on-call" autocomplete="off" pattern="[a-z][a-z0-9._-]{1,40}"></div>
+  <p class="status" id="status" role="status"></p>
+  <div class="list" id="list"><p class="empty">Loading proposals…</p></div>
+</main>
+<script>
+/* Lists judged proposals and lets a person approve or execute them through the policy service's API.
+   Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com> */
+
+/**
+ * Escapes text for safe insertion as HTML.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function esc(text) {
+  return String(text ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+}
+
+/**
+ * Sends a JSON POST and returns the decoded answer.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+async function post(path, body) {
+  const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!response.ok) throw new Error(`${path} answered ${response.status}`);
+  return response.json();
+}
+
+/**
+ * Renders the queue from the service.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+async function load() {
+  const proposals = await (await fetch("/proposals")).json();
+  const list = document.getElementById("list");
+  if (!proposals.length) {
+    list.innerHTML = '<p class="empty">No proposal has been judged yet. Agents propose through mcp-actions; run make e2e-remediation to see one arrive.</p>';
+    return;
+  }
+  list.innerHTML = proposals.slice().reverse().map((p) => {
+    const verdictClass = p.verdict === "REJECTED" ? "bad" : p.verdict === "APPROVED" ? "ok" : "warn";
+    const done = p.outcome !== "PENDING";
+    return `<article class="card">
+      <div class="title">${esc(p.action)} on ${esc(p.target)}</div>
+      <div class="chips"><span class="chip ${verdictClass}">${esc(p.verdict.replaceAll("_", " ").toLowerCase())}</span>
+        <span class="chip">approvals ${p.approvers.length} of ${p.needed}</span>
+        <span class="chip ${done ? (p.outcome === "VERIFIED" ? "ok" : "bad") : ""}">${esc(p.outcome.replaceAll("_", " ").toLowerCase())}</span>
+        ${p.blastRadius.map((s) => `<span class="chip">reaches ${esc(s)}</span>`).join("")}</div>
+      <ul class="reasons">${p.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
+      <div class="mono">${esc(p.id)}</div>
+      <div class="actions">
+        <button data-approve="${esc(p.id)}" ${p.verdict !== "NEEDS_APPROVAL" || done ? "disabled" : ""}>Approve</button>
+        <button class="primary" data-execute="${esc(p.id)}" ${p.verdict === "REJECTED" || done ? "disabled" : ""}>Execute</button>
+      </div></article>`;
+  }).join("");
+}
+
+document.getElementById("list").addEventListener("click", async (event) => {
+  const status = document.getElementById("status");
+  const approve = event.target.closest("[data-approve]");
+  const execute = event.target.closest("[data-execute]");
+  try {
+    if (approve) {
+      const answer = await post(`/proposals/${approve.dataset.approve}/approvals`, { by: document.getElementById("approver").value });
+      status.textContent = `Approved: ${answer.approvals} of ${answer.needed} approvals.`;
+    } else if (execute) {
+      execute.disabled = true;
+      status.textContent = "Executing: the service waits for the system to settle, then checks recovery. This takes about a minute.";
+      const answer = await post(`/proposals/${execute.dataset.execute}/execute`, {});
+      status.textContent = `Outcome: ${answer.outcome.replaceAll("_", " ").toLowerCase()}.`;
+    } else {
+      return;
+    }
+  } catch (error) {
+    status.textContent = `That did not work: ${error.message}. Check the approver's name uses lowercase letters, digits, dots or dashes.`;
+  }
+  await load();
+});
+
+load();
+setInterval(load, 5000);
+</script>
+</body>
+</html>

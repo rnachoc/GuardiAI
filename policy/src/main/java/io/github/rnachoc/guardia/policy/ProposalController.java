@@ -9,7 +9,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +32,7 @@ public class ProposalController {
     private final Supplier<Map<String, Boolean>> facts;
     private final ActionCatalog catalog;
     private final Executor executor;
-    private final Map<String, Judged> judged = new ConcurrentHashMap<>();
+    private final Map<String, Judged> judged = java.util.Collections.synchronizedMap(new java.util.LinkedHashMap<>());
     private final Clock clock = Clock.systemUTC();
 
     /**
@@ -68,7 +67,8 @@ public class ProposalController {
         Proposal proposal = new Proposal(request.id(), request.action(), request.target(), facts.get(), List.of(), Instant.now(clock));
         Decision decision = engine.decide(proposal);
         audit.append("decision", Map.of("proposal", request.id(), "verdict", decision.verdict().name(), "reasons", decision.reasons()));
-        judged.put(request.id(), new Judged(request, decision, java.util.Collections.synchronizedSet(new LinkedHashSet<>())));
+        judged.put(request.id(), new Judged(request, decision, java.util.Collections.synchronizedSet(new LinkedHashSet<>()),
+                new java.util.concurrent.atomic.AtomicReference<>("PENDING")));
         return decision;
     }
 
@@ -107,7 +107,26 @@ public class ProposalController {
         Executor.Request request = new Executor.Request(id, action.name(), found.request().target(),
                 action.verification().query().replace("$target", found.request().target()),
                 action.verification().expect(), action.autoRevert());
-        return executor.execute(request, found.decision(), found.approvers().size());
+        Executor.Result result = executor.execute(request, found.decision(), found.approvers().size());
+        if (result.outcome() != Executor.Outcome.ALREADY_DONE) {
+            found.outcome().set(result.outcome().name());
+        }
+        return result;
+    }
+
+    /**
+     * Lists every proposal judged here, newest last, for the approval queue.
+     *
+     * @return each proposal with its verdict, reasons, blast radius, approvals and outcome
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @GetMapping("/proposals")
+    public List<Map<String, Object>> list() {
+        return judged.values().stream().map(j -> Map.<String, Object>of(
+                "id", j.request().id(), "action", j.request().action(), "target", j.request().target(),
+                "verdict", j.decision().verdict().name(), "reasons", j.decision().reasons(),
+                "blastRadius", j.decision().blastRadius(), "needed", j.decision().approvals(),
+                "approvers", List.copyOf(j.approvers()), "outcome", j.outcome().get())).toList();
     }
 
     /**
@@ -131,9 +150,11 @@ public class ProposalController {
      * @param request the proposal
      * @param decision the engine's decision
      * @param approvers the distinct people who approved it
+     * @param outcome what execution did, or PENDING
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
-    record Judged(ProposalRequest request, Decision decision, Set<String> approvers) {
+    record Judged(ProposalRequest request, Decision decision, Set<String> approvers,
+                  java.util.concurrent.atomic.AtomicReference<String> outcome) {
     }
 
     /**
