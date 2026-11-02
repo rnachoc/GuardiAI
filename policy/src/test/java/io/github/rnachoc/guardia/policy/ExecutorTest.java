@@ -143,6 +143,24 @@ class ExecutorTest {
     }
 
     /**
+     * Verification waits for the settle period after running, so a rate window holds only data from after
+     * the action and a dead service's old samples cannot pass for recovery.
+     *
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void waitsForTheSettlePeriodBeforeTheFirstCheck() {
+        long[] firstCheck = {0};
+        Executor settling = new Executor(runner, (query, expect) -> {
+            firstCheck[0] = System.nanoTime();
+            return true;
+        }, audit, escalations::add, 1, 0, 300);
+        long ran = System.nanoTime();
+        assertThat(settling.execute(RESTART, decision(Decision.Verdict.APPROVED, 0), 0).outcome()).isEqualTo(Executor.Outcome.VERIFIED);
+        assertThat((firstCheck[0] - ran) / 1_000_000).isGreaterThanOrEqualTo(300);
+    }
+
+    /**
      * Records what the executor asks it to do.
      *
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>

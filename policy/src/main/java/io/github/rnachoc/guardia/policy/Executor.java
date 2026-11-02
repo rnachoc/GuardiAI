@@ -19,6 +19,7 @@ public class Executor {
     private final Consumer<String> escalate;
     private final int polls;
     private final long pollIntervalMillis;
+    private final long settleMillis;
 
     /**
      * Creates the executor.
@@ -31,11 +32,13 @@ public class Executor {
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     public Executor(Runner runner, Verifier verifier, AuditLog audit, Consumer<String> escalate, int polls) {
-        this(runner, verifier, audit, escalate, polls, 0);
+        this(runner, verifier, audit, escalate, polls, 0, 0);
     }
 
     /**
-     * Creates the executor with a wait between verification checks, so a restarted service has time to recover.
+     * Creates the executor with a settle period after running and a wait between verification checks. The
+     * settle period must cover the longest range in a verification query, so that a rate over [1m] holds
+     * only data from after the action and a dead service's old samples cannot pass for recovery.
      *
      * @param runner what actually acts on the system
      * @param verifier what evaluates a verification query
@@ -43,15 +46,18 @@ public class Executor {
      * @param escalate how a person is called
      * @param polls how many times verification is checked before giving up
      * @param pollIntervalMillis how long to wait before each check
+     * @param settleMillis how long to wait after running before the first check
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
-    public Executor(Runner runner, Verifier verifier, AuditLog audit, Consumer<String> escalate, int polls, long pollIntervalMillis) {
+    public Executor(Runner runner, Verifier verifier, AuditLog audit, Consumer<String> escalate, int polls,
+                    long pollIntervalMillis, long settleMillis) {
         this.runner = runner;
         this.verifier = verifier;
         this.audit = audit;
         this.escalate = escalate;
         this.polls = polls;
         this.pollIntervalMillis = pollIntervalMillis;
+        this.settleMillis = settleMillis;
     }
 
     /**
@@ -80,6 +86,13 @@ public class Executor {
         }
         runner.run(request.action(), request.target());
         audit.append("execution", Map.of("proposal", request.proposalId(), "outcome", "ran", "action", request.action(), "target", request.target()));
+        if (settleMillis > 0) {
+            try {
+                Thread.sleep(settleMillis);
+            } catch (InterruptedException interrupted) {
+                Thread.currentThread().interrupt();
+            }
+        }
         for (int poll = 1; poll <= polls; poll++) {
             if (pollIntervalMillis > 0) {
                 try {

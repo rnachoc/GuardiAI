@@ -125,15 +125,17 @@ public class PolicyApplication {
      * @param audit the audit log
      * @param polls how many times verification is checked
      * @param interval how long to wait before each check, in milliseconds
+     * @param settle how long to wait after running before the first check, in milliseconds
      * @return the executor
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     @Bean
     Executor executor(Executor.Runner runner, Executor.Verifier verifier, AuditLog audit,
                       @Value("${guardia.executor.polls:12}") int polls,
-                      @Value("${guardia.executor.poll-interval-ms:10000}") long interval) {
+                      @Value("${guardia.executor.poll-interval-ms:10000}") long interval,
+                      @Value("${guardia.executor.settle-ms:70000}") long settle) {
         org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Executor.class);
-        return new Executor(runner, verifier, audit, message -> log.warn("ESCALATION: {}", message), polls, interval);
+        return new Executor(runner, verifier, audit, message -> log.warn("ESCALATION: {}", message), polls, interval, settle);
     }
 
     /**

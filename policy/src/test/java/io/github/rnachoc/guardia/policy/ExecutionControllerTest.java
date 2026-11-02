@@ -64,6 +64,7 @@ class ExecutionControllerTest {
         registry.add("guardia.audit.file", () -> FOLDER.resolve("audit.jsonl").toString());
         registry.add("guardia.facts.file", () -> FOLDER.resolve("facts.json").toString());
         registry.add("guardia.executor.poll-interval-ms", () -> "0");
+        registry.add("guardia.executor.settle-ms", () -> "0");
     }
 
     /**
