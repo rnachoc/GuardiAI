@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh scripts/e2e_remediation.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke e2e-remediation verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents investigate chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke e2e-remediation verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents test-evals eval investigate chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -64,7 +64,7 @@ verify: ## Prove the running stack meets Phase 1: a purchase, live traffic, a tr
 	docker run --rm --network guardia_default --volume "$(CURDIR)/scripts":/scripts:ro \
 		--env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 /scripts/verify_stack.py
 
-test: test-repo test-mercadillo test-chaos test-mcp test-agents test-policy ## Run every test suite. Needs no API key and no running stack.
+test: test-repo test-mercadillo test-chaos test-mcp test-agents test-policy test-evals ## Run every test suite. Needs no API key and no running stack.
 
 test-repo: ## Test the repository's own rules and tools.
 	$(DOCKER_RUN) --env PYTHONDONTWRITEBYTECODE=1 $(PYTHON_IMAGE) python3 -m unittest discover --start-directory tests --verbose
@@ -93,6 +93,14 @@ test-agents: ## Type-check and test the investigator, against a recorded bundle 
 	mkdir -p .cache/npm
 	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
 		--workdir /repo $(NODE_IMAGE) sh -c 'cd mcp && npm ci --no-audit --no-fund && cd ../agents && npm ci --no-audit --no-fund && npm run typecheck && npm test'
+
+test-evals: ## Test the graders, and fail when evals/REPORT.md is stale or a threshold is crossed.
+	mkdir -p .cache/npm
+	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
+		--workdir /repo $(NODE_IMAGE) sh -c 'for p in chaos mcp agents evals; do (cd $$p && npm ci --no-audit --no-fund) || exit 1; done; cd evals && npm run typecheck && npm test && node src/cli.ts --check'
+
+eval: ## Run the evaluation over every recorded scenario and regenerate evals/REPORT.md.
+	$(DOCKER_RUN) --workdir /repo/evals $(NODE_IMAGE) node src/cli.ts
 
 investigate: ## Investigate a recorded scenario. Free by default; GUARDIA_MODEL_PROVIDER=anthropic spends, under GUARDIA_MAX_SPEND_USD.
 	@test -n "$(SCENARIO)" || (echo "name a scenario: make investigate SCENARIO=<id>" >&2; exit 1)

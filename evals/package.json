@@ -1,0 +1,24 @@
+{
+  "name": "@guardia/evals",
+  "version": "0.7.0",
+  "description": "GuardiAI's evaluation harness and its generated report. Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>",
+  "author": "Ignacio Rodriguez Caro <rnachoccontact@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "report": "node src/cli.ts"
+  },
+  "dependencies": {
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "6.0.3"
+  }
+}
