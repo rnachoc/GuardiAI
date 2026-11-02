@@ -14,7 +14,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 5 | Policy engine | Done | v0.5.0 at the commit that marks it done, not tagged yet |
 | 6 | Remediation and verification | Done | v0.6.0 at the commit that marks it done, not tagged yet |
 | 7 | Evaluation | In progress | — |
-| 8 | Console, postmortem and replay | Not started | — |
+| 8 | Console, postmortem and replay | In progress | — |
 | 9 | Security pack, model matrix, cost report | Not started | — |
 | 10 | Release | Not started | — |
 
@@ -226,6 +226,16 @@ Not done:
 - 30 more scenarios.
 - Turns for GuardiAI on the other 7 scenarios.
 - The single-prompt baseline, the model matrix and the LLM judge with 40 human labels, which need a model (ADR 16).
+
+## Phase 8: Console, postmortem and replay
+
+Started before Phase 7 is done, by decision ([ADR 20](docs/adr/0020-a-static-replay-console-first.md)). Phase 7 waits on recording 30 more scenarios, and the owner needed something to see.
+
+Done:
+
+- The replay console, built by `make console`: one static page over the ten recordings. Every citation in a diagnosis links to its tool call. It is checked at desktop and phone width, with no script errors and no sideways scrolling. A Pages workflow, run by hand, publishes it once Pages is enabled.
+
+Not done: the live console with the approval queue, notifications to a webhook mock, and the postmortem writer.
 
 ## Next
 

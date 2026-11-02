@@ -16,7 +16,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 5 Policy engine | Done as a library | `policy/src/main/java/.../policy/` |
 | 6 Remediation and verification | Done; only `restart_service` acts for real | `mcp/src/actions/`, `policy/`, `agents/src/remediate.ts`, `scripts/e2e_remediation.sh` |
 | 7 Evaluation | In progress: harness, graders, gate and report exist | `evals/` |
-| 8 Console, postmortem, replay | Not started | — |
+| 8 Console, postmortem, replay | In progress: static replay console | `console/` |
 | 9 Security pack, model matrix, cost report | Not started | — |
 | 10 Release | Not started | — |
 
@@ -149,6 +149,8 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
 7. **Model matrix:** "not measured" under ADR 16. The harness supports it, with a provider per tier behind the spend cap.
 
 ### 5.4 Phase 8: console, postmortem, replay
+
+**Status:** the static replay console exists (`make console`, ADR 20), and a Pages workflow publishes it once you enable Pages (Settings, Pages, Source: GitHub Actions, then run the Pages workflow). Still to do is everything live listed below. Finding: recordings start 60 s before their run, so some carry log lines from the end of the previous scenario. Leave a gap between recordings, or start the window at the run's start.
 
 1. **Console** (`console/`, React, Vite, TypeScript), in the style you asked for: Apple's and Netflix's sites. Dark, generous whitespace, large type, one accent colour, smooth transitions, rows of incident cards. Views:
    - live incident timeline;
