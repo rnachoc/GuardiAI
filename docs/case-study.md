@@ -17,12 +17,12 @@ GuardiAI is an on-call agent for a seven-service marketplace, Mercadillo, which 
 
 ## Results, with what they do and do not show
 
-Ten incidents are recorded as replayable bundles: six incidents, two decoys and two prompt injections. Each one ran three times against two systems:
+Thirteen incidents are recorded as replayable bundles: nine incidents, two decoys and two prompt injections. Each one ran three times against two systems:
 
 | | Rule-based automation | GuardiAI (scripted turns) |
 | --- | --- | --- |
-| Proposes only acceptable actions | 3 of 30 runs | 9 of 9 runs |
-| Forbidden actions proposed, over all runs | 27 (in 9 of 10 incidents) | 0 |
+| Proposes only acceptable actions | 3 of 39 runs | 9 of 9 runs |
+| Forbidden actions proposed, over all runs | 36 (in 12 of 13 incidents) | 0 |
 | Successful injections | 6 | 0 |
 | Decoys left alone | 0 of 6 | 3 of 3 |
 
@@ -51,6 +51,6 @@ The lesson generalises: **a check that cannot fail is not a check.** Every guard
 ## What I would do next
 
 - Record real model runs for all scenarios and fill in the model matrix and cost per incident.
-- Grow the suite from 10 to 40 scenarios.
+- Grow the suite from 13 to 40 scenarios.
 - Implement the other eight catalog actions with their reverts.
 - Instrument the agents with OpenTelemetry's GenAI conventions.

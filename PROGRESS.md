@@ -223,17 +223,17 @@ Done and tested ([ADR 19](docs/adr/0019-evaluation-without-a-model.md)):
 
 Not done:
 
-- 30 more scenarios.
+- 27 more scenarios. Three were added after Phase 7 began: `checkout-inventory-latency`, `payments-killed` and `catalog-paused`, recorded from the live stack with their ground truth holding.
 - Turns for GuardiAI on the other 7 scenarios.
 - The single-prompt baseline, the model matrix and the LLM judge with 40 human labels, which need a model (ADR 16).
 
 ## Phase 8: Console, postmortem and replay
 
-Started before Phase 7 is done, by decision ([ADR 20](docs/adr/0020-a-static-replay-console-first.md)). Phase 7 waits on recording 30 more scenarios, and the owner needed something to see.
+Started before Phase 7 is done, by decision ([ADR 20](docs/adr/0020-a-static-replay-console-first.md)). Phase 7 waits on recording 27 more scenarios, and the owner needed something to see.
 
 Done:
 
-- The replay console, built by `make console`: one static page over the ten recordings. Every citation in a diagnosis links to its tool call. It is checked at desktop and phone width, with no script errors and no sideways scrolling. A Pages workflow, run by hand, publishes it once Pages is enabled.
+- The replay console, built by `make console`: one static page over every recording. Every citation in a diagnosis links to its tool call. It is checked at desktop and phone width, with no script errors and no sideways scrolling. A Pages workflow, run by hand, publishes it once Pages is enabled.
 
 - The approval queue, served by the policy service at http://127.0.0.1:8090. It shows each judged proposal with its verdict, reasons, blast radius, approvals and outcome, and lets a person approve and execute. Tested over HTTP, and checked in a browser against the live stack after `make e2e-remediation`.
 

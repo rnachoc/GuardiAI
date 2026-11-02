@@ -127,7 +127,7 @@ Acceptance (brief): planner, executor, verification, automatic revert.
 
 ### 5.3 Phase 7: evaluation
 
-**Status:** the harness, graders, thresholds, CI gate and generated report exist (ADR 19). What remains is 30 more scenarios, turns for GuardiAI on the scenarios that lack them, and the human labels for a future judge.
+**Status:** the harness, graders, thresholds, CI gate and generated report exist (ADR 19). What remains is 27 more scenarios (13 of 40 are recorded), turns for GuardiAI on the scenarios that lack them, and the human labels for a future judge.
 
 Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated report.
 
