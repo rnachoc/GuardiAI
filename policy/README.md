@@ -17,6 +17,8 @@ What exists, test-first:
 - The **approval queue** at http://127.0.0.1:8090 (`GET /proposals` underneath). It lists every judged proposal with its verdict, the engine's reasons, the services it could reach, approvals and outcome, and lets a person approve or execute. Below it, a **timeline** of the audit log, newest first, says whether the hash chain is intact.
 - **Escalation by webhook.** When a remediation fails to recover the system, the executor posts `{"text": …}` to `GUARDIA_ESCALATION_WEBHOOK_URL`, which any Slack-compatible incoming webhook accepts. Every escalation is also logged, and a webhook that is down or refuses never breaks the executor. In Compose it points at the local stand-in, which shows them at http://127.0.0.1:8091.
 
-What does not exist yet: the facts collector, its Compose service, idempotent execution, verification and automatic revert (Phase 6, [plan](../docs/HANDOFF.md#52-phase-6-remediation-and-verification)).
+- **Real actions.** `restart_service`, `pause_consumer`, `resume_consumer` and `clear_cache` through the Docker API (`DockerRunner`), and `failover` of payments to `payments-standby` through Toxiproxy (`ToxiproxyRunner`), routed by `RoutingRunner`. `make e2e-actions` runs each on the live stack.
+
+What does not exist yet: a facts collector (preconditions come from `deploy/policy/facts.json`, kept by hand), and runners for `scale_deployment`, `rollback_deploy`, `toggle_flag` and `increase_pool_size`, which fail their dry run.
 
 `make test-policy` runs the tests in a container.

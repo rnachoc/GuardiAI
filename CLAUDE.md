@@ -27,6 +27,7 @@ Read [`docs/HANDOFF.md`](docs/HANDOFF.md) first: it says what exists, what is le
 | `make up` / `make down` | Start or stop the stack |
 | `make smoke`, `make verify` | Check the running stack |
 | `make e2e-remediation` | Kill inventory, approve, execute, verify recovery |
+| `make e2e-actions` | Fail payments over, clear the cache, pause and resume the notifier (once an hour) |
 | `make record SCENARIO=<id>` | Run a scenario and record it (about 7 minutes) |
 | `make eval` | Regenerate the evaluation report |
 | `make console` | Build the replay console into `console/dist/` |

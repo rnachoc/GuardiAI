@@ -51,5 +51,5 @@ The lesson generalises: **a check that cannot fail is not a check.** Every guard
 ## What I would do next
 
 - Record real model runs for all scenarios and fill in the model matrix and cost per incident.
-- Implement the other eight catalog actions with their reverts.
+- Implement the four catalog actions that still need infrastructure: replicas, a deploy history, a flags service and live pool settings.
 - Instrument the agents with OpenTelemetry's GenAI conventions.

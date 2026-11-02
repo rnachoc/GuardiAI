@@ -204,7 +204,8 @@ What the end-to-end test found: verification passed in 11 s at first, because a 
 
 Known limits:
 
-- The live runner implements only `restart_service`. Automatic revert is proven in the executor's tests, not live, because no live action has a revert yet.
+- Five actions act for real: `restart_service`, `pause_consumer` and `resume_consumer` (pausing and unpausing the container) and `clear_cache` (deleting the catalog's `products::*` keys in Redis) through the Docker API, and `failover` of payments to a standby through Toxiproxy's API, which repoints checkout's connection. `make e2e-actions` proposes, approves, executes and verifies each on the live stack, and checks the standby really serves charges; it runs in CI. Clearing the cache was also checked by hand in Redis: 40 keys before, 0 after.
+- Not real yet: `scale_deployment`, `rollback_deploy`, `toggle_flag` and `increase_pool_size`, which need replicas, a deploy history, a flags service and live pool settings. Automatic revert is proven in the executor's tests; live, `fail_back` and `resume_consumer` exist but no live test makes a verification fail on purpose.
 - The planner's drafts are scripted by hand (ADR 16).
 - The local facts file is static.
 - Escalations go to the service's log, until the webhook mock of Phase 8.
