@@ -153,14 +153,14 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
 **Status:** the static replay console exists (`make console`, ADR 20), and a Pages workflow publishes it once you enable Pages (Settings, Pages, Source: GitHub Actions, then run the Pages workflow). Still to do is everything live listed below. Finding: recordings start 60 s before their run, so some carry log lines from the end of the previous scenario. Leave a gap between recordings, or start the window at the run's start.
 
 1. **Console** (`console/`, React, Vite, TypeScript), in the style you asked for: Apple's and Netflix's sites. Dark, generous whitespace, large type, one accent colour, smooth transitions, rows of incident cards. Views:
-   - live incident timeline;
+   - live incident timeline (done in the policy service's page, from `GET /audit`; move it here);
    - hypotheses with links to their evidence (open the ledger entry and re-run it);
-   - approval queue with expected effect and blast radius (call the policy service);
+   - approval queue with expected effect and blast radius (done in the policy service's page; move it here);
    - replay of any recorded incident with its full tool trace;
    - cost per incident ("not measured" for model cost under ADR 16).
    Serve it from Compose behind a strict content security policy, with no tokens in local storage.
 2. **Notifications**: the policy service already posts escalations to `GUARDIA_ESCALATION_WEBHOOK_URL` (`WebhookEscalation.java`). Done: the stand-in `deploy/webhook-mock` stores and shows them at http://127.0.0.1:8091. Still to do: a stack test that makes a remediation fail on purpose and checks the message arrives.
-3. **Postmortem writer**: `agents/src/postmortem.ts` exists and is tested (alert, hypotheses, unknowns, actions, refused drafts, ledger). Still to do: add a timeline from the policy service's audit log (`GET /audit` would need adding). Then make it suggest runbook edits as a diff against `docs/runbooks/`, and write the result to `docs/incidents/` in the runbook format, so `mcp-runbooks` finds it. Scripted turns under ADR 16.
+3. **Postmortem writer**: `agents/src/postmortem.ts` exists and is tested (alert, hypotheses, unknowns, actions, refused drafts, ledger). Still to do: add a timeline from the policy service's audit log (`GET /audit` exists and each entry carries its time). Then make it suggest runbook edits as a diff against `docs/runbooks/`, and write the result to `docs/incidents/` in the runbook format, so `mcp-runbooks` finds it. Scripted turns under ADR 16.
 
 ### 5.5 Phase 9: security pack, model matrix, cost report
 

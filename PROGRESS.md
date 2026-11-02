@@ -240,7 +240,9 @@ Done:
 - The postmortem writer (`agents/src/postmortem.ts`, `make postmortem SCENARIO=<id>`), deterministic and model-free. It cites only ledger evidence, lists refused drafts with the gate's reason, and never repeats tool output. Tested on the incident, injection and decoy recordings, including that the planted instruction never appears.
 - Escalation through a Slack-style webhook (`GUARDIA_ESCALATION_WEBHOOK_URL`), tested against a stand-in webhook, including one that refuses and one that is down. In Compose the messages go to a stand-in for Slack (`deploy/webhook-mock`) that shows them at http://127.0.0.1:8091, checked in the live stack.
 
-Not done: the live incident timeline, and in the postmortem, the audit timeline and runbook suggestions.
+- A live timeline under the approval queue, read from the audit log (`GET /audit`). Every entry now records the time it was written, inside its hash, so redating one breaks the chain; logs written before this still verify. `make e2e-remediation` checks the timeline tells the whole story in order, with times.
+
+Not done: in the postmortem, the audit timeline and runbook suggestions; the React console that brings the views together.
 
 ## Next
 

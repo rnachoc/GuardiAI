@@ -27,7 +27,7 @@ make up && make test
 | --- | --- |
 | http://127.0.0.1:3000 | Grafana, on the Mercadillo overview dashboard |
 | http://127.0.0.1:8080/api/products | The shop's public API ([routes](mercadillo/README.md#public-api)) |
-| http://127.0.0.1:8090 | GuardiAI's approval queue; `make e2e-remediation` fills it |
+| http://127.0.0.1:8090 | GuardiAI's approval queue and audit timeline; `make e2e-remediation` fills them |
 | http://127.0.0.1:8091 | Escalations GuardiAI sent to a person, through a stand-in for a Slack webhook |
 
 `make verify` proves the stack works end to end, `make smoke` checks the backing services, and `make` lists every target. Before committing, `make hooks` installs the hook that stops a commit carrying a secret.
