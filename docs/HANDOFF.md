@@ -13,12 +13,12 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 2 Chaos and snapshots | Done (40 of 40 scenarios) | `chaos/src/`, `chaos/scenarios/`, `chaos/fixtures/` |
 | 3 Read-only tool servers | Done | `mcp/src/{metrics,logs,traces,changes,runbooks}/` |
 | 4 Investigator | Done, on scripted turns (ADR 16) | `agents/src/`, `agents/responses/` |
-| 5 Policy engine | Done as a library | `policy/src/main/java/.../policy/` |
+| 5 Policy engine | Done, served by the policy service | `policy/src/main/java/.../policy/` |
 | 6 Remediation and verification | Done; 7 of 9 actions act for real | `mcp/src/actions/`, `policy/`, `agents/src/remediate.ts`, `scripts/e2e_remediation.sh` |
-| 7 Evaluation | In progress: harness, graders, gate and report exist | `evals/` |
+| 7 Evaluation | Done without a model: 40 scenarios, harness, graders, gate and report. Left: scripted turns for 37, and the LLM judge, which needs a model | `evals/` |
 | 8 Console, postmortem, replay | In progress: static replay console, live approval queue, postmortem writer | `console/`, `policy/src/main/resources/static/` |
-| 9 Security pack, model matrix, cost report | In progress: only the model matrix and cost report are left, and they need a model | `agents/test/security.test.ts`, README Risks |
-| 10 Release | In progress: case study and video script | `docs/` |
+| 9 Security pack, model matrix, cost report | Done without a model: only the model matrix and cost report are left, and they need one | `agents/test/security.test.ts`, README Risks |
+| 10 Release | Ready: case study, video script, screenshot, ADRs. Left: enable GitHub Pages | `docs/` |
 
 Phases 0 to 7 are the minimum publishable version, so phases 6 and 7 come first.
 

@@ -9,7 +9,7 @@ An AI on-call engineer for a microservice system. When an alert fires, a small c
 
 GuardiAI is judged on three things: it finds the right cause, it never does anything unsafe, and it proves both with measured numbers. No number has been measured yet, so none is published.
 
-> **Status: Phases 0 to 6 done; 7 to 10 in progress ([plan](docs/HANDOFF.md)).** The marketplace GuardiAI watches runs with full telemetry, and all 40 incident scenarios are recorded with a sealed ground truth. Read-only tool servers answer from the live stack or a recording. The investigator validates every citation. The policy service decides, audits, and, after approval, restarts a failed service for real, verifies its recovery and escalates when it cannot. The [evaluation report](evals/REPORT.md) compares GuardiAI's guardrails with rule-based automation, on scripted turns only: no model is called (ADR 16). Read the [case study](docs/case-study.md) for the short version. The [status table](#status) says exactly what exists.
+> **Status: Phases 0 to 6 done; 7 to 10 in progress, and what they lack is mostly what needs a paid model (ADR 16) ([what is left](docs/HANDOFF.md)).** The marketplace GuardiAI watches runs with full telemetry, and all 40 incident scenarios are recorded with a sealed ground truth. Read-only tool servers answer from the live stack or a recording. The investigator validates every citation. The policy service decides, audits, and, after approval, restarts a failed service for real, verifies its recovery and escalates when it cannot. The [evaluation report](evals/REPORT.md) compares GuardiAI's guardrails with rule-based automation, on scripted turns only: no model is called (ADR 16). Read the [case study](docs/case-study.md) for the short version. The [status table](#status) says exactly what exists.
 
 ![The replay console: the recorded incidents, each replayed with its evidence, next to what a rule-based automation would have done](docs/images/replay-console.png)
 
@@ -43,7 +43,7 @@ make up && make test
 | 2 | Chaos and snapshots | Done | 40 scenarios with an injector, each recorded as a hashed bundle whose ground truth is re-checked on every build. |
 | 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
 | 4 | Investigator | Done | Bounded loop, evidence ledger and validator, run on hand-scripted turns. No model is called, by the owner's decision ([ADR 16](docs/adr/0016-no-paid-model-runs.md)). |
-| 5 | Policy engine | Done | Catalog, blast radius, decisions and a hash-chained audit log, all test-first. Nothing executes yet (Phase 6). |
+| 5 | Policy engine | Done | Catalog, blast radius, decisions and a hash-chained, timestamped audit log, all test-first, served by the policy service. |
 | 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Seven of the nine catalog actions act for real, including a failover to a standby payments. |
 | 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). All 40 scenarios recorded; GuardiAI has scripted turns for 3 of them, and no model has been measured (ADR 16). |
 | 8 | Console, postmortem and replay | In progress | A static [replay console](console) over all forty recordings, a live approval queue at 127.0.0.1:8090, and a model-free postmortem writer (`make postmortem`). |
