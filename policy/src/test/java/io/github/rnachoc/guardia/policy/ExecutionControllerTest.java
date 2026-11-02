@@ -1,6 +1,9 @@
 package io.github.rnachoc.guardia.policy;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -171,5 +174,32 @@ class ExecutionControllerTest {
         String id = "prop-99999999-9999-9999-9999-999999999999";
         send("/proposals/" + id + "/approvals", "{\"by\":\"ana\"}").andExpect(status().isNotFound());
         send("/proposals/" + id + "/execute", "{}").andExpect(status().isNotFound());
+    }
+
+    /**
+     * The approval queue lists each judged proposal with its verdict, blast radius, approvals and outcome.
+     *
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void listsJudgedProposalsForTheQueue() throws Exception {
+        String id = "prop-aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+        send("/proposals", "{\"id\":\"" + id + "\",\"action\":\"restart_service\",\"target\":\"inventory\"}");
+        http.perform(get("/proposals")).andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == '" + id + "')].verdict").value("NEEDS_APPROVAL"))
+                .andExpect(jsonPath("$[?(@.id == '" + id + "')].needed").value(1))
+                .andExpect(jsonPath("$[?(@.id == '" + id + "')].outcome").value("PENDING"));
+    }
+
+    /**
+     * The console page is served at the root.
+     *
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void servesTheApprovalQueuePage() throws Exception {
+        http.perform(get("/")).andExpect(status().isOk()).andExpect(forwardedUrl("index.html"));
+        http.perform(get("/index.html")).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<title>GuardiAI Approvals</title>")));
     }
 }
