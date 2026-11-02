@@ -96,6 +96,15 @@ test("the mid-fault check falls 100 s after the last fault, but before the first
   assert.equal(decoyWindow.faultCheck - decoyWindow.start, 67);
 });
 
+test("a configuration dump that sets a password to null is not a secret, but a real password still is", () => {
+  const dump = written(files({ "logs.json.gz": { lines: [{ time: "1", service: "notifier", level: "info", traceId: "",
+    line: "ConsumerConfig values:\n\tssl.key.password = null\n\tssl.keymanager.algorithm = SunX509" }] } }));
+  assert.ok(!verifyBundle(dump, scenario).some((problem) => problem.includes("a password assignment")));
+  const leak = written(files({ "logs.json.gz": { lines: [{ time: "1", service: "notifier", level: "info", traceId: "",
+    line: "connecting with password = hunter2secret\n\tnext" }] } }));
+  assert.ok(verifyBundle(leak, scenario).some((problem) => problem.includes("a password assignment")));
+});
+
 test("a secret recorded in a log line is caught, even though the file is compressed", () => {
   const key = ["AKIA", "Z".repeat(16)].join("");
   const folder = written(files({ "logs.json.gz": { lines: [{ time: "1", service: "checkout", level: "error", traceId: "",
