@@ -1,0 +1,24 @@
+{
+  "scenario": "catalog-killed",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "8b3bfc84364f6db3e9aa242b630e1789a0e54fb0c4e7af1118497f13b900d813",
+    "metrics.json.gz": "f5378c3b680ea62e73bacf1c6378200b4f7232918cbdef6dbd57dae03dfebd73",
+    "logs.json.gz": "075bbaf895ba1a9d8b0a134c8b496d662e19e29fce8bea9f975aff87d7f5b9a7",
+    "traces.json.gz": "1ed8b559c72d82283d48cf6e9975b65880d04a3cfb4586317ee57f069611c539",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "a667e5d48d0f17b4763b6470fedf65ce5210a5554dc5343957a549189dd105be",
+    "truth/evidence.json.gz": "32e636fafe39f2572273d12fc3cab1cb3933402a0c806db9a94fb20667968318"
+  }
+}

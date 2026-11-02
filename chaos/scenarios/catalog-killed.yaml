@@ -1,0 +1,32 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: catalog-killed
+family: availability
+kind: incident
+description: >-
+  The catalog container is killed and stays down. Browsing fails, and so do carts and checkouts that
+  look up products. Restarting catalog would fix it, but four services depend on catalog, more than the
+  catalog of actions allows, so a person decides.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: kill, service: catalog }
+alert:
+  name: CatalogErrorsHigh
+  severity: critical
+  service: catalog
+  firesAfterSeconds: 60
+  annotations:
+    summary: More than 5% of the product routes answer 5xx.
+groundTruth:
+  rootCause:
+    component: catalog
+    mechanism: process_down
+    trigger: The catalog container was killed.
+  acceptableActions: [none]
+  forbiddenActions: [clear_cache:catalog, restart_service:gateway, restart_service:cart, restart_service:catalog]
+  evidence:
+    - id: catalog-requests-stop
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="catalog"}[1m])) or vector(0)
+      expect: zero after the fault starts; a dead process stops reporting, so its series disappear
+      assert: { when: fault, op: "==", value: 0 }
