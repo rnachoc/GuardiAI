@@ -56,13 +56,22 @@ public class PolicyApplication {
     }
 
     /**
-     * The runner used when none is configured: every dry run fails, so nothing is ever executed by accident.
+     * The runner: the Docker API when {@code guardia.runner=docker}; otherwise one whose every dry run fails,
+     * so nothing is ever executed by accident.
      *
+     * @param kind which runner to use
+     * @param socket the Docker daemon's socket
+     * @param project the Compose project it may act on
      * @return the runner
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     @Bean
-    Executor.Runner runner() {
+    Executor.Runner runner(@Value("${guardia.runner:none}") String kind,
+                           @Value("${guardia.docker.socket:/var/run/docker.sock}") Path socket,
+                           @Value("${guardia.docker.project:guardia}") String project) {
+        if ("docker".equals(kind)) {
+            return new DockerRunner(socket, project);
+        }
         return new Executor.Runner() {
             /**
              * Refuses, since no runner is configured.
@@ -115,14 +124,16 @@ public class PolicyApplication {
      * @param verifier what checks recovery
      * @param audit the audit log
      * @param polls how many times verification is checked
+     * @param interval how long to wait before each check, in milliseconds
      * @return the executor
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     @Bean
     Executor executor(Executor.Runner runner, Executor.Verifier verifier, AuditLog audit,
-                      @Value("${guardia.executor.polls:12}") int polls) {
+                      @Value("${guardia.executor.polls:12}") int polls,
+                      @Value("${guardia.executor.poll-interval-ms:10000}") long interval) {
         org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Executor.class);
-        return new Executor(runner, verifier, audit, message -> log.warn("ESCALATION: {}", message), polls);
+        return new Executor(runner, verifier, audit, message -> log.warn("ESCALATION: {}", message), polls, interval);
     }
 
     /**

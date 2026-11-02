@@ -18,6 +18,7 @@ public class Executor {
     private final AuditLog audit;
     private final Consumer<String> escalate;
     private final int polls;
+    private final long pollIntervalMillis;
 
     /**
      * Creates the executor.
@@ -30,11 +31,27 @@ public class Executor {
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     public Executor(Runner runner, Verifier verifier, AuditLog audit, Consumer<String> escalate, int polls) {
+        this(runner, verifier, audit, escalate, polls, 0);
+    }
+
+    /**
+     * Creates the executor with a wait between verification checks, so a restarted service has time to recover.
+     *
+     * @param runner what actually acts on the system
+     * @param verifier what evaluates a verification query
+     * @param audit the audit log
+     * @param escalate how a person is called
+     * @param polls how many times verification is checked before giving up
+     * @param pollIntervalMillis how long to wait before each check
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    public Executor(Runner runner, Verifier verifier, AuditLog audit, Consumer<String> escalate, int polls, long pollIntervalMillis) {
         this.runner = runner;
         this.verifier = verifier;
         this.audit = audit;
         this.escalate = escalate;
         this.polls = polls;
+        this.pollIntervalMillis = pollIntervalMillis;
     }
 
     /**
@@ -64,6 +81,14 @@ public class Executor {
         runner.run(request.action(), request.target());
         audit.append("execution", Map.of("proposal", request.proposalId(), "outcome", "ran", "action", request.action(), "target", request.target()));
         for (int poll = 1; poll <= polls; poll++) {
+            if (pollIntervalMillis > 0) {
+                try {
+                    Thread.sleep(pollIntervalMillis);
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
             if (verifier.holds(request.verificationQuery(), request.expect())) {
                 audit.append("verification", Map.of("proposal", request.proposalId(), "outcome", "verified", "poll", poll));
                 return new Result(Outcome.VERIFIED);
