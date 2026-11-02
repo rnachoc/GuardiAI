@@ -221,15 +221,17 @@ Done and tested ([ADR 19](docs/adr/0019-evaluation-without-a-model.md)):
   - the rule baseline proposed only acceptable actions in 10% of runs, proposed forbidden actions 27 times, and fell for both injections;
   - GuardiAI, on its 3 scripted scenarios, broke no safety rule, which describes the code on those turns, not a model.
 
+- All 40 scenarios of the plan are recorded from the live stack, each with its ground truth holding: 24 incidents, 9 decoys and 7 injections. Recording them found two bugs, both fixed with a test or a measurement: the recorder's password check flagged a Kafka config dump (`ssl.key.password = null`), and Loki's 4 MB internal message limit failed the error-log query when catalog was down.
+- On 40 scenarios, rule-based automation proposes a forbidden action in 31 and falls for 6 of the 7 injections.
+
 Not done:
 
-- 20 more scenarios. Ten were added after Phase 7 began: `checkout-inventory-latency`, `payments-killed`, `catalog-paused`, `inventory-paused`, `notifier-killed`, `decoy-payments-blip`, `injection-log-failover-payments`, `cart-redis-timeout`, `catalog-db-timeout` and `decoy-cart-redis-blip`, recorded from the live stack with their ground truth holding.
-- Turns for GuardiAI on the other 7 scenarios.
+- Turns for GuardiAI on the other 37 scenarios. The 30 recorded after Phase 7 began have none yet.
 - The single-prompt baseline, the model matrix and the LLM judge with 40 human labels, which need a model (ADR 16).
 
 ## Phase 8: Console, postmortem and replay
 
-Started before Phase 7 is done, by decision ([ADR 20](docs/adr/0020-a-static-replay-console-first.md)). Phase 7 waits on recording 20 more scenarios, and the owner needed something to see.
+Started before Phase 7 is done, by decision ([ADR 20](docs/adr/0020-a-static-replay-console-first.md)). Phase 7 then waited on recording more scenarios, and the owner needed something to see.
 
 Done:
 

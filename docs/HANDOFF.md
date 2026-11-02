@@ -10,7 +10,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | --- | --- | --- |
 | 0 Foundations | Done | `Makefile`, `.github/workflows/ci.yml`, `tests/` |
 | 1 Mercadillo and observability | Done | `mercadillo/`, `deploy/observability/`, `scripts/verify_stack.py` |
-| 2 Chaos and snapshots | Done (10 of 40 scenarios) | `chaos/src/`, `chaos/scenarios/`, `chaos/fixtures/` |
+| 2 Chaos and snapshots | Done (40 of 40 scenarios) | `chaos/src/`, `chaos/scenarios/`, `chaos/fixtures/` |
 | 3 Read-only tool servers | Done | `mcp/src/{metrics,logs,traces,changes,runbooks}/` |
 | 4 Investigator | Done, on scripted turns (ADR 16) | `agents/src/`, `agents/responses/` |
 | 5 Policy engine | Done as a library | `policy/src/main/java/.../policy/` |
@@ -127,7 +127,7 @@ Acceptance (brief): planner, executor, verification, automatic revert.
 
 ### 5.3 Phase 7: evaluation
 
-**Status:** the harness, graders, thresholds, CI gate and generated report exist (ADR 19). What remains is 20 more scenarios (20 of 40 are recorded), turns for GuardiAI on the scenarios that lack them, and the human labels for a future judge.
+**Status:** the harness, graders, thresholds, CI gate and generated report exist (ADR 19). All 40 scenarios are recorded. What remains is turns for GuardiAI on the scenarios that lack them, and the human labels for a future judge.
 
 Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated report.
 
