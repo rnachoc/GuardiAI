@@ -14,13 +14,14 @@ Only `restart_service` acted for real. The catalog lists nine actions, and a run
 - `clear_cache` on catalog deletes the `products::*` keys of its Spring cache, with `redis-cli` run as an exec in the Redis container.
 - `failover` of payments points checkout's Toxiproxy proxy at a second payments container, `payments-standby`, and `fail_back` points it at the primary again. Nothing restarts and no client is reconfigured.
 - `scale_deployment` adds one replica: a copy of the container's image, environment, healthcheck and memory limit, labelled `io.guardia.replica-of` instead of with Compose's labels, on the same networks under the service's name. `scale_back` removes it. A second replica is refused while one runs. Its verification counts the instances that reported to Prometheus in the last 30 seconds, since `up` does not exist for services that push over OTLP.
+- `toggle_flag` switches off a service's `<service>.latest_release` flag in a small flags service (`deploy/flags`), and `toggle_back` switches it on. No Mercadillo service reads the flags yet, so a toggle is real in the flag store and has no effect on behaviour.
 - `RoutingRunner` sends each action and each revert to the runner that implements it. An action no runner implements still fails its dry run.
-- `rollback_deploy`, `toggle_flag` and `increase_pool_size` stay unimplemented until the stack has a deploy history, a flags service and live pool settings.
+- `rollback_deploy` and `increase_pool_size` stay unimplemented until the stack has a deploy history and live pool settings.
 - `make e2e-actions` runs the four new actions on the live stack and runs in CI. It also checks that the standby really serves charges.
 
 ## Consequences
 
-- Six of nine actions act for real, each verified against Prometheus after the settle period.
+- Seven of nine actions act for real, each verified against Prometheus after the settle period.
 - The stack runs one more JVM, the idle standby.
 - A replica runs and reports, but measured live it served no requests: checkout reaches inventory through Toxiproxy, which keeps dialling the first address it resolves. Scaling out adds capacity only once a load balancer sits in front of the replicas.
 - Clearing the cache is started detached, so the runner does not see the exec's exit code. The command was checked by hand (40 keys before, 0 after), and verification checks the catalog's latency afterwards.

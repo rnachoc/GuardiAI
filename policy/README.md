@@ -17,10 +17,10 @@ What exists, test-first:
 - The **approval queue** at http://127.0.0.1:8090 (`GET /proposals` underneath). It lists every judged proposal with its verdict, the engine's reasons, the services it could reach, approvals and outcome, and lets a person approve or execute. Below it, a **timeline** of the audit log, newest first, says whether the hash chain is intact.
 - **Escalation by webhook.** When a remediation fails to recover the system, the executor posts `{"text": …}` to `GUARDIA_ESCALATION_WEBHOOK_URL`, which any Slack-compatible incoming webhook accepts. Every escalation is also logged, and a webhook that is down or refuses never breaks the executor. In Compose it points at the local stand-in, which shows them at http://127.0.0.1:8091.
 
-- **Real actions.** `restart_service`, `pause_consumer`, `resume_consumer`, `clear_cache` and `scale_deployment` (with `scale_back`) through the Docker API (`DockerRunner`), and `failover` of payments to `payments-standby` through Toxiproxy (`ToxiproxyRunner`), routed by `RoutingRunner`. `make e2e-actions` runs each on the live stack.
+- **Real actions.** `restart_service`, `pause_consumer`, `resume_consumer`, `clear_cache` and `scale_deployment` (with `scale_back`) through the Docker API (`DockerRunner`), `failover` of payments to `payments-standby` through Toxiproxy (`ToxiproxyRunner`), and `toggle_flag` in the flags service (`FlagsRunner`), routed by `RoutingRunner`. `make e2e-actions` runs each on the live stack.
 
-- **Live facts.** `standby_healthy` and `database_healthy` come from Docker's health status of `payments-standby` and `postgres`, read on every judgement; the other preconditions come from `deploy/policy/facts.json`.
+- **Live facts.** `standby_healthy`, `database_healthy` and `flag_exists` come from Docker's health status of `payments-standby`, `postgres` and `flags`, read on every judgement; the other preconditions come from `deploy/policy/facts.json`.
 
-What does not exist yet: live facts for the other preconditions (deploy freeze, replica and pool bounds, Kafka retention), and runners for `rollback_deploy`, `toggle_flag` and `increase_pool_size`, which fail their dry run.
+What does not exist yet: live facts for the other preconditions (deploy freeze, replica and pool bounds, Kafka retention), and runners for `rollback_deploy` and `increase_pool_size`, which fail their dry run.
 
 `make test-policy` runs the tests in a container.

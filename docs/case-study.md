@@ -51,5 +51,5 @@ The lesson generalises: **a check that cannot fail is not a check.** Every guard
 ## What I would do next
 
 - Record real model runs for all scenarios and fill in the model matrix and cost per incident.
-- Implement the three catalog actions that still need infrastructure: a deploy history, a flags service and live pool settings.
+- Implement the two catalog actions that still need infrastructure, a deploy history and live pool settings, and make the services read the feature flags GuardiAI can already switch.
 - Instrument the agents with OpenTelemetry's GenAI conventions.

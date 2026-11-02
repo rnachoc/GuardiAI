@@ -44,7 +44,7 @@ make up && make test
 | 3 | Read-only tool servers | Done | All five servers, live and replay, with allow-listed query subsets, caps, redaction and abuse tests. |
 | 4 | Investigator | Done | Bounded loop, evidence ledger and validator, run on hand-scripted turns. No model is called, by the owner's decision ([ADR 16](docs/adr/0016-no-paid-model-runs.md)). |
 | 5 | Policy engine | Done | Catalog, blast radius, decisions and a hash-chained audit log, all test-first. Nothing executes yet (Phase 6). |
-| 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Six of the nine catalog actions act for real, including a failover to a standby payments. |
+| 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Seven of the nine catalog actions act for real, including a failover to a standby payments. |
 | 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). All 40 scenarios recorded; GuardiAI has scripted turns for 3 of them, and no model has been measured (ADR 16). |
 | 8 | Console, postmortem and replay | In progress | A static [replay console](console) over all forty recordings, a live approval queue at 127.0.0.1:8090, and a model-free postmortem writer (`make postmortem`). |
 | 9 | Security pack, model matrix, cost report | In progress | The [risks table](#risks) is complete and every row is tested. GuardiAI's own metrics and the agents' GenAI telemetry are in Prometheus, Tempo and Grafana. No model matrix (needs a model). |
