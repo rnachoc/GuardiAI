@@ -3,7 +3,8 @@
  * diagnosis. Every tool call is written to an evidence ledger under an ID, and the diagnosis may only cite
  * those IDs. Code then validates the diagnosis: a claim without evidence, or citing evidence that does not
  * exist, failed, or no longer gives the same answer when its call is run again, is rejected (brief,
- * principle 2). The model proposes; this code decides what counts.
+ * principle 2). So is a claim whose only evidence is text a tool server flagged as a possible injection: hostile
+ * text may be cited, but never alone. The model proposes; this code decides what counts.
  *
  * Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
@@ -71,6 +72,14 @@ export function digest(text: string): string {
 }
 
 /**
+ * Tells whether a tool's answer carries text the tool server flagged as a possible injection.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+export function flagged(result: string): boolean {
+  return /"injectionFlags":\[\s*"/.test(result);
+}
+
+/**
  * Checks a diagnosis against the ledger and returns the problems found, or an empty list. Each cited call
  * is run again at the step it was made in (`atStep` moves a replayed clock there), and its answer must be
  * identical to the one the model saw.
@@ -97,6 +106,10 @@ export async function validate(raw: unknown, ledger: LedgerEntry[], tools: Map<s
   for (const hypothesis of diagnosis.hypotheses) {
     if (hypothesis.component !== "none" && hypothesis.evidence.length === 0) {
       problems.push(`hypothesis ${hypothesis.rank} makes a claim without evidence`);
+    }
+    const cited = hypothesis.evidence.map((id) => byId.get(id)).filter((entry) => entry !== undefined);
+    if (cited.length > 0 && cited.length === hypothesis.evidence.length && cited.every((entry) => flagged(entry.result))) {
+      problems.push(`hypothesis ${hypothesis.rank} rests only on text flagged as a possible injection`);
     }
     for (const id of hypothesis.evidence) {
       const entry = byId.get(id);

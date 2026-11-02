@@ -70,7 +70,7 @@ export function criticalPath(trace: Trace) {
  * Prepares a span for the agent: free-text attributes redacted and wrapped as untrusted.
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
-function present(span: Span) {
+export function present(span: Span) {
   const attributes: Record<string, string> = {};
   const flags: string[] = [];
   for (const [name, value] of Object.entries(span.attributes)) {

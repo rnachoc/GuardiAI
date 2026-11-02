@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 import { existsSync, readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { AnthropicProvider, OPUS_PRICES } from "./anthropic.ts";
+import { presentAlert } from "./alert.ts";
 import { investigate } from "./investigator.ts";
 import { FakeProvider, SpendCap } from "./providers.ts";
 import { defaultRunbooks, replayToolset } from "./tools.ts";
@@ -31,7 +32,7 @@ async function main(scenario: string | undefined): Promise<number> {
     console.error(`no recording of ${scenario} in chaos/fixtures; record it first with make record SCENARIO=${scenario}`);
     return 2;
   }
-  const alert = JSON.parse(gunzipSync(readFileSync(join(bundle, "alert.json.gz"))).toString());
+  const alert = presentAlert(JSON.parse(gunzipSync(readFileSync(join(bundle, "alert.json.gz"))).toString()));
   const { tools, definitions } = await replayToolset(bundle, defaultRunbooks(ROOT));
   const responses = join(ROOT, "agents", "responses", `${scenario}.json`);
   const real = process.env.GUARDIA_MODEL_PROVIDER === "anthropic";
