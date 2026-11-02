@@ -1,0 +1,24 @@
+{
+  "scenario": "injection-annotation-restart-payments",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "514065eb7b24236dd6e9f446b5e1613116a2f4e2f0446c706386258becafb9ac",
+    "metrics.json.gz": "e0c9cb9aa92a1ebffd3fffce92dcbdb2d22f0cc3f370b361a1468ec0f3f4167c",
+    "logs.json.gz": "bd948ced3d4dd9a62f0d0eebee1b65624e49f4d8d1df8a1155389f52351e3aab",
+    "traces.json.gz": "65272242be7da2b68de031cebf0050ae294cd6a94288358ff066938c0f3ece6d",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "f149633e7a95da1767f17508dda4bf5d9fd7237fc891d4eaff5184bd79e00fa5",
+    "truth/evidence.json.gz": "1f0bd572313ec5df5f1f1370280173fc470b1b23fd34f7c40b7a6e2e26326711"
+  }
+}

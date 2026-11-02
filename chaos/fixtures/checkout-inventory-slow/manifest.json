@@ -1,0 +1,24 @@
+{
+  "scenario": "checkout-inventory-slow",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "b7747d5a40e8cb15139270cdb1ecdd8a9402ba22aafaf20cd7525b26253d9938",
+    "metrics.json.gz": "77a85d42c5e0086d64e3d4192f76c5cad3d3ffedff14631e5d42cc4c6a5a3d72",
+    "logs.json.gz": "71e5c1c11dcf2cbc86959ac9727c794f9a422a28be28d6a819bfa5ad5e387998",
+    "traces.json.gz": "263bbd921a3b2750595286b24f3486b5c649ff1daeb929775a6d9a2271b26aa1",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "11da876ea26d5b8201acf4d0eea69236225da937559d34c4b39c1666641c1186",
+    "truth/evidence.json.gz": "4da01e54242d0e25538bb8e990ba9c5111fe26d0737975b79921b40338fcca24"
+  }
+}

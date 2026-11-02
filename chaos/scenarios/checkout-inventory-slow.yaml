@@ -1,0 +1,41 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: checkout-inventory-slow
+family: latency
+kind: incident
+description: >-
+  The connection from checkout to inventory gains 700 milliseconds of latency: enough to slow every
+  checkout, not enough to break one. Inventory itself stays fast, and nothing in the catalog of actions
+  fixes the path.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: latency, proxy: checkout-inventory, latencyMs: 700, jitterMs: 50 }
+alert:
+  name: CheckoutLatencyHigh
+  severity: warning
+  service: checkout
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of POST /checkouts is above 500 milliseconds.
+groundTruth:
+  rootCause:
+    component: inventory
+    mechanism: network_latency
+    trigger: Latency added on the connection between checkout and inventory.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:checkout, restart_service:inventory, failover:payments]
+  evidence:
+    - id: checkout-client-latency-to-inventory
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_client_request_duration_seconds_bucket{service_name="checkout",
+        server_address="inventory-proxy"}[1m])))
+      expect: above 0.6 seconds while the fault is active
+      assert: { when: fault, op: ">", value: 0.6 }
+    - id: inventory-server-latency
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="inventory",
+        http_route="/reservations"}[1m])))
+      expect: below 0.2 seconds, so the time is lost before inventory receives the request
+      assert: { when: fault, op: "<", value: 0.2 }

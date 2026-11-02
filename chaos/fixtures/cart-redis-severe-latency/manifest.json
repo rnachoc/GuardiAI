@@ -1,0 +1,24 @@
+{
+  "scenario": "cart-redis-severe-latency",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "109f5c0683dada65e8486a36dddedbb80c65533cc58f0b4c182d603ae2cac630",
+    "metrics.json.gz": "09487f8fcfa11c44a70404613930c064ae3ee6163885424990f9929ae5cd21f6",
+    "logs.json.gz": "115c6c4ed472662f7735d9a10b89c55b5813edfe887f1b0e1edb12529b1a96f4",
+    "traces.json.gz": "88d7191999777e4a3952df386c869b6b4418305419499a32290e68dfcfcb5ec3",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "62f2c9886bc2496c54d648127034bf98fd9bda71328015d8048c0f7a523262c9",
+    "truth/evidence.json.gz": "89f851a4577cee97c591447cb919fa981bb969da8b16c25f19289137b6c05f34"
+  }
+}

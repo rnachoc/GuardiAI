@@ -1,0 +1,33 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: catalog-db-severe-latency
+family: database
+kind: incident
+description: >-
+  The connection from the catalog to PostgreSQL gains 1.5 seconds of latency. Product pages crawl.
+  Clearing the cache would send even more reads to the slow database.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: latency, proxy: catalog-postgres, latencyMs: 1500, jitterMs: 100 }
+alert:
+  name: CatalogLatencyHigh
+  severity: critical
+  service: catalog
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of GET /products is above 300 milliseconds.
+groundTruth:
+  rootCause:
+    component: postgres
+    mechanism: database_latency
+    trigger: Latency added on the connection between the catalog and PostgreSQL.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:catalog, clear_cache:catalog, restart_service:postgres]
+  evidence:
+    - id: catalog-list-latency
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="catalog",
+        http_route="/products"}[1m])))
+      expect: above 1 second while the fault is active
+      assert: { when: fault, op: ">", value: 1.0 }

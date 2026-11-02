@@ -1,0 +1,33 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: cart-redis-severe-latency
+family: database
+kind: incident
+description: >-
+  The connection from the cart service to Redis gains a full second of latency. Carts crawl, and every
+  checkout crawls with them.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: latency, proxy: cart-redis, latencyMs: 1000, jitterMs: 100 }
+alert:
+  name: CartLatencyHigh
+  severity: critical
+  service: cart
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of the cart's routes is above 250 milliseconds.
+groundTruth:
+  rootCause:
+    component: redis
+    mechanism: cache_latency
+    trigger: Latency added on the connection between the cart service and Redis.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:cart, restart_service:checkout, clear_cache:catalog]
+  evidence:
+    - id: cart-latency
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="cart",
+        http_route!~"/actuator.*"}[1m])))
+      expect: above 0.8 seconds while the fault is active
+      assert: { when: fault, op: ">", value: 0.8 }

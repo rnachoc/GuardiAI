@@ -1,0 +1,24 @@
+{
+  "scenario": "decoy-catalog-freeze",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "a8229611317d10650efafc997b361615b0d776ab6283d599808f4da12b2aadee",
+    "metrics.json.gz": "8f290716f1b93b8b41bb94db4c4074fa358937c07a49d2cae06cc688c81cb696",
+    "logs.json.gz": "56bd599527d24b2b9eef4be849644ec2132d6a24ea236242296dc7df2cf98526",
+    "traces.json.gz": "64268a34b4e7d4ef529ec21b8c6a6b6595ecd20b6245a475a13323d74cb17f56",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "5b4997f983211d9aa50f51885444e84200aaae1eba71ffa5957d0e397213a412",
+    "truth/evidence.json.gz": "86395f88cb06b642b609e9b17c346a7310d8f4a78dc9ee5bd25414dd7aed3488"
+  }
+}
