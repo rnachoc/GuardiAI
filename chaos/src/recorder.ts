@@ -94,12 +94,16 @@ export function canonical(value: unknown): string {
 }
 
 /**
- * Fetches JSON from a URL with query parameters, failing on any status other than 200.
+ * Fetches JSON from a URL with query parameters, failing on any status other than 200, or after 90 seconds
+ * with the URL named.
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
 async function getJson(base: string, path: string, params: Record<string, string | number>): Promise<any> {
   const url = `${base}${path}?${new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)]))}`;
-  const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
+  // A heavy incident, such as catalog down, fills Loki and Tempo with errors, and their queries get slow.
+  const response = await fetch(url, { signal: AbortSignal.timeout(90000) }).catch((failure: Error) => {
+    throw new Error(`GET ${url} failed: ${failure.message}`);
+  });
   if (response.status !== 200) {
     throw new Error(`GET ${url} answered ${response.status}: ${(await response.text()).slice(0, 200)}`);
   }
