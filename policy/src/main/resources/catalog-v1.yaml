@@ -26,9 +26,10 @@ actions:
     maxPerHour: 6
     maxBlastRadius: 3
     verification:
+      # Instances that reported in the last 30 seconds; an old instance's series lingers for 5 minutes.
       query: >-
-        up{service_name="$target"}
-      expect: ">= 1"
+        count(timestamp(target_info{service_name="$target"}) > time() - 30)
+      expect: ">= 2"
       timeoutSeconds: 120
     autoRevert: scale_back
   - name: rollback_deploy

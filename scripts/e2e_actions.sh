@@ -1,6 +1,7 @@
 #!/bin/sh
 # The other real actions end to end on the running stack: payments fails over to its standby through
-# Toxiproxy, the catalog's cache is cleared in Redis, and the notifier's consumer is paused and resumed.
+# Toxiproxy, the catalog's cache is cleared in Redis, the notifier's consumer is paused and resumed, and
+# inventory gains a replica.
 # Each is proposed, approved and executed through the policy service, which verifies it against
 # Prometheus. Catalog limits allow one failover an hour, so run this at most once an hour.
 #
@@ -54,6 +55,12 @@ test "$(docker compose ps notifier --format '{{.State}}')" = "paused"
 remediate resume_consumer notifier
 test "$(docker compose ps notifier --format '{{.State}}')" = "running"
 
+echo "scale_deployment: inventory gains a replica, which reports as a second instance"
+remediate scale_deployment inventory
+test "$(docker ps --filter label=io.guardia.replica-of=inventory --format '{{.State}}')" = "running"
+echo "  removing the replica by hand, so the next run starts from one"
+docker rm -f "$(docker ps --quiet --filter label=io.guardia.replica-of=inventory)" > /dev/null
+
 echo "audit chain intact"
 curl --silent --fail "$POLICY/audit/verify" | grep -q '"problems":\[\]'
-echo "e2e: failover, cache clearing and consumer pause verified end to end"
+echo "e2e: failover, cache clearing, consumer pause and scale-out verified end to end"

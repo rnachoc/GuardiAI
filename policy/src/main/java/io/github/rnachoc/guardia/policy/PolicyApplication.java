@@ -76,8 +76,8 @@ public class PolicyApplication {
             ToxiproxyRunner proxies = new ToxiproxyRunner(toxiproxy);
             return new RoutingRunner(
                     java.util.Map.of("restart_service", docker, "pause_consumer", docker, "resume_consumer", docker,
-                            "clear_cache", docker, "failover", proxies),
-                    java.util.Map.of("resume_consumer", docker, "fail_back", proxies));
+                            "clear_cache", docker, "scale_deployment", docker, "failover", proxies),
+                    java.util.Map.of("resume_consumer", docker, "scale_back", docker, "fail_back", proxies));
         }
         return new Executor.Runner() {
             /**
