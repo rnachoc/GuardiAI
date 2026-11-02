@@ -97,7 +97,7 @@ The brief asks for 40 scenarios across 8 families, with 6 decoys and 6 injection
 
 ### 5.2 Phase 6: remediation and verification
 
-**Status:** proposals, approvals, execution, verification and the live end-to-end test work (ADR 18). What remains is real runners for `rollback_deploy`, `toggle_flag` and `increase_pool_size` (the other six run for real: see `DockerRunner`, `ToxiproxyRunner` and `make e2e-actions`; a scaled-out replica gets no traffic while calls go through Toxiproxy, which only a load balancer in front of the replicas would fix), wiring the planner after the investigator, a facts collector, and webhook escalation. The numbered plan below is the original; items 1 to 5 are done for `restart_service`.
+**Status:** proposals, approvals, execution, verification and the live end-to-end test work (ADR 18). What remains is real runners for `rollback_deploy`, `toggle_flag` and `increase_pool_size` (the other six run for real: see `DockerRunner`, `ToxiproxyRunner` and `make e2e-actions`; a scaled-out replica gets no traffic while calls go through Toxiproxy, which only a load balancer in front of the replicas would fix), wiring the planner after the investigator, live facts for the preconditions still read from `deploy/policy/facts.json` (two are already measured from Docker), and webhook escalation. The numbered plan below is the original; items 1 to 5 are done for `restart_service`.
 
 Acceptance (brief): planner, executor, verification, automatic revert.
 

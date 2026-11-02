@@ -19,6 +19,8 @@ What exists, test-first:
 
 - **Real actions.** `restart_service`, `pause_consumer`, `resume_consumer`, `clear_cache` and `scale_deployment` (with `scale_back`) through the Docker API (`DockerRunner`), and `failover` of payments to `payments-standby` through Toxiproxy (`ToxiproxyRunner`), routed by `RoutingRunner`. `make e2e-actions` runs each on the live stack.
 
-What does not exist yet: a facts collector (preconditions come from `deploy/policy/facts.json`, kept by hand), and runners for `rollback_deploy`, `toggle_flag` and `increase_pool_size`, which fail their dry run.
+- **Live facts.** `standby_healthy` and `database_healthy` come from Docker's health status of `payments-standby` and `postgres`, read on every judgement; the other preconditions come from `deploy/policy/facts.json`.
+
+What does not exist yet: live facts for the other preconditions (deploy freeze, replica and pool bounds, Kafka retention), and runners for `rollback_deploy`, `toggle_flag` and `increase_pool_size`, which fail their dry run.
 
 `make test-policy` runs the tests in a container.

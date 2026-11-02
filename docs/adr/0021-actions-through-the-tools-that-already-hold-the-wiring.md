@@ -24,5 +24,5 @@ Only `restart_service` acted for real. The catalog lists nine actions, and a run
 - The stack runs one more JVM, the idle standby.
 - A replica runs and reports, but measured live it served no requests: checkout reaches inventory through Toxiproxy, which keeps dialling the first address it resolves. Scaling out adds capacity only once a load balancer sits in front of the replicas.
 - Clearing the cache is started detached, so the runner does not see the exec's exit code. The command was checked by hand (40 keys before, 0 after), and verification checks the catalog's latency afterwards.
-- The failover's preconditions come from `deploy/policy/facts.json`, kept by hand. `standby_healthy` is true because the standby exists, not because something measured it. A facts collector is still to do.
+- `standby_healthy` and `database_healthy` are read from Docker's health status of `payments-standby` and `postgres` on every judgement, and override `deploy/policy/facts.json`. Checked live: with the standby stopped, a failover is rejected because `standby_healthy` does not hold. The other preconditions still come from the file, kept by hand.
 - Catalog limits allow one failover an hour, so `make e2e-actions` runs at most once an hour on the same stack.
