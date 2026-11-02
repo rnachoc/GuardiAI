@@ -7,5 +7,5 @@
   "database_healthy": true,
   "lag_below_retention": true,
   "within_pool_bounds": true,
-  "standby_healthy": false
+  "standby_healthy": true
 }

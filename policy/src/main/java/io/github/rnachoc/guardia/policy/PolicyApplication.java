@@ -62,15 +62,22 @@ public class PolicyApplication {
      * @param kind which runner to use
      * @param socket the Docker daemon's socket
      * @param project the Compose project it may act on
+     * @param toxiproxy Toxiproxy's API, through which payments fails over
      * @return the runner
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     @Bean
     Executor.Runner runner(@Value("${guardia.runner:none}") String kind,
                            @Value("${guardia.docker.socket:/var/run/docker.sock}") Path socket,
-                           @Value("${guardia.docker.project:guardia}") String project) {
+                           @Value("${guardia.docker.project:guardia}") String project,
+                           @Value("${guardia.toxiproxy.url:http://toxiproxy:8474}") String toxiproxy) {
         if ("docker".equals(kind)) {
-            return new DockerRunner(socket, project);
+            DockerRunner docker = new DockerRunner(socket, project);
+            ToxiproxyRunner proxies = new ToxiproxyRunner(toxiproxy);
+            return new RoutingRunner(
+                    java.util.Map.of("restart_service", docker, "pause_consumer", docker, "resume_consumer", docker,
+                            "clear_cache", docker, "failover", proxies),
+                    java.util.Map.of("resume_consumer", docker, "fail_back", proxies));
         }
         return new Executor.Runner() {
             /**

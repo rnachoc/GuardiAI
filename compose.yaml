@@ -133,6 +133,16 @@ services:
     depends_on:
       otel-collector:
         condition: service_started
+  payments-standby:
+    # A second payments, idle until GuardiAI fails over: the policy service points checkout's proxy at it.
+    <<: *mercadillo-service
+    image: guardia/mercadillo-payments:local
+    environment:
+      <<: *mercadillo-environment
+      OTEL_SERVICE_NAME: payments-standby
+    depends_on:
+      payments:
+        condition: service_started
   cart:
     <<: *mercadillo-service
     image: guardia/mercadillo-cart:local

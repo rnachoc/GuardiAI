@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh scripts/e2e_remediation.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke e2e-remediation verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents test-evals test-webhook-mock eval console investigate postmortem chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke e2e-remediation e2e-actions verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents test-evals test-webhook-mock eval console investigate postmortem chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -59,6 +59,9 @@ smoke: ## Prove each backing service of the running stack does its job.
 
 e2e-remediation: ## Kill inventory, then propose, approve, execute and verify its restart on the running stack.
 	./scripts/e2e_remediation.sh
+
+e2e-actions: ## Fail payments over, clear the catalog's cache, pause and resume the notifier, each through the policy service.
+	sh scripts/e2e_actions.sh
 
 verify: ## Prove the running stack meets Phase 1: a purchase, live traffic, a trace across services, logs, the dashboard.
 	docker run --rm --network guardia_default --volume "$(CURDIR)/scripts":/scripts:ro \
