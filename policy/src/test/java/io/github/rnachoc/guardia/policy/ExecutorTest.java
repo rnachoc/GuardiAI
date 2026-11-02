@@ -45,7 +45,7 @@ class ExecutorTest {
      */
     private Executor executor(Boolean... checks) {
         List<Boolean> answers = new ArrayList<>(List.of(checks));
-        return new Executor(runner, query -> answers.isEmpty() ? false : answers.remove(0), audit, escalations::add, 3);
+        return new Executor(runner, (query, expect) -> answers.isEmpty() ? false : answers.remove(0), audit, escalations::add, 3);
     }
 
     /**
@@ -61,7 +61,7 @@ class ExecutorTest {
     }
 
     private static final Executor.Request RESTART = new Executor.Request("p-1", "restart_service", "inventory",
-            "sum(rate(http_server_request_duration_seconds_count{service_name=\"inventory\"}[1m])) > 0", "none");
+            "sum(rate(http_server_request_duration_seconds_count{service_name=\"inventory\"}[1m]))", "> 0", "none");
 
     /**
      * A rejected decision never runs, and neither does one still waiting for its approvals.
@@ -120,7 +120,7 @@ class ExecutorTest {
      */
     @Test
     void revertsAndEscalatesWhenRecoveryIsNotConfirmed() {
-        Executor.Request scale = new Executor.Request("p-2", "scale_deployment", "checkout", "up > 0", "scale_back");
+        Executor.Request scale = new Executor.Request("p-2", "scale_deployment", "checkout", "up", ">= 1", "scale_back");
         Executor.Result result = executor(false, false, false).execute(scale, decision(Decision.Verdict.APPROVED, 0), 0);
         assertThat(result.outcome()).isEqualTo(Executor.Outcome.REVERTED);
         assertThat(runner.calls).containsExactly("dry-run scale_deployment checkout", "run scale_deployment checkout",
