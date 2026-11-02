@@ -126,6 +126,7 @@ public class PolicyApplication {
      * @param polls how many times verification is checked
      * @param interval how long to wait before each check, in milliseconds
      * @param settle how long to wait after running before the first check, in milliseconds
+     * @param webhook a Slack-style webhook to call a person through; empty means the log only
      * @return the executor
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
@@ -133,9 +134,12 @@ public class PolicyApplication {
     Executor executor(Executor.Runner runner, Executor.Verifier verifier, AuditLog audit,
                       @Value("${guardia.executor.polls:12}") int polls,
                       @Value("${guardia.executor.poll-interval-ms:10000}") long interval,
-                      @Value("${guardia.executor.settle-ms:70000}") long settle) {
+                      @Value("${guardia.executor.settle-ms:70000}") long settle,
+                      @Value("${guardia.escalation.webhook-url:}") String webhook) {
         org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Executor.class);
-        return new Executor(runner, verifier, audit, message -> log.warn("ESCALATION: {}", message), polls, interval, settle);
+        java.util.function.Consumer<String> escalate = webhook.isBlank()
+                ? message -> log.warn("ESCALATION: {}", message) : new WebhookEscalation(webhook);
+        return new Executor(runner, verifier, audit, escalate, polls, interval, settle);
     }
 
     /**
