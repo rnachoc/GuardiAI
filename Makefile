@@ -30,7 +30,7 @@ GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
 SHELL_SCRIPTS := scripts/smoke.sh scripts/e2e_remediation.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke e2e-remediation verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents test-evals eval console investigate chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke e2e-remediation verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents test-evals eval console investigate postmortem chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -106,6 +106,11 @@ console: ## Build the replay console into console/dist/index.html, from the reco
 	mkdir -p .cache/npm
 	$(DOCKER_RUN) --env npm_config_cache=/repo/.cache/npm --env npm_config_update_notifier=false $(NPM_DOCKER_FLAGS) \
 		--workdir /repo $(NODE_IMAGE) sh -c 'for p in chaos mcp agents evals; do test -d $$p/node_modules || (cd $$p && npm ci --no-audit --no-fund) || exit 1; done; node console/src/build.ts'
+
+postmortem: ## Print the postmortem of one scenario in replay. Costs nothing: make postmortem SCENARIO=payments-latency
+	@test -n "$(SCENARIO)" || (echo "name a scenario: make postmortem SCENARIO=<id>" >&2; exit 1)
+	test -d agents/node_modules || $(MAKE) test-agents
+	@$(DOCKER_RUN) $(NPM_DOCKER_FLAGS) --workdir /repo/agents $(NODE_IMAGE) node src/postmortem-cli.ts $(SCENARIO)
 
 investigate: ## Investigate a recorded scenario. Free by default; GUARDIA_MODEL_PROVIDER=anthropic spends, under GUARDIA_MAX_SPEND_USD.
 	@test -n "$(SCENARIO)" || (echo "name a scenario: make investigate SCENARIO=<id>" >&2; exit 1)
