@@ -1,0 +1,24 @@
+{
+  "scenario": "decoy-payments-freeze",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "a52a1c8beaf18c17e019c814269ca04c3a4ad508c1ddde0629a3e8f3f0f20759",
+    "metrics.json.gz": "89242e7eaa256473969a9deb744906491b3502152bd724aa88d61dc69e0931e0",
+    "logs.json.gz": "ee6e588d559d38f034887f6a71f3014c423a930d2c868cf5ff4fda17c77b788d",
+    "traces.json.gz": "2c02688fee7359457875705f0c2790163b327a61595432970e093e137c55c6ad",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "fbd826d63ae9cb612dd6cc881be7b73bf777afe8ba1da34107bc1123ee076e6d",
+    "truth/evidence.json.gz": "3657fdcc1cce6cecfe50b21c36c9811983f08ac617d73a21bfb95b0ff4656f0f"
+  }
+}

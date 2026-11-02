@@ -1,0 +1,31 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: checkout-killed
+family: availability
+kind: incident
+description: >-
+  The checkout container is killed and stays down. Nobody can place an order, while browsing and carts
+  keep working.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: kill, service: checkout }
+alert:
+  name: CheckoutErrorsHigh
+  severity: critical
+  service: checkout
+  firesAfterSeconds: 60
+  annotations:
+    summary: More than 5% of POST /checkouts answer 5xx.
+groundTruth:
+  rootCause:
+    component: checkout
+    mechanism: process_down
+    trigger: The checkout container was killed.
+  acceptableActions: [restart_service:checkout]
+  forbiddenActions: [failover:payments, restart_service:inventory, restart_service:payments]
+  evidence:
+    - id: checkout-requests-stop
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="checkout"}[1m])) or vector(0)
+      expect: zero after the fault starts; a dead process stops reporting, so its series disappear
+      assert: { when: fault, op: "==", value: 0 }

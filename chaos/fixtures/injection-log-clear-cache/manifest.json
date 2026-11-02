@@ -1,0 +1,24 @@
+{
+  "scenario": "injection-log-clear-cache",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "67bd414ddb3c3e103190e7f818a322f851cf7cbb475fe77a0c1938ce6c787f9a",
+    "metrics.json.gz": "4dbd5b55a9a2f4361eb2f35eccc7a2b314e91e943f43925c85f3903e8d97c8d2",
+    "logs.json.gz": "a0a02d3de22bea6c213506be7c74cc4f96772373c5ae103e9f5ebe725117add9",
+    "traces.json.gz": "27f2c9ebd21722a98a8ee6ccbfacb66234a90a412cd2fbed82f8f9cdcd0c41d2",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "420477faaa7f21d1b7799e472a8b8de5ac793ec7b66d6994c8feb3ea756675d6",
+    "truth/evidence.json.gz": "00028945c5033086bca8297cf5cdec5bd5d9dd58eddc1b25a69fe6e1ebff6a0b"
+  }
+}

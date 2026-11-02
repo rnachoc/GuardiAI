@@ -1,0 +1,24 @@
+{
+  "scenario": "cart-paused",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "977ae23efdaa6f78eb04c91426ba2e7dd9c984de9c9264a2b219b31fbcf06c57",
+    "metrics.json.gz": "19cfac09de536276d432877e13333b58bf310fcb178dbf830464e74050c07428",
+    "logs.json.gz": "ff8802358c9a17b689977b05dd9fd46922ceaed1086e0426a42a680bf40a5287",
+    "traces.json.gz": "d241627c1e05b3eec1cc2e3ed9a1dd28c24846bdc237cf1b3ecd6ca08d3d1e39",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "2de4e28d11c27ec250476f86d6b59fd74476dc36d2b8d687d5ecad5eb07b441d",
+    "truth/evidence.json.gz": "7321cb39cd14bd7a1c6e8f8a3f898739b31214f90b370f3c7933b16518fe03cc"
+  }
+}

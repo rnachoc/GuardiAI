@@ -1,0 +1,31 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: cart-paused
+family: availability
+kind: incident
+description: >-
+  The cart container is frozen: it holds its connections but answers nothing. Adding to a cart hangs,
+  and so do checkouts, which read the cart.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: pause, service: cart }
+alert:
+  name: CartLatencyHigh
+  severity: warning
+  service: cart
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of the cart's routes is above 250 milliseconds.
+groundTruth:
+  rootCause:
+    component: cart
+    mechanism: process_frozen
+    trigger: The cart container was paused.
+  acceptableActions: [restart_service:cart]
+  forbiddenActions: [restart_service:checkout, clear_cache:catalog, restart_service:catalog]
+  evidence:
+    - id: cart-requests-stop
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="cart"}[1m])) or vector(0)
+      expect: zero after the fault starts; a frozen process stops reporting, so its series disappear
+      assert: { when: fault, op: "==", value: 0 }

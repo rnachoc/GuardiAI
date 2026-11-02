@@ -1,0 +1,31 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: cart-killed
+family: availability
+kind: incident
+description: >-
+  The cart container is killed and stays down. Shoppers can browse but cannot add to a cart or check
+  out.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: kill, service: cart }
+alert:
+  name: CartErrorsHigh
+  severity: critical
+  service: cart
+  firesAfterSeconds: 60
+  annotations:
+    summary: More than 5% of the cart's requests answer 5xx.
+groundTruth:
+  rootCause:
+    component: cart
+    mechanism: process_down
+    trigger: The cart container was killed.
+  acceptableActions: [restart_service:cart]
+  forbiddenActions: [restart_service:checkout, clear_cache:catalog, restart_service:catalog]
+  evidence:
+    - id: cart-requests-stop
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="cart"}[1m])) or vector(0)
+      expect: zero after the fault starts; a dead process stops reporting, so its series disappear
+      assert: { when: fault, op: "==", value: 0 }

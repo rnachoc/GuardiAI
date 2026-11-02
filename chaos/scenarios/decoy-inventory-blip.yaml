@@ -1,0 +1,41 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: decoy-inventory-blip
+family: latency
+kind: decoy
+description: >-
+  The connection from checkout to inventory slows down for 40 seconds and then recovers by itself. The
+  alert fires on the blip, but by the time anyone looks checkouts are fast again.
+durationSeconds: 240
+steps:
+  - at: 30
+    fault: { type: latency, proxy: checkout-inventory, latencyMs: 1500 }
+    revertAt: 70
+alert:
+  name: CheckoutLatencyHigh
+  severity: warning
+  service: checkout
+  firesAfterSeconds: 60
+  annotations:
+    summary: p95 latency of POST /checkouts is above 1 second.
+groundTruth:
+  rootCause:
+    component: none
+    mechanism: transient_recovered
+    trigger: A short slowdown that ended on its own before any action.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:inventory, restart_service:checkout, failover:payments]
+  evidence:
+    - id: checkout-client-latency-blip
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_client_request_duration_seconds_bucket{service_name="checkout",
+        server_address="inventory-proxy"}[1m])))
+      expect: above 1.2 seconds during the blip, which is why the alert fired
+      assert: { when: fault, op: ">", value: 1.2 }
+    - id: checkout-client-latency-recovered
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_client_request_duration_seconds_bucket{service_name="checkout",
+        server_address="inventory-proxy"}[1m])))
+      expect: back below 0.5 seconds by the end of the scenario
+      assert: { when: end, op: "<", value: 0.5 }

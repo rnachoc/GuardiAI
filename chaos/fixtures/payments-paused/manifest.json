@@ -1,0 +1,24 @@
+{
+  "scenario": "payments-paused",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "76413cc7208c057b96e84bbcc87d809a1e8865faea6c5f159ac8095c494fd507",
+    "metrics.json.gz": "0b78c02a176c394eca19cd1470e14d5898bbece8ae860d57274ac5a901ab7601",
+    "logs.json.gz": "ffcb021b810d069a75b1aa6e9b586c4a8e5d343adf4279047e223190c6422da3",
+    "traces.json.gz": "79b3bde1ea74316cf68f93243d25d1032a7f0b72e593febc4d02db16690bdf1f",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "d568e8806bc3dd6c4772a666f603ce78c8b6605f5e20d098b538732335a5df11",
+    "truth/evidence.json.gz": "b724eb97ea1e85f60a18da67c9dc355351fe0b5c6fcff850b4d9fc9628938b61"
+  }
+}

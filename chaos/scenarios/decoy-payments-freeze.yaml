@@ -1,0 +1,32 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: decoy-payments-freeze
+family: availability
+kind: decoy
+description: >-
+  The payments container freezes for 30 seconds and then carries on by itself. A few checkouts are slow
+  while it is frozen, and by the time anyone looks payments is answering again.
+durationSeconds: 240
+steps:
+  - at: 30
+    fault: { type: pause, service: payments }
+    revertAt: 60
+alert:
+  name: CheckoutLatencyHigh
+  severity: warning
+  service: checkout
+  firesAfterSeconds: 60
+  annotations:
+    summary: p95 latency of POST /checkouts is above 1 second.
+groundTruth:
+  rootCause:
+    component: none
+    mechanism: transient_recovered
+    trigger: A short freeze that ended on its own before any action.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:payments, failover:payments, restart_service:checkout]
+  evidence:
+    - id: payments-answering-again
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="payments"}[1m])) or vector(0)
+      expect: above zero again by the end of the scenario
+      assert: { when: end, op: ">", value: 0 }

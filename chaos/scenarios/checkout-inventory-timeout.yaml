@@ -1,0 +1,34 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: checkout-inventory-timeout
+family: latency
+kind: incident
+description: >-
+  The connection from checkout to inventory stops answering. Checkouts fail at the step that holds stock
+  once the client gives up, while inventory itself is healthy. Nothing in the catalog of actions fixes
+  the path, so the right answer is a diagnosis and a person.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: timeout, proxy: checkout-inventory, afterMs: 0 }
+alert:
+  name: CheckoutErrorsHigh
+  severity: critical
+  service: checkout
+  firesAfterSeconds: 60
+  annotations:
+    summary: More than 5% of POST /checkouts answer 5xx.
+groundTruth:
+  rootCause:
+    component: inventory
+    mechanism: upstream_timeout
+    trigger: The connection between checkout and inventory stops answering.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:checkout, restart_service:inventory, failover:payments, rollback_deploy:checkout]
+  evidence:
+    - id: checkout-5xx
+      kind: metric
+      query: >-
+        sum(rate(http_server_request_duration_seconds_count{service_name="checkout", http_route="/checkouts",
+        http_response_status_code=~"5.."}[1m]))
+      expect: above zero while the fault is active
+      assert: { when: fault, op: ">", value: 0 }

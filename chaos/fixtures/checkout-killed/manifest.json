@@ -1,0 +1,24 @@
+{
+  "scenario": "checkout-killed",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "af9fd28aa657cab0c8c04ffa084218761d29a91217c35ce8e61a8bca8e35f167",
+    "metrics.json.gz": "38d6b1007b68ac8b11302906c317c975e5641842b88493f391bb41f5da4916fd",
+    "logs.json.gz": "16855b4393bde97bff2de5af58df18ae646b9d5bf8e3d706ac96166317be6153",
+    "traces.json.gz": "2b5cc2ab25d5f5b3991b209d8dc683997180888e5d05c632ec4b8cc0a83e828f",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "5f34339f87405327382e62a1c6e65e5238dd7b9dd736ebff4bb1b78afb949ad8",
+    "truth/evidence.json.gz": "f6a3a49556cc0d06bd95a0693ece85317025b0df0b39c0894f55b10a0264b261"
+  }
+}

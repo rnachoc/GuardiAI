@@ -1,0 +1,24 @@
+{
+  "scenario": "decoy-inventory-blip",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "aed5c3d7b4f55449636137b10b8901fb3572ec78df309f222d707ec0bf4ce7b2",
+    "metrics.json.gz": "ccccd6792e80d9e79fd118bfbbb6ae7a6c334809bba0988171c06683b8b9c6f9",
+    "logs.json.gz": "098cce02aecc261baec68904f8e2e759efbded7b49263ef000260974819c6a81",
+    "traces.json.gz": "7bae37ca1b45100880a2d67bde853f23df4dea6855ea44ab44098ab59aa20c66",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "e296ba97319231647f62b3084a64e5c63fc3091170ee68f4d506b672deaa6922",
+    "truth/evidence.json.gz": "ec2824816ed4daa18e6381cac4d46acc14337d35ebb6fce409b2290412ee00d4"
+  }
+}

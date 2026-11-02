@@ -1,0 +1,24 @@
+{
+  "scenario": "cart-killed",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "d1c65daee33e0ad257f32c7584b0349655140e497d46f63a0d0a9c48e82ad5d2",
+    "metrics.json.gz": "782f5ec209d0d124323fbce6cd7d4fa77c1e5da08fac2bd907d6ccdd08d2cbb5",
+    "logs.json.gz": "002793b1dc78b41c9d13d7443e92730be7715b8caa62e63702d867326436b8ea",
+    "traces.json.gz": "12c2f1250ca647abb48149c38f31a8add985845142d7136605b0797e67656f6e",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "94fd47c842fac203d37c16e0817ffa008c6360c7e00bb3fba3149aee23cb0dc6",
+    "truth/evidence.json.gz": "4fd28f8bead08d9e803e8cc28c586bc8dfcf75787d7b140a63489bdd78e0d08c"
+  }
+}
