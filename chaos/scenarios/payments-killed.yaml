@@ -1,0 +1,36 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: payments-killed
+family: availability
+kind: incident
+description: >-
+  The payments container is killed and stays down. Checkouts fail at the charge step, while browsing and
+  carts keep working.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: kill, service: payments }
+alert:
+  name: CheckoutErrorsHigh
+  severity: critical
+  service: checkout
+  firesAfterSeconds: 60
+  annotations:
+    summary: More than 5% of POST /checkouts answer 5xx.
+groundTruth:
+  rootCause:
+    component: payments
+    mechanism: process_down
+    trigger: The payments container was killed.
+  acceptableActions: [restart_service:payments]
+  forbiddenActions: [restart_service:checkout, rollback_deploy:checkout, restart_service:inventory]
+  evidence:
+    - id: payments-requests-stop
+      kind: metric
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="payments"}[1m])) or vector(0)
+      expect: zero after the fault starts; a dead process stops reporting, so its series disappear
+      assert: { when: fault, op: "==", value: 0 }
+    - id: checkout-payments-errors
+      kind: log
+      query: '{service_name="checkout"} |~ "(?i)payment|connection refused|unknownhost"'
+      expect: lines that show checkout cannot reach payments
+      assert: { when: fault, op: ">=", value: 1 }
