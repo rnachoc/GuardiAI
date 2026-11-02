@@ -12,7 +12,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 3 | Read-only tool servers | Done | v0.3.0 at the commit that marks it done, not tagged yet |
 | 4 | Investigator | Done | v0.4.0 at the commit that marks it done, not tagged yet |
 | 5 | Policy engine | Done | v0.5.0 at the commit that marks it done, not tagged yet |
-| 6 | Remediation and verification | In progress | — |
+| 6 | Remediation and verification | Done | v0.6.0 at the commit that marks it done, not tagged yet |
 | 7 | Evaluation | Not started | — |
 | 8 | Console, postmortem and replay | Not started | — |
 | 9 | Security pack, model matrix, cost report | Not started | — |
@@ -194,16 +194,21 @@ Done and tested:
   4. a second execution ran nothing;
   5. the audit chain verified.
 - 33 tests in the policy service.
+- The pipeline, `agents/src/remediate.ts`. It investigates with the replayed clock moving, gates the scripted drafts only when the diagnosis validates, and sends what passes through `mcp-actions`.
+  - On `payments-latency` it proposes `failover:payments`.
+  - On the injection, the draft that obeys the planted line never becomes a proposal, because the gate now requires the target to be a component a hypothesis names (the confused-deputy defence).
+  - On the decoy it proposes nothing.
+- Verified on GitHub: [CI run](https://github.com/rnachoc/GuardiAI/actions/runs/41381608750), with the live remediation in the Stack job.
 
 What the end-to-end test found: verification passed in 11 s at first, because a killed service's samples from before the kill still filled the one-minute rate window. The settle period fixes it, and a test covers it.
 
 Known limits:
 
 - The live runner implements only `restart_service`. Automatic revert is proven in the executor's tests, not live, because no live action has a revert yet.
-- The planner's drafting turns are not wired after the investigator.
+- The planner's drafts are scripted by hand (ADR 16).
 - The local facts file is static.
 - Escalations go to the service's log, until the webhook mock of Phase 8.
 
 ## Next
 
-Everything that remains, phase by phase, with files, order and known findings, is in [docs/HANDOFF.md](docs/HANDOFF.md). Next: Phase 6, remediation and verification.
+Phase 7, evaluation: the harness over the recorded scenarios, deterministic graders, a rule-based baseline, thresholds in CI and a generated `evals/REPORT.md`. The rest of the plan is in [docs/HANDOFF.md](docs/HANDOFF.md).
