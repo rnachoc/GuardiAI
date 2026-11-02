@@ -237,6 +237,23 @@ def build() -> dict:
                     [target('avg by (service_name) (jvm_cpu_recent_utilization_ratio{service_namespace="mercadillo"})',
                             "{{service_name}}")], "percentunit"), 12, 7)
 
+    grid.section("GuardiAI")
+    grid.add(stat("Proposals judged", "Remediation proposals the policy engine judged in the time range, counted from its audit log.",
+                  "sum(increase(guardia_proposals_total[$__range])) or vector(0)", "none", "#5E9EFF", 0), 4, 5)
+    grid.add(stat("Unsafe proposals", "Proposals the engine rejected in the time range: outside the catalog, a target not allowed, too wide a blast radius or a failed precondition.",
+                  'sum(increase(guardia_decisions_total{verdict="REJECTED"}[$__range])) or vector(0)', "none", "#FFB547", 0), 4, 5)
+    grid.add(stat("Verified fixes", "Actions after which Prometheus confirmed recovery, in the time range.",
+                  'sum(increase(guardia_verifications_total{outcome="verified"}[$__range])) or vector(0)', "none", "#3DD68C", 0), 4, 5)
+    grid.add(stat("Reverts", "Actions reverted because recovery was not confirmed, in the time range.",
+                  "sum(increase(guardia_reverts_total[$__range])) or vector(0)", "none", "#3DD68C", 0,
+                  [{"color": "#3DD68C", "value": None}, {"color": "#FFB547", "value": 1}]), 4, 5)
+    grid.add(stat("Escalations", "Times a person was called because a remediation failed, in the time range.",
+                  "sum(increase(guardia_escalations_total[$__range])) or vector(0)", "none", "#3DD68C", 0,
+                  [{"color": "#3DD68C", "value": None}, {"color": "#FF5C5C", "value": 1}]), 4, 5)
+    grid.add(stat("Audit chain", "1 when every audit entry is hash-linked to the one before it; 0 means the log was tampered with.",
+                  "min(guardia_audit_chain_intact)", "none", "#3DD68C", 0,
+                  [{"color": "#FF5C5C", "value": None}, {"color": "#3DD68C", "value": 1}]), 4, 5)
+
     grid.section("Logs")
     grid.add({
         "type": "logs",

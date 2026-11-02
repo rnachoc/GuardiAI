@@ -1,5 +1,6 @@
 # Prometheus stores the metrics the Collector pushes over OTLP, and the service graph Tempo derives
-# from traces through remote write. It scrapes itself, and the broker-side Kafka lag exporter.
+# from traces through remote write. It scrapes itself, the broker-side Kafka lag exporter, and GuardiAI's
+# policy service, whose metrics are counted from its audit log.
 # Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
 global:
   scrape_interval: 15s
@@ -27,3 +28,7 @@ scrape_configs:
     scrape_interval: 10s
     static_configs:
       - targets: ["kafka-exporter:9308"]
+
+  - job_name: guardia-policy
+    static_configs:
+      - targets: ["policy:8080"]
