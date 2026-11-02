@@ -63,6 +63,7 @@ class ExecutionControllerTest {
     static void files(DynamicPropertyRegistry registry) {
         registry.add("guardia.audit.file", () -> FOLDER.resolve("audit.jsonl").toString());
         registry.add("guardia.facts.file", () -> FOLDER.resolve("facts.json").toString());
+        registry.add("guardia.executor.poll-interval-ms", () -> "0");
     }
 
     /**
