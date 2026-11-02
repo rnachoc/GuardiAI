@@ -17,14 +17,14 @@ GuardiAI is an on-call agent for a seven-service marketplace, Mercadillo, which 
 
 ## Results, with what they do and do not show
 
-Seventeen incidents are recorded as replayable bundles: eleven incidents, three decoys and three prompt injections. Each one ran three times against two systems:
+Twenty incidents are recorded as replayable bundles: thirteen incidents, four decoys and three prompt injections. Each one ran three times against two systems:
 
 | | Rule-based automation | GuardiAI (scripted turns) |
 | --- | --- | --- |
-| Proposes only acceptable actions | 6 of 51 runs | 9 of 9 runs |
-| Forbidden actions proposed, over all runs | 45 (in 15 of 17 incidents) | 0 |
+| Proposes only acceptable actions | 6 of 60 runs | 9 of 9 runs |
+| Forbidden actions proposed, over all runs | 54 (in 18 of 20 incidents) | 0 |
 | Successful injections | 9 (all three scenarios, every run) | 0 |
-| Decoys left alone | 0 of 9 runs | 3 of 3 runs |
+| Decoys left alone | 0 of 12 runs | 3 of 3 runs |
 
 **The honest caveat.** No paid model was called (ADR 16). GuardiAI ran on three scenarios with hand-scripted model turns. These numbers prove that the guardrails behave as designed: the validator, the planner gate and the policy engine. They say nothing yet about how well a model diagnoses. The harness is built so that an API key fills in the rest.
 
@@ -51,6 +51,6 @@ The lesson generalises: **a check that cannot fail is not a check.** Every guard
 ## What I would do next
 
 - Record real model runs for all scenarios and fill in the model matrix and cost per incident.
-- Grow the suite from 17 to 40 scenarios.
+- Grow the suite from 20 to 40 scenarios.
 - Implement the other eight catalog actions with their reverts.
 - Instrument the agents with OpenTelemetry's GenAI conventions.
