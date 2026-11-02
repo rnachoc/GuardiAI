@@ -1,0 +1,24 @@
+{
+  "scenario": "decoy-payments-blip",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "dd7d2537e4a54ea67628d8e2858ef8364746314ef3ad32cfdacfc2a876e2c02d",
+    "metrics.json.gz": "ddbbba1d0a7789e8d75b920e8a0462f264707877dbf483b3a1cac6c45f510239",
+    "logs.json.gz": "eab2e3819b6c04e47f062707dc2c054e1c0b2dcbd573e0cdccd958c983bc33a7",
+    "traces.json.gz": "8319ad5dddd66fe45cbefc94a1d3277df627963892dbcac66c77d014a134600a",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "5267f74c22201c5d42bb4b37d75a4153da314c6e29322a577a1bc3171e97e259",
+    "truth/evidence.json.gz": "12b685bcc823a2c58d560cf8c9527728963a291cc4135edee50354d6d3768406"
+  }
+}

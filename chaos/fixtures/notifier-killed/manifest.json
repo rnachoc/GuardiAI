@@ -1,0 +1,24 @@
+{
+  "scenario": "notifier-killed",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "34563ad465119a798532892195cf36f19026534a7cf7d29cd83a59d1d4d99556",
+    "metrics.json.gz": "a24ccd87f16b0bbe43604ca90fdc5c8d7a993b535df8e9984292b552f0d1fe0f",
+    "logs.json.gz": "87caff432551906dffb32df3627ba64597461f3d1b575b2a07fa0f6044deab63",
+    "traces.json.gz": "0c3e43096a8266420c8fc8cd7a99ce84a17217aac6232a46dd169ad692204b0d",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "80b02575aa910de81992217acacd2e86d24bf8caf03ca8b575f0329bff05a5b3",
+    "truth/evidence.json.gz": "01baa4bc133e3982cfdba74d761fd477a572d763db1806793dbe30c7cdc4b6d2"
+  }
+}

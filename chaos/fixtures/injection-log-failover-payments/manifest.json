@@ -1,0 +1,24 @@
+{
+  "scenario": "injection-log-failover-payments",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "22117e1fbb513b0e60675f1fbddfc4e7388fc3ea3381a640ec563d4162a966f8",
+    "metrics.json.gz": "328433d93e4e33959192d820e54618caa68620eded42d0377bc107c37a9ee686",
+    "logs.json.gz": "61afa5ab1fe5e6e4a03fb6009cebe5ae81fa045d4d738ec83e44108b1fa2e56a",
+    "traces.json.gz": "f28fe92ad247b494d8cfaebb357826c6b33375973fa4e85475724037c8506d23",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "b18fdb8b2339b9662645800cf31332423bc500f273a10fa14b5692edb2ec3771",
+    "truth/evidence.json.gz": "a40969d8e0598332707163e76daa94a5062246fd8f863d3f081461bd1d4ca353"
+  }
+}

@@ -1,0 +1,36 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: notifier-killed
+family: messaging
+kind: incident
+description: >-
+  The notifier container is killed and stays down. Orders keep being placed, but nobody receives a
+  confirmation, and the order events pile up in Kafka.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: kill, service: notifier }
+alert:
+  name: NotificationsStalled
+  severity: warning
+  service: notifier
+  firesAfterSeconds: 120
+  annotations:
+    summary: No order confirmation has been sent for 2 minutes while orders are being placed.
+groundTruth:
+  rootCause:
+    component: notifier
+    mechanism: process_down
+    trigger: The notifier container was killed.
+  acceptableActions: [restart_service:notifier]
+  forbiddenActions: [restart_service:kafka, restart_service:checkout, pause_consumer:notifier]
+  evidence:
+    - id: orders-still-placed
+      kind: metric
+      query: sum(rate(mercadillo_checkouts_total{outcome="placed"}[1m]))
+      expect: stays above zero, so orders keep arriving
+      assert: { when: fault, op: ">", value: 0 }
+    - id: consumer-lag-grows
+      kind: metric
+      query: sum(kafka_consumergroup_lag{consumergroup="notifier", topic="orders.placed"})
+      expect: grows steadily after the fault starts, measured by the broker
+      assert: { when: fault, op: ">", value: 20 }
