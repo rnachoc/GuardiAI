@@ -34,6 +34,12 @@ upstream() {
   docker compose exec -T policy wget -qO- http://toxiproxy:8474/proxies/checkout-payments | sed 's/.*"upstream":"\([^"]*\)".*/\1/'
 }
 
+echo "a failover is rejected while the standby is down: the engine reads its health from Docker"
+docker compose stop payments-standby > /dev/null 2>&1
+post /proposals "{\"id\":\"prop-$(cat /proc/sys/kernel/random/uuid 2>/dev/null || python3 -c 'import uuid; print(uuid.uuid4())')\",\"action\":\"failover\",\"target\":\"payments\"}" \
+  | grep -q 'precondition standby_healthy does not hold'
+docker compose up -d --no-build --wait payments-standby > /dev/null 2>&1
+
 echo "failover: checkout's payments traffic moves to the standby"
 test "$(upstream)" = "payments:8080"
 remediate failover payments
