@@ -111,4 +111,34 @@ class AuditLogTest {
         Files.write(path, lines);
         assertThat(new AuditLog(path).verify()).anyMatch(problem -> problem.contains("entry 2"));
     }
+
+    /**
+     * Each entry records when it was written, inside the hash, so the timeline cannot be quietly redated.
+     *
+     * @throws IOException if the log cannot be read
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void recordsWhenEachEntryWasWritten() throws IOException {
+        Path path = folder.resolve("timed.jsonl");
+        java.time.Clock clock = java.time.Clock.fixed(java.time.Instant.parse("2026-11-02T09:30:00Z"), java.time.ZoneOffset.UTC);
+        new AuditLog(path, clock).append("proposal", Map.of("id", "p-1"));
+        assertThat(Files.readString(path)).contains("\"at\":\"2026-11-02T09:30:00Z\"");
+        assertThat(new AuditLog(path).verify()).isEmpty();
+        Files.writeString(path, Files.readString(path).replace("09:30:00Z", "08:30:00Z"));
+        assertThat(new AuditLog(path).verify()).anyMatch(problem -> problem.contains("entry 1"));
+    }
+
+    /**
+     * The latest entries can be read back, oldest first, for the timeline.
+     *
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void readsBackTheLatestEntries() {
+        Path path = threeEntries();
+        List<Map<String, Object>> latest = new AuditLog(path).latest(2);
+        assertThat(latest).extracting(entry -> entry.get("kind")).containsExactly("decision", "approval");
+        assertThat(latest.get(1).get("data")).isEqualTo(Map.of("proposal", "p-1", "by", "on-call"));
+    }
 }

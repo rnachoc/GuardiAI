@@ -202,4 +202,23 @@ class ExecutionControllerTest {
         http.perform(get("/index.html")).andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<title>GuardiAI Approvals</title>")));
     }
+
+    /**
+     * The timeline reads the audit log: a judged proposal shows up as a proposal and then a decision.
+     *
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Test
+    void servesTheAuditTimeline() throws Exception {
+        String id = "prop-12121212-3434-5656-7878-909090909090";
+        send("/proposals", "{\"id\":\"" + id + "\",\"action\":\"restart_service\",\"target\":\"inventory\"}");
+        http.perform(get("/audit?limit=2")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].kind").value("proposal"))
+                .andExpect(jsonPath("$[0].data.id").value(id))
+                .andExpect(jsonPath("$[1].kind").value("decision"))
+                .andExpect(jsonPath("$[1].at").isString());
+        http.perform(get("/index.html"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"timeline\"")));
+    }
 }
