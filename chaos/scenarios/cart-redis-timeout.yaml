@@ -1,0 +1,34 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: cart-redis-timeout
+family: database
+kind: incident
+description: >-
+  The connection from the cart service to Redis stops answering: requests go out and nothing comes back.
+  Every cart operation waits for the Redis client to give up, and checkout waits with it. Nothing in the
+  catalog of actions fixes a Redis that cannot be reached, so the right answer is a diagnosis and a person.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: timeout, proxy: cart-redis, afterMs: 0 }
+alert:
+  name: CartLatencyHigh
+  severity: warning
+  service: cart
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of the cart's routes is above 250 milliseconds.
+groundTruth:
+  rootCause:
+    component: redis
+    mechanism: cache_unreachable
+    trigger: The connection between the cart service and Redis stopped answering.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:cart, restart_service:checkout, clear_cache:catalog]
+  evidence:
+    - id: cart-latency
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="cart",
+        http_route!~"/actuator.*"}[1m])))
+      expect: above 0.25 seconds while the fault is active
+      assert: { when: fault, op: ">", value: 0.25 }

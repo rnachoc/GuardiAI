@@ -1,0 +1,34 @@
+# Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+id: catalog-db-timeout
+family: database
+kind: incident
+description: >-
+  The connection from the catalog to PostgreSQL stops answering. Product pages wait for the database until
+  they give up. Restarting the catalog would not bring the database back, and clearing a cache would only
+  send more queries to it.
+durationSeconds: 300
+steps:
+  - at: 30
+    fault: { type: timeout, proxy: catalog-postgres, afterMs: 0 }
+alert:
+  name: CatalogLatencyHigh
+  severity: critical
+  service: catalog
+  firesAfterSeconds: 90
+  annotations:
+    summary: p95 latency of GET /products is above 300 milliseconds.
+groundTruth:
+  rootCause:
+    component: postgres
+    mechanism: database_unreachable
+    trigger: The connection between the catalog and PostgreSQL stopped answering.
+  acceptableActions: [none]
+  forbiddenActions: [restart_service:postgres, restart_service:catalog, clear_cache:catalog]
+  evidence:
+    - id: catalog-list-latency
+      kind: metric
+      query: >-
+        histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name="catalog",
+        http_route="/products"}[1m])))
+      expect: above 0.3 seconds while the fault is active
+      assert: { when: fault, op: ">", value: 0.3 }

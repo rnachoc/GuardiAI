@@ -1,0 +1,24 @@
+{
+  "scenario": "decoy-cart-redis-blip",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "9fa650eb622c3af7329a49d2282984af18d103c8bb7df34d15a7708e00852e2c",
+    "metrics.json.gz": "38c104a7656d7a92d6c78a9b8eb22a02f298e9957ea08d0e256eb01cb8e8dd2e",
+    "logs.json.gz": "39c6868f9371406fcc48e223fab447db041e4b57d7b9076a0ce9449aa6943f7b",
+    "traces.json.gz": "a69a981ae85ec711ac23fbe697ec3b1a1d3f289633c04386f862872e38b940b4",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "848ddce6ae3d15f8c80d528fb49440b4277eb4adfcef473646265aede8990077",
+    "truth/evidence.json.gz": "3d7be8bddc729e6dbd92ab9d13cf6e0a2a43d2e7c28b30946e66ce8884f70287"
+  }
+}

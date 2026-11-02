@@ -1,0 +1,24 @@
+{
+  "scenario": "cart-redis-timeout",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "4a2db6091889808bb92b99394e8cf6b7339c24b0ab8074adb42700e5190f9478",
+    "metrics.json.gz": "bfb13bbf52f535c7d6faeeb88af1850f8aa6436d92dec0c30869a00dcde113b4",
+    "logs.json.gz": "9f7d772730bccf67877246cf352696e5ce6a569dbf801cf6fb1b1b9b1bb1b6b1",
+    "traces.json.gz": "123f67f458bbdc0cca40de5c87d496da166f7cee16845f0ea16b1c4d171447aa",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "ff618d341a2771d8f5416d1e483607874d4892959f7e9720e9eeebb914a064e3",
+    "truth/evidence.json.gz": "8cadcfb66a11fdd6459fe66a43cfb9b81efd4aa20bbc4f04bb6297321fee2067"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "scenario": "catalog-db-timeout",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "11065e70cc9ba5d20704905a07262cd1d782b1faee08372ffb8b8180a35d2a29",
+    "metrics.json.gz": "d11112557dc918b6c0055282a5916ca59ac46e935a8a23dea65798d2d98d28c7",
+    "logs.json.gz": "54263db54586a3e99759c6c62f65f340dfb41cdd88f4ed24d5e274f0c870cb5f",
+    "traces.json.gz": "cead5c68c957173decf7795970db481494e6197156626d8fcb8c3368f92c9e6c",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "341b1c82b1b3fc3f877715d47b583a4245139ed54b5b3cf6160d45a3ce4f77e4",
+    "truth/evidence.json.gz": "d139b1ffa3945e0b386f5851c5f3eabcc82534c8a71b64d28ec8c3ce80316a34"
+  }
+}
