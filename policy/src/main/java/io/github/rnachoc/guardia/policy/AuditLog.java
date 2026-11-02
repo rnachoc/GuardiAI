@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Clock;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
@@ -21,7 +23,8 @@ import java.util.TreeMap;
 
 /**
  * An append-only, hash-chained audit log of every proposal, decision and action. Each line is a JSON entry
- * holding its sequence number, the previous entry's hash, its kind, its data and its own hash. Editing,
+ * holding its sequence number, when it was written, the previous entry's hash, its kind, its data and its own
+ * hash. Editing,
  * deleting, inserting or reordering any entry breaks the chain, which {@link #verify()} reports.
  *
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
@@ -34,6 +37,7 @@ public class AuditLog {
     private static final ObjectMapper JSON = new ObjectMapper().configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 
     private final Path file;
+    private final Clock clock;
 
     /**
      * Opens, or will create, the log at a path.
@@ -42,7 +46,19 @@ public class AuditLog {
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     public AuditLog(Path file) {
+        this(file, Clock.systemUTC());
+    }
+
+    /**
+     * Opens, or will create, the log at a path, timing entries with a given clock.
+     *
+     * @param file the JSON Lines file
+     * @param clock what tells the time of each entry
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    public AuditLog(Path file, Clock clock) {
         this.file = file;
+        this.clock = clock;
     }
 
     /**
@@ -56,7 +72,7 @@ public class AuditLog {
         try {
             List<String> lines = Files.exists(file) ? Files.readAllLines(file) : List.of();
             String previous = lines.isEmpty() ? GENESIS : JSON.readTree(lines.getLast()).path("hash").asText();
-            String line = entry(lines.size() + 1L, previous, kind, data) + "\n";
+            String line = entry(lines.size() + 1L, previous, kind, data, clock.instant().truncatedTo(ChronoUnit.SECONDS).toString()) + "\n";
             Files.writeString(file, line, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException failure) {
             throw new UncheckedIOException(failure);
@@ -74,7 +90,25 @@ public class AuditLog {
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     public static String entry(long sequence, String previous, String kind, Map<String, ?> data) {
+        return entry(sequence, previous, kind, data, null);
+    }
+
+    /**
+     * Builds one entry's line, with the time it was written inside the hash.
+     *
+     * @param sequence its position, from 1
+     * @param previous the previous entry's hash
+     * @param kind what happened
+     * @param data its details
+     * @param at when it happened, in ISO 8601, or {@code null} to leave it out
+     * @return the JSON line, without a line break
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    public static String entry(long sequence, String previous, String kind, Map<String, ?> data, String at) {
         Map<String, Object> body = new TreeMap<>(Map.of("sequence", sequence, "previous", previous, "kind", kind, "data", new TreeMap<>(data)));
+        if (at != null) {
+            body.put("at", at);
+        }
         try {
             String unsigned = JSON.writeValueAsString(body);
             body.put("hash", sha256(unsigned));
@@ -153,6 +187,29 @@ public class AuditLog {
                 }
             }
             return false;
+        } catch (IOException failure) {
+            throw new UncheckedIOException(failure);
+        }
+    }
+
+    /**
+     * Reads back the latest entries, oldest first, without their hashes, for the timeline.
+     *
+     * @param limit how many entries at most
+     * @return the entries
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    public synchronized List<Map<String, Object>> latest(int limit) {
+        try {
+            List<String> lines = Files.exists(file) ? Files.readAllLines(file) : List.of();
+            List<Map<String, Object>> entries = new ArrayList<>();
+            for (String line : lines.subList(Math.max(0, lines.size() - limit), lines.size())) {
+                Map<String, Object> entry = JSON.readValue(line, new TypeReference<Map<String, Object>>() { });
+                entry.remove("hash");
+                entry.remove("previous");
+                entries.add(entry);
+            }
+            return entries;
         } catch (IOException failure) {
             throw new UncheckedIOException(failure);
         }

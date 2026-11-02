@@ -36,6 +36,16 @@ test "$(docker compose ps inventory --format '{{.State}}')" = "running"
 echo "execute again: nothing runs twice"
 post "/proposals/$ID/execute" '{}' | grep -q '"outcome":"ALREADY_DONE"'
 
+echo "the timeline holds the whole story, in order, with times"
+curl --silent --fail "$POLICY/audit?limit=200" | python3 -c '
+import json, sys
+proposal = sys.argv[1]
+mine = [e for e in json.load(sys.stdin) if proposal in (e["data"].get("id"), e["data"].get("proposal"))]
+kinds = [e["kind"] for e in mine]
+assert kinds == ["proposal", "decision", "execution", "approval", "claim", "execution", "verification"], kinds
+assert all(e.get("at") for e in mine), "an entry has no time"
+' "$ID"
+
 echo "audit chain intact"
 curl --silent --fail "$POLICY/audit/verify" | grep -q '"problems":\[\]'
 echo "e2e: remediation verified end to end"

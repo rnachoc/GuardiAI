@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -164,6 +165,18 @@ public class ProposalController {
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     public record Approval(@NotBlank @Pattern(regexp = "[a-z][a-z0-9._-]{1,40}") String by) {
+    }
+
+    /**
+     * Returns the latest audit entries, oldest first, for the timeline.
+     *
+     * @param limit how many entries, from 1 to 500
+     * @return the entries
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @GetMapping("/audit")
+    public List<Map<String, Object>> timeline(@RequestParam(defaultValue = "100") int limit) {
+        return audit.latest(Math.clamp(limit, 1, 500));
     }
 
     /**

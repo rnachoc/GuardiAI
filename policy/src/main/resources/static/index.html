@@ -35,6 +35,15 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
 .empty { color: var(--muted); }
 .status { min-height: 1.5em; color: var(--info); }
+h2 { font-size: 28px; letter-spacing: -0.02em; margin: 56px 0 6px; }
+.chain { font-size: 14px; margin: 0 0 18px; color: var(--muted); }
+.chain.ok::before { content: "● "; color: var(--ok); } .chain.bad::before { content: "● "; color: var(--accent); }
+.timeline { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
+.timeline li { position: relative; padding: 0 0 16px 20px; }
+.timeline li::before { content: ""; position: absolute; left: -5px; top: 7px; width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+.timeline li.ok::before { background: var(--ok); } .timeline li.bad::before { background: var(--accent); } .timeline li.warn::before { background: var(--warn); }
+.timeline time { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-right: 8px; }
+.timeline .what { overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -44,9 +53,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--info); outl
   <div class="who"><label for="approver">Approving as</label><input id="approver" value="on-call" autocomplete="off" pattern="[a-z][a-z0-9._-]{1,40}"></div>
   <p class="status" id="status" role="status"></p>
   <div class="list" id="list"><p class="empty">Loading proposals…</p></div>
+  <h2>Timeline</h2>
+  <p class="chain" id="chain">Checking the audit chain…</p>
+  <ol class="timeline" id="timeline"><li>Loading the audit log…</li></ol>
 </main>
 <script>
-/* Lists judged proposals and lets a person approve or execute them through the policy service's API.
+/* Lists judged proposals and lets a person approve or execute them through the policy service's API, and
+   shows the audit log as a timeline.
    Author: Ignacio Rodriguez Caro <rnachoccontact@gmail.com> */
 
 /**
@@ -96,6 +109,45 @@ async function load() {
   }).join("");
 }
 
+/**
+ * Describes one audit entry in a sentence, with a tone for its marker.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function describe(entry) {
+  const d = entry.data ?? {};
+  const short = (id) => `…${esc(String(id ?? "").slice(-8))}`;
+  switch (entry.kind) {
+    case "proposal": return ["", `Proposal ${short(d.id)}: ${esc(d.action)} on ${esc(d.target)}`];
+    case "decision": return [d.verdict === "REJECTED" ? "bad" : d.verdict === "APPROVED" ? "ok" : "warn",
+      `Engine: ${esc(String(d.verdict ?? "").replaceAll("_", " ").toLowerCase())} for ${short(d.proposal)}${(d.reasons ?? []).length ? ` (${(d.reasons ?? []).map(esc).join("; ")})` : ""}`];
+    case "approval": return ["ok", `Approved by ${esc(d.by)} for ${short(d.proposal)}`];
+    case "claim": return ["", `Execution of ${short(d.proposal)} claimed, so it can only run once`];
+    case "execution": return [d.outcome === "ran" ? "ok" : "bad", d.outcome === "ran" ? `Ran ${esc(d.action)} on ${esc(d.target)}` : `Execution of ${short(d.proposal)}: ${esc(String(d.outcome).replaceAll("_", " "))}`];
+    case "verification": return [d.outcome === "verified" ? "ok" : "bad", d.outcome === "verified" ? `Recovery verified for ${short(d.proposal)} at check ${esc(d.poll)}` : `Recovery not confirmed for ${short(d.proposal)} after ${esc(d.polls)} checks`];
+    case "revert": return ["warn", `Reverted with ${esc(d.action)} on ${esc(d.target)}`];
+    case "escalation": return ["bad", `Escalated ${short(d.proposal)} to a person`];
+    default: return ["", `${esc(entry.kind)}: ${esc(JSON.stringify(d))}`];
+  }
+}
+
+/**
+ * Renders the timeline from the audit log, newest first, and whether its hash chain is intact.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+async function loadTimeline() {
+  const [entries, check] = await Promise.all([(await fetch("/audit?limit=100")).json(), (await fetch("/audit/verify")).json()]);
+  const chain = document.getElementById("chain");
+  chain.className = `chain ${check.problems.length ? "bad" : "ok"}`;
+  chain.textContent = check.problems.length ? `Audit chain broken: ${check.problems.join("; ")}` : "Audit chain intact: every entry is hash-linked to the one before it.";
+  document.getElementById("timeline").innerHTML = entries.length
+    ? entries.slice().reverse().map((entry) => {
+        const [tone, what] = describe(entry);
+        const at = entry.at ? new Date(entry.at).toLocaleTimeString([], { hour12: false }) : "--:--:--";
+        return `<li class="${tone}"><time datetime="${esc(entry.at)}">${esc(at)}</time><span class="what">${what}</span></li>`;
+      }).join("")
+    : "<li>The audit log is empty.</li>";
+}
+
 document.getElementById("list").addEventListener("click", async (event) => {
   const status = document.getElementById("status");
   const approve = event.target.closest("[data-approve]");
@@ -115,11 +167,19 @@ document.getElementById("list").addEventListener("click", async (event) => {
   } catch (error) {
     status.textContent = `That did not work: ${error.message}. Check the approver's name uses lowercase letters, digits, dots or dashes.`;
   }
-  await load();
+  await refresh();
 });
 
-load();
-setInterval(load, 5000);
+/**
+ * Reloads the queue and the timeline.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+async function refresh() {
+  await Promise.allSettled([load(), loadTimeline()]);
+}
+
+refresh();
+setInterval(refresh, 5000);
 </script>
 </body>
 </html>
