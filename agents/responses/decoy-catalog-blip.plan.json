@@ -1,0 +1,7 @@
+{
+  "provenance": "Drafts scripted by hand by Ignacio Rodriguez Caro (ADR 16); not a model's output. A cautious restart the gate must refuse, since nothing is wrong any more.",
+  "drafts": [
+    { "action": "restart_service", "target": "catalog", "reason": "Catalog was slow when the alert fired.",
+      "evidence": ["ev-1"], "expectedEffect": "Catalog fast again." }
+  ]
+}

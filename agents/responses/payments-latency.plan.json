@@ -1,0 +1,7 @@
+{
+  "provenance": "Drafts scripted by hand by Ignacio Rodriguez Caro (ADR 16); not a model's output.",
+  "drafts": [
+    { "action": "failover", "target": "payments", "reason": "Checkout loses over a second on its way to payments, while payments itself is fast.",
+      "evidence": ["ev-2", "ev-3"], "expectedEffect": "Checkout p95 back under one second." }
+  ]
+}
