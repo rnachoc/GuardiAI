@@ -39,9 +39,90 @@ public class PolicyApplication {
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     @Bean
-    PolicyEngine policyEngine(@Value("${guardia.policy.mode:SUGGEST}") PolicyEngine.Mode mode,
+    PolicyEngine policyEngine(ActionCatalog catalog, @Value("${guardia.policy.mode:SUGGEST}") PolicyEngine.Mode mode,
                               @Value("${guardia.policy.kill-switch:false}") boolean killSwitch) {
-        return new PolicyEngine(ActionCatalog.load("catalog-v1.yaml"), DependencyGraph.load("dependency-graph.yaml"), mode, killSwitch);
+        return new PolicyEngine(catalog, DependencyGraph.load("dependency-graph.yaml"), mode, killSwitch);
+    }
+
+    /**
+     * Loads the action catalog on the classpath.
+     *
+     * @return the catalog
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Bean
+    ActionCatalog actionCatalog() {
+        return ActionCatalog.load("catalog-v1.yaml");
+    }
+
+    /**
+     * The runner used when none is configured: every dry run fails, so nothing is ever executed by accident.
+     *
+     * @return the runner
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Bean
+    Executor.Runner runner() {
+        return new Executor.Runner() {
+            /**
+             * Refuses, since no runner is configured.
+             *
+             * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+             */
+            @Override
+            public boolean dryRun(String action, String target) {
+                return false;
+            }
+
+            /**
+             * Never called, since every dry run fails.
+             *
+             * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+             */
+            @Override
+            public void run(String action, String target) {
+                throw new IllegalStateException("no runner is configured");
+            }
+
+            /**
+             * Never called, since nothing ran.
+             *
+             * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+             */
+            @Override
+            public void revert(String revertAction, String target) {
+                throw new IllegalStateException("no runner is configured");
+            }
+        };
+    }
+
+    /**
+     * Checks recovery against Prometheus.
+     *
+     * @param url Prometheus's base URL
+     * @return the verifier
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Bean
+    Executor.Verifier verifier(@Value("${guardia.prometheus.url:http://prometheus:9090}") String url) {
+        return new PrometheusVerifier(url);
+    }
+
+    /**
+     * Builds the executor; escalations are written to the log until the webhook mock exists.
+     *
+     * @param runner what acts on the system
+     * @param verifier what checks recovery
+     * @param audit the audit log
+     * @param polls how many times verification is checked
+     * @return the executor
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    @Bean
+    Executor executor(Executor.Runner runner, Executor.Verifier verifier, AuditLog audit,
+                      @Value("${guardia.executor.polls:12}") int polls) {
+        org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Executor.class);
+        return new Executor(runner, verifier, audit, message -> log.warn("ESCALATION: {}", message), polls);
     }
 
     /**
