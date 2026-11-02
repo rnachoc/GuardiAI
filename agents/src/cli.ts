@@ -13,6 +13,7 @@ import { AnthropicProvider, OPUS_PRICES } from "./anthropic.ts";
 import { presentAlert } from "./alert.ts";
 import { investigate } from "./investigator.ts";
 import { FakeProvider, SpendCap } from "./providers.ts";
+import { exportInvestigation } from "./telemetry.ts";
 import { defaultRunbooks, replayToolset } from "./tools.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -39,7 +40,11 @@ async function main(scenario: string | undefined): Promise<number> {
   const anthropic = real ? new AnthropicProvider(definitions) : undefined;
   const capped = anthropic ? new SpendCap(anthropic, Number(process.env.GUARDIA_MAX_SPEND_USD ?? "1"), OPUS_PRICES) : undefined;
   const provider = capped ?? new FakeProvider(responses);
+  const began = Date.now();
   const result = await investigate(provider, alert, tools, LIMITS);
+  if (await exportInvestigation(process.env.OTEL_EXPORTER_OTLP_ENDPOINT, scenario, result, Date.now() - began)) {
+    console.log(`sent the investigation's trace and metrics to ${process.env.OTEL_EXPORTER_OTLP_ENDPOINT}`);
+  }
   if (anthropic) {
     anthropic.saveRecording(responses, scenario);
     console.log(`recorded the turns to ${responses}; spent about $${capped?.spent().toFixed(4)}`);

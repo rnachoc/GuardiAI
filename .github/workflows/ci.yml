@@ -58,6 +58,8 @@ jobs:
           persist-credentials: false
       - run: make up
       - run: make smoke
+      - name: Send an investigation's telemetry, so the agents' dashboard row has data
+        run: make investigate SCENARIO=payments-latency
       - name: Prove the Phase 1 criteria on the running stack
         run: make verify
       - name: Kill inventory, then propose, approve, execute and verify its restart

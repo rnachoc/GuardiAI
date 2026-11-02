@@ -28,7 +28,7 @@ NPM_DOCKER_FLAGS ?=
 # A local gitleaks binary can replace the container: make secrets GITLEAKS=gitleaks
 GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
-SHELL_SCRIPTS := scripts/smoke.sh scripts/e2e_remediation.sh .githooks/pre-commit
+SHELL_SCRIPTS := scripts/smoke.sh scripts/e2e_remediation.sh scripts/e2e_actions.sh .githooks/pre-commit
 
 .PHONY: help up down clean ps logs smoke e2e-remediation e2e-actions verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents test-evals test-webhook-mock eval console investigate postmortem chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
@@ -118,10 +118,11 @@ postmortem: ## Print the postmortem of one scenario in replay. Costs nothing: ma
 	test -d agents/node_modules || $(MAKE) test-agents
 	@$(DOCKER_RUN) $(NPM_DOCKER_FLAGS) --workdir /repo/agents $(NODE_IMAGE) node src/postmortem-cli.ts $(SCENARIO)
 
-investigate: ## Investigate a recorded scenario. Free by default; GUARDIA_MODEL_PROVIDER=anthropic spends, under GUARDIA_MAX_SPEND_USD.
+investigate: ## Investigate a recorded scenario, and send its telemetry to the stack when it runs. Free by default; GUARDIA_MODEL_PROVIDER=anthropic spends, under GUARDIA_MAX_SPEND_USD.
 	@test -n "$(SCENARIO)" || (echo "name a scenario: make investigate SCENARIO=<id>" >&2; exit 1)
 	test -d agents/node_modules || $(MAKE) test-agents
 	$(DOCKER_RUN) --env GUARDIA_MODEL_PROVIDER --env GUARDIA_MAX_SPEND_USD --env ANTHROPIC_API_KEY $(NPM_DOCKER_FLAGS) \
+		$$(docker network inspect guardia_default > /dev/null 2>&1 && echo --network guardia_default --env OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318) \
 		--workdir /repo/agents $(NODE_IMAGE) node src/cli.ts $(SCENARIO)
 
 chaos: ## Run one scenario against the running stack: make chaos SCENARIO=payments-latency

@@ -254,6 +254,22 @@ def build() -> dict:
                   "min(guardia_audit_chain_intact)", "none", "#3DD68C", 0,
                   [{"color": "#FF5C5C", "value": None}, {"color": "#3DD68C", "value": 1}]), 4, 5)
 
+    grid.section("GuardiAI agents")
+    runs = "sum(max_over_time(guardia_investigations_total[$__range]))"
+    grid.add(stat("Investigations", "Investigations that sent telemetry in the time range (OpenTelemetry GenAI conventions).",
+                  runs, "none", "#5E9EFF", 0), 5, 5)
+    grid.add(stat("Evidence validity", "Share of investigations whose every cited piece of evidence was re-run and gave the same answer.",
+                  f'sum(max_over_time(guardia_investigations_total{{guardia_evidence_valid="true"}}[$__range])) / {runs}', "percentunit", "#3DD68C", 0,
+                  [{"color": "#FF5C5C", "value": None}, {"color": "#FFB547", "value": 0.9}, {"color": "#3DD68C", "value": 1}]), 5, 5)
+    grid.add(stat("Steps per investigation", "Mean number of model turns before a diagnosis.",
+                  "sum(max_over_time(guardia_investigation_steps_sum[$__range])) / sum(max_over_time(guardia_investigation_steps_count[$__range]))",
+                  "none", "#B48CFF", 1), 5, 5)
+    grid.add(stat("Tokens per investigation", "Mean input and output tokens (gen_ai.client.token.usage). With the fake provider these are the scripted turns' counts, not a model's.",
+                  f"sum(max_over_time(gen_ai_client_token_usage_sum[$__range])) / {runs}", "none", "#5E9EFF", 0), 5, 5)
+    grid.add(stat("Time to diagnosis", "Mean time from the alert to a validated diagnosis (gen_ai.client.operation.duration).",
+                  "sum(max_over_time(gen_ai_client_operation_duration_seconds_sum[$__range])) / sum(max_over_time(gen_ai_client_operation_duration_seconds_count[$__range]))",
+                  "s", "#3DD68C", 2), 4, 5)
+
     grid.section("Logs")
     grid.add({
         "type": "logs",
