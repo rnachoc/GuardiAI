@@ -41,7 +41,7 @@ make up && make test
 | 4 | Investigator | Done | Bounded loop, evidence ledger and validator, run on hand-scripted turns. No model is called, by the owner's decision ([ADR 16](docs/adr/0016-no-paid-model-runs.md)). |
 | 5 | Policy engine | Done | Catalog, blast radius, decisions and a hash-chained audit log, all test-first. Nothing executes yet (Phase 6). |
 | 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Only `restart_service` acts for real. |
-| 7 | Evaluation | Not started | Nothing. No number has been measured. |
+| 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). 10 of 40 scenarios; no model measured (ADR 16). |
 | 8 | Console, postmortem and replay | Not started | Nothing. |
 | 9 | Security pack, model matrix, cost report | Not started | Nothing. |
 | 10 | Release | Not started | Nothing. |

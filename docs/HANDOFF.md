@@ -15,7 +15,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 4 Investigator | Done, on scripted turns (ADR 16) | `agents/src/`, `agents/responses/` |
 | 5 Policy engine | Done as a library | `policy/src/main/java/.../policy/` |
 | 6 Remediation and verification | Done; only `restart_service` acts for real | `mcp/src/actions/`, `policy/`, `agents/src/remediate.ts`, `scripts/e2e_remediation.sh` |
-| 7 Evaluation | Not started | — |
+| 7 Evaluation | In progress: harness, graders, gate and report exist | `evals/` |
 | 8 Console, postmortem, replay | Not started | — |
 | 9 Security pack, model matrix, cost report | Not started | — |
 | 10 Release | Not started | — |
@@ -126,6 +126,8 @@ Acceptance (brief): planner, executor, verification, automatic revert.
 6. **ADRs:** execution and idempotency; the auto-revert and escalation contract.
 
 ### 5.3 Phase 7: evaluation
+
+**Status:** the harness, graders, thresholds, CI gate and generated report exist (ADR 19). What remains is 30 more scenarios, turns for GuardiAI on the scenarios that lack them, and the human labels for a future judge.
 
 Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated report.
 

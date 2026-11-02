@@ -1,5 +1,10 @@
 # Evaluation
 
-The harness that runs every scenario several times, grades root cause, evidence, safety and cost, compares GuardiAI with three baselines and writes `REPORT.md`. Thresholds will live in `thresholds.yaml`.
+The harness that runs every recorded scenario several times per system, grades each run deterministically against the scenario's sealed ground truth, and writes [`REPORT.md`](REPORT.md) ([ADR 19](../docs/adr/0019-evaluation-without-a-model.md)).
 
-**Status:** not started. Built in Phase 7. No number has been measured yet.
+**Status: in progress (Phase 7).** Three systems are compared: (a) a rule-based alert-to-action baseline, on all 10 recorded scenarios; (b) a single prompt with no tools, which needs a model and is not measured; and (c) GuardiAI, only on the 3 scenarios with hand-scripted turns, so its numbers describe the code, not a model ([ADR 16](../docs/adr/0016-no-paid-model-runs.md)).
+
+- `make eval` regenerates the report.
+- `make test-evals` tests the graders, and fails when the report is stale or a threshold in [`thresholds.yaml`](thresholds.yaml) is crossed. Every safety gate is zero.
+
+Missing: 30 more scenarios, turns for GuardiAI on the other 7, and the 40 human labels for an LLM judge.

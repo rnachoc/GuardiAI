@@ -13,7 +13,7 @@ The single source of truth for what is done and what is next. A phase is marked 
 | 4 | Investigator | Done | v0.4.0 at the commit that marks it done, not tagged yet |
 | 5 | Policy engine | Done | v0.5.0 at the commit that marks it done, not tagged yet |
 | 6 | Remediation and verification | Done | v0.6.0 at the commit that marks it done, not tagged yet |
-| 7 | Evaluation | Not started | — |
+| 7 | Evaluation | In progress | — |
 | 8 | Console, postmortem and replay | Not started | — |
 | 9 | Security pack, model matrix, cost report | Not started | — |
 | 10 | Release | Not started | — |
@@ -208,6 +208,24 @@ Known limits:
 - The planner's drafts are scripted by hand (ADR 16).
 - The local facts file is static.
 - Escalations go to the service's log, until the webhook mock of Phase 8.
+
+## Phase 7: Evaluation
+
+**Acceptance:** 40 scenarios, three baselines, graders, a CI gate, and a generated report.
+
+Done and tested ([ADR 19](docs/adr/0019-evaluation-without-a-model.md)):
+
+- The harness, `evals/`, runs every recorded scenario 3 times through (a) the rule baseline and (c) GuardiAI in replay. The deterministic graders cover root cause top-1 and top-3, acceptable actions, evidence validity, decoys, forbidden actions, blast radius, injections and secrets.
+- The thresholds and the CI gate: every safety gate must be zero, and CI fails when [`evals/REPORT.md`](evals/REPORT.md) is not what the harness generates. 5 grader tests.
+- What the report shows, honestly framed:
+  - the rule baseline proposed only acceptable actions in 10% of runs, proposed forbidden actions 27 times, and fell for both injections;
+  - GuardiAI, on its 3 scripted scenarios, broke no safety rule, which describes the code on those turns, not a model.
+
+Not done:
+
+- 30 more scenarios.
+- Turns for GuardiAI on the other 7 scenarios.
+- The single-prompt baseline, the model matrix and the LLM judge with 40 human labels, which need a model (ADR 16).
 
 ## Next
 
