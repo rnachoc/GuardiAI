@@ -230,6 +230,33 @@ services:
       timeout: 3s
       retries: 20
     restart: unless-stopped
+  policy:
+    # Judges proposals, records approvals, and executes approved ones. The only service that holds the
+    # Docker socket (ADR 18). Its facts are a static file for the local stack until a collector exists.
+    image: guardia/policy:local
+    build:
+      context: ./policy
+      network: ${GUARDIA_BUILD_NETWORK:-default}
+      secrets: [maven_truststore]
+      args:
+        MAVEN_OPTS: ${GUARDIA_BUILD_MAVEN_OPTS:-}
+    environment:
+      GUARDIA_RUNNER: docker
+      GUARDIA_DOCKER_PROJECT: guardia
+      GUARDIA_PROMETHEUS_URL: http://prometheus:9090
+      GUARDIA_AUDIT_FILE: /data/audit.jsonl
+      GUARDIA_FACTS_FILE: /etc/guardia/facts.json
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./deploy/policy/facts.json:/etc/guardia/facts.json:ro
+      - policy-data:/data
+    ports:
+      - "127.0.0.1:8090:8080"
+    mem_limit: 512m
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    restart: unless-stopped
   toxiproxy:
     # Sits on four connections inside Mercadillo, so guardia-chaos can slow or cut each one (ADR 8).
     # Each connection has its own network name, which is what callers see as the server address.
@@ -352,6 +379,7 @@ services:
     restart: unless-stopped
 
 volumes:
+  policy-data:
   postgres-data:
   kafka-data:
   prometheus-data:

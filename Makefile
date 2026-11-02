@@ -28,9 +28,9 @@ NPM_DOCKER_FLAGS ?=
 # A local gitleaks binary can replace the container: make secrets GITLEAKS=gitleaks
 GITLEAKS ?= $(DOCKER_RUN) $(GITLEAKS_IMAGE)
 
-SHELL_SCRIPTS := scripts/smoke.sh .githooks/pre-commit
+SHELL_SCRIPTS := scripts/smoke.sh scripts/e2e_remediation.sh .githooks/pre-commit
 
-.PHONY: help up down clean ps logs smoke verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents investigate chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
+.PHONY: help up down clean ps logs smoke e2e-remediation verify test test-repo test-mercadillo test-policy test-chaos test-mcp test-agents investigate chaos record record-all chaos-reset dashboard lint secrets secrets-staged hooks
 
 help: ## List the targets.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -56,6 +56,9 @@ logs: ## Follow the logs of every service.
 
 smoke: ## Prove each backing service of the running stack does its job.
 	./scripts/smoke.sh
+
+e2e-remediation: ## Kill inventory, then propose, approve, execute and verify its restart on the running stack.
+	./scripts/e2e_remediation.sh
 
 verify: ## Prove the running stack meets Phase 1: a purchase, live traffic, a trace across services, logs, the dashboard.
 	docker run --rm --network guardia_default --volume "$(CURDIR)/scripts":/scripts:ro \

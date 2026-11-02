@@ -1,0 +1,11 @@
+{
+  "no_deploy_freeze": true,
+  "other_replicas_healthy": true,
+  "within_replica_bounds": true,
+  "previous_version_exists": false,
+  "flag_exists": false,
+  "database_healthy": true,
+  "lag_below_retention": true,
+  "within_pool_bounds": true,
+  "standby_healthy": false
+}
