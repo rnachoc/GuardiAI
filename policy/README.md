@@ -14,6 +14,8 @@ What exists, test-first:
 
 - The Spring Boot service: `POST /proposals` judges and audits; `GET /audit/verify` checks the chain. Facts come from `guardia.facts.file`, kept by code; a missing file makes every precondition unknown, so everything is rejected.
 
+- The **approval queue** at http://127.0.0.1:8090 (`GET /proposals` underneath). It lists every judged proposal with its verdict, the engine's reasons, the services it could reach, approvals and outcome, and lets a person approve or execute.
+
 What does not exist yet: the facts collector, its Compose service, idempotent execution, verification and automatic revert (Phase 6, [plan](../docs/HANDOFF.md#52-phase-6-remediation-and-verification)).
 
 `make test-policy` runs the tests in a container.

@@ -16,7 +16,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 5 Policy engine | Done as a library | `policy/src/main/java/.../policy/` |
 | 6 Remediation and verification | Done; only `restart_service` acts for real | `mcp/src/actions/`, `policy/`, `agents/src/remediate.ts`, `scripts/e2e_remediation.sh` |
 | 7 Evaluation | In progress: harness, graders, gate and report exist | `evals/` |
-| 8 Console, postmortem, replay | In progress: static replay console | `console/` |
+| 8 Console, postmortem, replay | In progress: static replay console and live approval queue | `console/`, `policy/src/main/resources/static/` |
 | 9 Security pack, model matrix, cost report | Not started | — |
 | 10 Release | Not started | — |
 

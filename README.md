@@ -27,6 +27,7 @@ make up && make test
 | --- | --- |
 | http://127.0.0.1:3000 | Grafana, on the Mercadillo overview dashboard |
 | http://127.0.0.1:8080/api/products | The shop's public API ([routes](mercadillo/README.md#public-api)) |
+| http://127.0.0.1:8090 | GuardiAI's approval queue; `make e2e-remediation` fills it |
 
 `make verify` proves the stack works end to end, `make smoke` checks the backing services, and `make` lists every target. Before committing, `make hooks` installs the hook that stops a commit carrying a secret.
 
@@ -42,7 +43,7 @@ make up && make test
 | 5 | Policy engine | Done | Catalog, blast radius, decisions and a hash-chained audit log, all test-first. Nothing executes yet (Phase 6). |
 | 6 | Remediation and verification | Done | Investigation to proposal to approval to execution, verified against Prometheus on the live stack in CI. Only `restart_service` acts for real. |
 | 7 | Evaluation | In progress | Harness, deterministic graders, safety gates in CI and a generated [report](evals/REPORT.md). 10 of 40 scenarios; no model measured (ADR 16). |
-| 8 | Console, postmortem and replay | In progress | A static [replay console](console) over the ten recordings, ready for GitHub Pages. No live console or postmortems yet. |
+| 8 | Console, postmortem and replay | In progress | A static [replay console](console) over the ten recordings, and a live approval queue at 127.0.0.1:8090. No postmortems yet. |
 | 9 | Security pack, model matrix, cost report | Not started | Nothing. |
 | 10 | Release | Not started | Nothing. |
 

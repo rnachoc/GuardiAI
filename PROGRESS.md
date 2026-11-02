@@ -235,7 +235,9 @@ Done:
 
 - The replay console, built by `make console`: one static page over the ten recordings. Every citation in a diagnosis links to its tool call. It is checked at desktop and phone width, with no script errors and no sideways scrolling. A Pages workflow, run by hand, publishes it once Pages is enabled.
 
-Not done: the live console with the approval queue, notifications to a webhook mock, and the postmortem writer.
+- The approval queue, served by the policy service at http://127.0.0.1:8090. It shows each judged proposal with its verdict, reasons, blast radius, approvals and outcome, and lets a person approve and execute. Tested over HTTP, and checked in a browser against the live stack after `make e2e-remediation`.
+
+Not done: the live incident timeline, notifications to a webhook mock, and the postmortem writer.
 
 ## Next
 
