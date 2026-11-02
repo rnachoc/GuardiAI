@@ -269,7 +269,9 @@ Done: a one-page case study (`docs/case-study.md`) with the real evaluation numb
 
 Also done: a screenshot of the replay console at the top of the README.
 
-Not done: GitHub Pages (enable Pages, then run the Pages workflow), and the final ADRs.
+- ADRs 21 and 22 record the last decisions: real actions through Docker and Toxiproxy, and GuardiAI's own telemetry without an SDK.
+
+Not done: GitHub Pages (enable Pages, then run the Pages workflow).
 
 ## Next
 

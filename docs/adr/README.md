@@ -24,3 +24,5 @@ Each record explains one significant decision: its context, the decision and its
 | 18 | [Execution through one service with the Docker socket](0018-execution-through-one-service-with-the-docker-socket.md) | Accepted |
 | 19 | [Evaluation without a model](0019-evaluation-without-a-model.md) | Accepted |
 | 20 | [A static replay console first](0020-a-static-replay-console-first.md) | Accepted |
+| 21 | [Actions through the tools that already hold the wiring](0021-actions-through-the-tools-that-already-hold-the-wiring.md) | Accepted |
+| 22 | [GuardiAI observes itself, without an SDK](0022-guardiai-observes-itself-without-an-sdk.md) | Accepted |

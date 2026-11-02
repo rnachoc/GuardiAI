@@ -180,7 +180,7 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
 ### 5.6 Phase 10: release
 
 1. **Static public demo** on GitHub Pages: a build of the console in replay-only mode, reading the bundles and recorded investigations, with no backend. This is the page anyone can open in a browser. Add a Pages workflow, with its actions pinned to commits.
-2. **Done:** [`docs/video-script.md`](video-script.md) and [`docs/case-study.md`](case-study.md), with real numbers and one failure explained (verification that passed on stale data). Still to do: refresh both if the numbers change, and the final ADRs.
+2. **Done:** [`docs/video-script.md`](video-script.md) and [`docs/case-study.md`](case-study.md), with real numbers and one failure explained (verification that passed on stale data). ADRs 21 (real actions) and 22 (GuardiAI's own telemetry) record the last decisions. Still to do: refresh the case study if the numbers change.
 3. **README:** what it is, a screenshot, a one-command start, the status table and the risks table, as the brief's definition of done asks.
 4. **Optional:** Helm and kind (`deploy/`).
 
