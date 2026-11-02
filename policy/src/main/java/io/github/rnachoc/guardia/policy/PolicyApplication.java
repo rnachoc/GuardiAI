@@ -162,22 +162,37 @@ public class PolicyApplication {
     }
 
     /**
-     * Reads the facts preconditions are judged on, from a JSON file that code keeps up to date. A missing or
-     * unreadable file yields no facts, so every precondition is unknown and every proposal is rejected.
+     * Reads the facts preconditions are judged on: from a JSON file, and, with the Docker runner, from Docker's
+     * health status for the facts it can measure, which then override the file. A missing or unreadable file
+     * yields no facts, so every precondition is unknown and every proposal is rejected.
      *
      * @param file the facts file
-     * @return a supplier that reads the file on each call
+     * @param kind which runner is in use
+     * @param socket the Docker daemon's socket
+     * @param project the Compose project
+     * @return a supplier that reads the facts on each call
      * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
      */
     @Bean
-    Supplier<Map<String, Boolean>> facts(@Value("${guardia.facts.file:/data/facts.json}") Path file) {
+    Supplier<Map<String, Boolean>> facts(@Value("${guardia.facts.file:/data/facts.json}") Path file,
+                                         @Value("${guardia.runner:none}") String kind,
+                                         @Value("${guardia.docker.socket:/var/run/docker.sock}") Path socket,
+                                         @Value("${guardia.docker.project:guardia}") String project) {
         ObjectMapper json = new ObjectMapper();
+        DockerRunner docker = "docker".equals(kind) ? new DockerRunner(socket, project) : null;
         return () -> {
+            Map<String, Boolean> facts;
             try {
-                return Files.exists(file) ? json.readValue(file.toFile(), new TypeReference<Map<String, Boolean>>() { }) : Map.of();
+                facts = Files.exists(file) ? new java.util.HashMap<>(json.readValue(file.toFile(), new TypeReference<Map<String, Boolean>>() { }))
+                        : new java.util.HashMap<>();
             } catch (IOException unreadable) {
                 return Map.of();
             }
+            if (docker != null && !facts.isEmpty()) {
+                facts.put("standby_healthy", docker.healthy("payments-standby"));
+                facts.put("database_healthy", docker.healthy("postgres"));
+            }
+            return Map.copyOf(facts);
         };
     }
 }

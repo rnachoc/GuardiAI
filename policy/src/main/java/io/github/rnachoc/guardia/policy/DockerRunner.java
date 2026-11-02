@@ -222,6 +222,27 @@ public class DockerRunner implements Executor.Runner {
     }
 
     /**
+     * Tells whether Docker reports a service's container as healthy. No container, no healthcheck, or a daemon
+     * that cannot be reached all count as not healthy, so doubt never satisfies a precondition.
+     *
+     * @param service the Compose service
+     * @return {@code true} only when Docker's health status is healthy
+     * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+     */
+    public boolean healthy(String service) {
+        try {
+            Optional<String> id = container(service);
+            if (id.isEmpty()) {
+                return false;
+            }
+            JsonNode state = JSON.readTree(request("GET", "/containers/" + id.get() + "/json", "").body()).path("State");
+            return "healthy".equals(state.path("Health").path("Status").asText());
+        } catch (IOException | UncheckedIOException unreadable) {
+            return false;
+        }
+    }
+
+    /**
      * Finds a Compose service's container by its labels.
      *
      * @param service the service
