@@ -11,6 +11,7 @@ What exists:
 - The **validator**: a diagnosis is refused when a claim has no evidence, cites an unknown or failed call, or cites a call whose answer changed when run again.
 - A **fake provider** that replays turns from `responses/`, and a **spend cap** for any provider that charges.
 - An **Anthropic provider** on the official SDK, using `claude-opus-5-5`, that records its turns for replay ([ADR 14](../docs/adr/0014-claude-through-the-official-sdk-recorded-for-replay.md)). It is tested against a local stand-in for the API, and has never called the real one.
+- The **postmortem writer** (`src/postmortem.ts`), plain code, not a model. It renders the alert, the ranked hypotheses with the evidence they cite, the unknowns, the actions with their verification and rollback, the drafts the planner gate refused and why, and the evidence ledger. Tool output is never repeated, only the call and its hash, so untrusted log text cannot travel into the document. `make postmortem SCENARIO=injection-log-restart-inventory` prints one.
 
 What does not exist yet:
 
@@ -19,6 +20,6 @@ What does not exist yet:
   ```bash
   GUARDIA_MODEL_PROVIDER=anthropic GUARDIA_MAX_SPEND_USD=1.00 ANTHROPIC_API_KEY=... make investigate SCENARIO=payments-latency
   ```
-- Triage, the remediation planner, the critic and the postmortem writer.
+- Triage and the critic. The postmortem does not yet include the policy service's audit timeline or suggest runbook edits.
 
 `make test-agents` runs the investigator end to end on the `payments-latency` recording, with no API key.

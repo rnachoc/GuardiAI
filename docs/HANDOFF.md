@@ -16,7 +16,7 @@ This is where the cloud sessions stopped, how to pick the work up on your own ma
 | 5 Policy engine | Done as a library | `policy/src/main/java/.../policy/` |
 | 6 Remediation and verification | Done; only `restart_service` acts for real | `mcp/src/actions/`, `policy/`, `agents/src/remediate.ts`, `scripts/e2e_remediation.sh` |
 | 7 Evaluation | In progress: harness, graders, gate and report exist | `evals/` |
-| 8 Console, postmortem, replay | In progress: static replay console and live approval queue | `console/`, `policy/src/main/resources/static/` |
+| 8 Console, postmortem, replay | In progress: static replay console, live approval queue, postmortem writer | `console/`, `policy/src/main/resources/static/` |
 | 9 Security pack, model matrix, cost report | Not started | — |
 | 10 Release | Not started | — |
 
@@ -160,7 +160,7 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
    - cost per incident ("not measured" for model cost under ADR 16).
    Serve it from Compose behind a strict content security policy, with no tokens in local storage.
 2. **Notifications** go to a Slack-like webhook mock, a small Compose service that stores and shows messages.
-3. **Postmortem writer** (`agents/src/postmortem.ts`): builds a timeline from the audit log and writes a blameless postmortem that cites evidence IDs. It suggests runbook edits as a diff against `docs/runbooks/`, and the result goes to `docs/incidents/` in the runbook format, so `mcp-runbooks` finds it. Scripted turns under ADR 16.
+3. **Postmortem writer**: `agents/src/postmortem.ts` exists and is tested (alert, hypotheses, unknowns, actions, refused drafts, ledger). Still to do: add a timeline from the policy service's audit log (`GET /audit` would need adding). Then make it suggest runbook edits as a diff against `docs/runbooks/`, and write the result to `docs/incidents/` in the runbook format, so `mcp-runbooks` finds it. Scripted turns under ADR 16.
 
 ### 5.5 Phase 9: security pack, model matrix, cost report
 
