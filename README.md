@@ -11,6 +11,8 @@ GuardiAI is judged on three things: it finds the right cause, it never does anyt
 
 > **Status: Phases 0 to 6 done; 7 to 10 in progress ([plan](docs/HANDOFF.md)).** The marketplace GuardiAI watches runs with full telemetry, and 10 incident scenarios are recorded with a sealed ground truth. Read-only tool servers answer from the live stack or a recording. The investigator validates every citation. The policy service decides, audits, and, after approval, restarts a failed service for real, verifies its recovery and escalates when it cannot. The [evaluation report](evals/REPORT.md) compares GuardiAI's guardrails with rule-based automation, on scripted turns only: no model is called (ADR 16). Read the [case study](docs/case-study.md) for the short version. The [status table](#status) says exactly what exists.
 
+![The replay console: ten recorded incidents, each replayed with its evidence, next to what a rule-based automation would have done](docs/images/replay-console.png)
+
 > **Synthetic only.** Mercadillo, the system GuardiAI watches, is a fictional marketplace. There are no real credentials anywhere in this repository.
 
 ## Quick start

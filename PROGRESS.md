@@ -262,7 +262,9 @@ Not done: the model matrix and cost report (not measurable under ADR 16, but the
 
 Done: a one-page case study (`docs/case-study.md`) with the real evaluation numbers and one failure explained, and a three-minute video script (`docs/video-script.md`) in which every screen exists.
 
-Not done: GitHub Pages (enable Pages, then run the Pages workflow), a screenshot in the README, and the final ADRs.
+Also done: a screenshot of the replay console at the top of the README.
+
+Not done: GitHub Pages (enable Pages, then run the Pages workflow), and the final ADRs.
 
 ## Next
 
