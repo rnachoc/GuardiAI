@@ -159,7 +159,7 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
    - replay of any recorded incident with its full tool trace;
    - cost per incident ("not measured" for model cost under ADR 16).
    Serve it from Compose behind a strict content security policy, with no tokens in local storage.
-2. **Notifications** go to a Slack-like webhook mock, a small Compose service that stores and shows messages.
+2. **Notifications**: the policy service already posts escalations to `GUARDIA_ESCALATION_WEBHOOK_URL` (`WebhookEscalation.java`). Still to do: a Slack-like webhook mock, a small Compose service that stores and shows the messages, and point the variable at it.
 3. **Postmortem writer**: `agents/src/postmortem.ts` exists and is tested (alert, hypotheses, unknowns, actions, refused drafts, ledger). Still to do: add a timeline from the policy service's audit log (`GET /audit` would need adding). Then make it suggest runbook edits as a diff against `docs/runbooks/`, and write the result to `docs/incidents/` in the runbook format, so `mcp-runbooks` finds it. Scripted turns under ADR 16.
 
 ### 5.5 Phase 9: security pack, model matrix, cost report
