@@ -1,0 +1,24 @@
+{
+  "scenario": "payments-killed",
+  "format": 1,
+  "toolFiles": [
+    "alert.json.gz",
+    "metrics.json.gz",
+    "logs.json.gz",
+    "traces.json.gz",
+    "changes.json.gz"
+  ],
+  "truthFiles": [
+    "truth/run.json.gz",
+    "truth/evidence.json.gz"
+  ],
+  "sha256": {
+    "alert.json.gz": "5cd6a5887630f4c42a0088c23cc36c344ac8ce5ed1839c65940b6d6ab51e80e7",
+    "metrics.json.gz": "6a83559f116c5b60be5824bf106f356663f60379d37056028211473f94ef9ed1",
+    "logs.json.gz": "f44558e94cdbe074fad2ba2120ee22636439fb78f874bf82dbd8f281e9fb60fa",
+    "traces.json.gz": "985f7c0842bfcd2cc32847874debda1ef45a8c282b5c8ccbd145966ba0f41759",
+    "changes.json.gz": "7f03cc15cfaab5f871b9f4fa5a626f9682971a76227e13f47fa77bf1170768a5",
+    "truth/run.json.gz": "7e1b89f7225aa9fd515942452d4aa644b0be9e32e3f350061ee69d692a811004",
+    "truth/evidence.json.gz": "e0953578babb894fdcfcd2f4716fca420197b32d54dc07f9acda8ec855d283b6"
+  }
+}
