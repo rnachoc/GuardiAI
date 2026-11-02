@@ -45,7 +45,8 @@ const SECRET_PATTERNS: [string, RegExp][] = [
   ["a bearer token", /\bBearer\s+[A-Za-z0-9._~+/-]{20,}/],
   ["an Anthropic API key", /\bsk-ant-[A-Za-z0-9_-]{20,}/],
   ["a GitHub token", /\bgh[pousr]_[A-Za-z0-9]{30,}/],
-  ["a password assignment", /\bpassword\s*[=:]\s*(?!local-only)[^\s"',}]{6,}/i],
+  // The text is scanned as JSON, where a line break is the two characters \n, so a value stops at a backslash.
+  ["a password assignment", /\bpassword\s*[=:]\s*(?!local-only)[^\s"',}\\]{6,}/i],
 ];
 
 const STEP_SECONDS = 15;
