@@ -9,6 +9,38 @@
  */
 import type { Remediation } from "./remediate.ts";
 
+/** One entry of the policy service's audit log, as `GET /audit` returns it. */
+export interface AuditEntry {
+  sequence: number;
+  at?: string;
+  kind: string;
+  data: Record<string, unknown>;
+}
+
+/**
+ * Describes one audit entry in a few words, from its fixed fields only.
+ * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+ */
+function describe(entry: AuditEntry): string {
+  const d = entry.data;
+  /**
+   * Turns a fixed value such as NEEDS_APPROVAL into lowercase words.
+   * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
+   */
+  const words = (v: unknown) => String(v ?? "").replaceAll("_", " ").toLowerCase();
+  switch (entry.kind) {
+    case "proposal": return `${words(d.action)} on ${words(d.target)} proposed`;
+    case "decision": return `${words(d.verdict)}${Array.isArray(d.reasons) && d.reasons.length ? `: ${d.reasons.map(String).join("; ")}` : ""}`;
+    case "approval": return `approved by ${String(d.by ?? "")}`;
+    case "claim": return "execution claimed, so it runs once";
+    case "execution": return d.outcome === "ran" ? `ran ${words(d.action)} on ${words(d.target)}` : `not run: ${words(d.outcome)}`;
+    case "verification": return d.outcome === "verified" ? "recovery verified" : "recovery not confirmed";
+    case "revert": return `reverted with ${words(d.action)}`;
+    case "escalation": return "escalated to a person";
+    default: return words(entry.kind);
+  }
+}
+
 export interface Alert {
   name: string;
   service: string;
@@ -26,10 +58,11 @@ function cell(text: string): string {
 }
 
 /**
- * Writes the postmortem for one scenario's run of the pipeline.
+ * Writes the postmortem for one scenario's run of the pipeline. Given the policy service's audit log, it adds
+ * the timeline of what happened to this run's proposals, and to no others.
  * @author Ignacio Rodriguez Caro <rnachoccontact@gmail.com>
  */
-export function writePostmortem(scenario: string, alert: Alert, result: Remediation): string {
+export function writePostmortem(scenario: string, alert: Alert, result: Remediation, audit?: AuditEntry[]): string {
   const { investigation, plan } = result;
   const diagnosis = investigation.diagnosis;
   const fired = new Date(alert.firedAt * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
@@ -68,6 +101,14 @@ export function writePostmortem(scenario: string, alert: Alert, result: Remediat
   }
   if (plan && plan.refused.length > 0) {
     lines.push("", "### Drafts the planner gate refused", "", ...plan.refused.map((r) => `- ${r.draft.action} on ${cell(r.draft.target)}: ${cell(r.reason)}`));
+  }
+  if (audit) {
+    const mine = new Set(result.proposalIds);
+    const entries = audit.filter((e) => mine.has(String(e.data.id ?? e.data.proposal ?? ""))).sort((a, b) => a.sequence - b.sequence);
+    lines.push("", "## Timeline", "", "From the policy service's audit log, for this run's proposals.", "");
+    lines.push(...(entries.length ? ["| Time | Step | What happened |", "| --- | --- | --- |",
+      ...entries.map((e) => `| ${e.at ? e.at.slice(11, 19) : "--:--:--"} | ${cell(e.kind)} | ${cell(describe(e))} |`)]
+      : ["The audit log holds nothing for this run's proposals."]));
   }
   lines.push("", "## Evidence", "", `${investigation.steps} steps, ${investigation.ledger.length} tool calls, ${investigation.tokens.inputTokens + investigation.tokens.outputTokens} tokens. Tool output is not repeated here; run the call again to see it.`, "",
     "| ID | Step | Tool | Arguments | Result | SHA-256 |", "| --- | --- | --- | --- | --- | --- |",
