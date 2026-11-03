@@ -53,3 +53,24 @@ test("decoy: says that no action was proposed", async () => {
 test("is deterministic", async () => {
   assert.equal(await postmortemOf("payments-latency"), await postmortemOf("payments-latency"));
 });
+
+test("with the audit log, the postmortem tells what the policy service did, for these proposals only", async () => {
+  const alert = JSON.parse(gunzipSync(readFileSync(join(ROOT, "chaos", "fixtures", "payments-latency", "alert.json.gz"))).toString());
+  const result = await remediate(ROOT, "payments-latency", join(mkdtempSync(join(tmpdir(), "pm-")), "proposals.jsonl"));
+  const id = result.proposalIds[0]!;
+  const audit = [
+    { sequence: 1, at: "2026-11-01T14:40:00Z", kind: "proposal", data: { id, action: "failover", target: "payments" } },
+    { sequence: 2, at: "2026-11-01T14:40:00Z", kind: "decision", data: { proposal: id, verdict: "NEEDS_APPROVAL", reasons: ["high risk, every check passed"] } },
+    { sequence: 3, at: "2026-11-01T14:41:10Z", kind: "approval", data: { proposal: id, by: "on-call" } },
+    { sequence: 4, at: "2026-11-01T14:41:12Z", kind: "approval", data: { proposal: "prop-someone-else", by: "x" } },
+    { sequence: 5, at: "2026-11-01T14:41:20Z", kind: "execution", data: { proposal: id, outcome: "ran", action: "failover", target: "payments" } },
+    { sequence: 6, at: "2026-11-01T14:42:40Z", kind: "verification", data: { proposal: id, outcome: "verified", poll: 1 } },
+  ];
+  const text = writePostmortem("payments-latency", alert, result, audit);
+  assert.match(text, /## Timeline/);
+  assert.match(text, /\| 14:40:00 \| decision \| needs approval: high risk, every check passed \|/);
+  assert.match(text, /\| 14:41:10 \| approval \| approved by on-call \|/);
+  assert.match(text, /\| 14:42:40 \| verification \| recovery verified \|/);
+  assert.doesNotMatch(text, /approved by x/);
+  assert.doesNotMatch(writePostmortem("payments-latency", alert, result), /## Timeline/);
+});
