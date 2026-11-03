@@ -160,7 +160,7 @@ Acceptance (brief): 40 scenarios, three baselines, graders, CI gate, generated r
    - cost per incident ("not measured" for model cost under ADR 16).
    Serve it from Compose behind a strict content security policy, with no tokens in local storage.
 2. **Notifications**: the policy service already posts escalations to `GUARDIA_ESCALATION_WEBHOOK_URL` (`WebhookEscalation.java`). Done: the stand-in `deploy/webhook-mock` stores and shows them at http://127.0.0.1:8091. Still to do: a stack test that makes a remediation fail on purpose and checks the message arrives.
-3. **Postmortem writer**: `agents/src/postmortem.ts` exists and is tested (alert, hypotheses, unknowns, actions, refused drafts, ledger). Still to do: add a timeline from the policy service's audit log (`GET /audit` exists and each entry carries its time). Then make it suggest runbook edits as a diff against `docs/runbooks/`, and write the result to `docs/incidents/` in the runbook format, so `mcp-runbooks` finds it. Scripted turns under ADR 16.
+3. **Postmortem writer**: `agents/src/postmortem.ts` exists and is tested (alert, hypotheses, unknowns, actions, refused drafts, ledger). The timeline from the policy service's audit log is done too (`--audit <file>`). Still to do: make it suggest runbook edits as a diff against `docs/runbooks/`, and write the result to `docs/incidents/` in the runbook format, so `mcp-runbooks` finds it. Scripted turns under ADR 16.
 
 ### 5.5 Phase 9: security pack, model matrix, cost report
 

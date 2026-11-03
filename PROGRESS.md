@@ -246,7 +246,9 @@ Done:
 
 - A live timeline under the approval queue, read from the audit log (`GET /audit`). Every entry now records the time it was written, inside its hash, so redating one breaks the chain; logs written before this still verify. `make e2e-remediation` checks the timeline tells the whole story in order, with times.
 
-Not done: in the postmortem, the audit timeline and runbook suggestions; the React console that brings the views together.
+- With the policy service's audit log (`--audit <file>` on the postmortem CLI, a saved `GET /audit` answer), the postmortem adds a timeline of what happened to the run's own proposals: decision, approvals, execution, verification. Entries for other proposals are left out, and only fixed fields are rendered.
+
+Not done: in the postmortem, runbook suggestions; the React console that brings the views together.
 
 ## Phase 9: Security pack, model matrix, cost report
 
