@@ -35,7 +35,7 @@ x-mercadillo-build: &mercadillo-build
 services:
   postgres:
     # 17, not 18: the Flyway that Spring Boot 3.5 manages supports PostgreSQL up to 17 (ADR 4).
-    image: postgres:17.11-alpine@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b
+    image: postgres:18.4-alpine@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?copy .env.example to .env}
       POSTGRES_USER: ${POSTGRES_USER:?copy .env.example to .env}
