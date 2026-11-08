@@ -289,7 +289,7 @@ services:
   otel-collector:
     # The image has no shell or HTTP client for a healthcheck. Services depend on it being started,
     # and their exporters retry until it accepts data.
-    image: otel/opentelemetry-collector-contrib:0.163.2@sha256:7f22d2a6748110ffb6a59bc0df448bccbf501cdb667d610ede4c61d3863d5849
+    image: otel/opentelemetry-collector-contrib:0.164.0-386@sha256:40392928d2b988b77e7525dbac33e5e3d9bedb40b9ff8c1f9119d92ca3a8a1c3
     command: ["--config=/etc/otelcol/config.yaml"]
     volumes:
       - ./deploy/observability/otel-collector.yaml:/etc/otelcol/config.yaml:ro
